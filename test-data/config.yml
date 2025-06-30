@@ -1,0 +1,8 @@
+bind: "0.0.0.0:8080"
+
+log-level: debug
+log-target: console
+
+data-path: data
+
+db-cnn: "sqlite://./data/app.db?mode=rwc"
