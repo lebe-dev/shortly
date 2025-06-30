@@ -1,6 +1,6 @@
 # Starter: Rust + Svelte
 
-!(project logo)[logo.png]
+![project logo](logo.png)
 
 1. Rename app name in `Cargo.toml`
 
