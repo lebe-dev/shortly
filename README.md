@@ -12,6 +12,11 @@
 docker build --progress=plain --platform=linux/amd64 -t myapp:1.0.0 .
 ```
 
+## Technical stack
+
+- Backend: Rust + axum + sqlite (sqlx)
+- Frontend: [Svelte 5](https://svelte.dev/docs/svelte/overview) + [tailwindcss](https://tailwindcss.com/docs/installation/tailwind-cli) + [shadcn](https://shadcn-svelte.com/docs/)
+
 ## Docs for LLMs
 
 Check `docs/LLM`.
