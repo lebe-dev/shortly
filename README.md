@@ -1,4 +1,4 @@
-# Starter: Rust + Svelte
+# Shortly
 
 ![project logo](logo.png)
 
@@ -9,7 +9,7 @@
 ## How to build
 
 ```bash
-docker build --progress=plain --platform=linux/amd64 -t myapp:1.0.0 .
+docker build --progress=plain --platform=linux/amd64 -t tinyops/shortly:0.1.0 .
 ```
 
 ## Technical stack
