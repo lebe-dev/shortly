@@ -3,5 +3,4 @@
 /frontend/build
 /*.db*
 /docs
-/.tw
 /*.md
