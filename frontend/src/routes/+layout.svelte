@@ -8,5 +8,5 @@
 
 <Toaster position="top-right" />
 
-<ModeWatcher />
+<ModeWatcher defaultMode="light" />
 {@render children()}
