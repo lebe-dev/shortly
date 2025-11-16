@@ -1,4 +1,4 @@
-FROM node:22.14.0-alpine3.21 AS frontend-build
+FROM node:24.11.1-alpine3.22 AS frontend-build
 
 WORKDIR /build
 
@@ -7,7 +7,7 @@ COPY frontend/ /build
 RUN yarn && \
     yarn build
 
-FROM rust:1.88.0-alpine3.21 AS app-build
+FROM rust:1.91.1-alpine3.22 AS app-build
 
 WORKDIR /build
 
@@ -27,7 +27,7 @@ RUN cargo test && \
     upx -9 --lzma target/release/server && \
     chmod +x target/release/server
 
-FROM alpine:3.22.0
+FROM alpine:3.22.2
 
 WORKDIR /app
 
@@ -39,7 +39,7 @@ RUN apk add libressl-dev && \
 COPY --from=app-build /build/config.yml-dist /app/config.yml
 COPY --from=app-build /build/target/release/server /app/server
 
-RUN chown -R harvester: /app && chmod +x /app/server
+RUN chown -R app: /app && chmod +x /app/server
 
 USER app
 
