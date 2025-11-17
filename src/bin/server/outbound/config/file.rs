@@ -38,6 +38,7 @@ mod tests {
         assert_eq!(config.bind, "0.0.0.0:8080");
         assert_eq!(config.log_level, "debug");
         assert_eq!(config.log_target, "console");
+        assert_eq!(config.base_url, "http://localhost:8080");
         assert_eq!(config.db_cnn, "sqlite://./data/app.db?mode=rwc");
         assert_eq!(config.short_url.ttl, 168);
         assert_eq!(config.scheduler.cleanup_expired_urls, "0 0 * * *");

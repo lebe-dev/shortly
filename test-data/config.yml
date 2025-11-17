@@ -5,8 +5,10 @@ log-target: console
 
 db-cnn: "sqlite://./data/app.db?mode=rwc"
 
+base-url: "http://localhost:8080"
+
 short-url:
   ttl: 168
 
 scheduler:
-  cleanup-expired-urls: '0 0 * * *'
+  cleanup-expired-urls: "0 0 * * *"

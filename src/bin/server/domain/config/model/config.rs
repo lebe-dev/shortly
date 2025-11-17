@@ -12,6 +12,8 @@ pub struct AppConfig {
 
     pub db_cnn: String,
 
+    pub base_url: String,
+
     pub short_url: ShortUrlConfig,
 
     pub scheduler: SchedulerConfig,

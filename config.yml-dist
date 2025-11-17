@@ -5,6 +5,8 @@ log-target: file
 
 db-cnn: "sqlite://./data/app.db?mode=rwc"
 
+base-url: 'https://shortly.company.com'
+
 short-url:
   # TTL in hours
   ttl: 168 # 7 days
