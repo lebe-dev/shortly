@@ -40,7 +40,7 @@ check-cve:
 
   image:
     name: aquasec/trivy:latest
-    entrypoint: [""]
+    #entrypoint: [""]
 
   before_script:
     - export IMAGE_TAG=$(cat version)
