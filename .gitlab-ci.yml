@@ -42,8 +42,10 @@ check-cve:
     name: aquasec/trivy:latest
     entrypoint: [""]
 
+  before_script:
+    - export IMAGE_TAG=$(cat version.txt)
+
   script:
-    - export IMAGE_TAG=$(cat version)
     - trivy image --disable-telemetry -s HIGH,CRITICAL --exit-code 1 $IMAGE_NAME:$IMAGE_TAG
 
 deploy-dev:
