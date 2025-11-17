@@ -5,6 +5,7 @@ stages:
 
 variables:
   IMAGE_NAME: tinyops/shortly
+  DOCKER_TLS_CERTDIR: ""
 
 build-image:
   stage: build
