@@ -15,14 +15,11 @@ use route::{config::get_app_config_route, version::get_version_route};
 use rust_embed::Embed;
 use server_lib::{
     VERSION,
-    domain::url::{
-        ports::{UrlRepository, UrlService},
-        service::UrlServiceImpl,
-    },
+    domain::url::{ports::UrlRepository, service::UrlServiceImpl},
     outbound::sqlite::init::Sqlite,
 };
 
-use crate::route::url::generate::generate_short_url_route;
+use crate::route::url::{generate::generate_short_url_route, get::get_short_url_by_id_route};
 
 pub mod domain;
 pub mod logger;
@@ -67,6 +64,7 @@ async fn main() -> anyhow::Result<()> {
                     let app = Router::new()
                         .route("/api/version", get(get_version_route))
                         .route("/api/config", get(get_app_config_route))
+                        .route("/api/url/{url_id}", get(get_short_url_by_id_route))
                         .route("/api/url", post(generate_short_url_route))
                         .fallback(static_handler)
                         //.layer(from_fn(auth_middleware))

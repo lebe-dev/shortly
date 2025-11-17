@@ -7,8 +7,7 @@ use log::error;
 use serde::{Deserialize, Serialize};
 use server_lib::domain::url::ports::UrlService;
 
-use crate::domain::config::model::dto::AppConfigDto;
-use crate::{AppState, SharedAppState};
+use crate::SharedAppState;
 
 #[derive(Deserialize, Clone, Debug)]
 pub struct RegisterUrlRequest {
@@ -17,7 +16,7 @@ pub struct RegisterUrlRequest {
 
 #[derive(Serialize, Clone, Debug)]
 pub struct RegisterUrlResponse {
-    url: String,
+    pub url: String,
 }
 
 pub async fn generate_short_url_route(
