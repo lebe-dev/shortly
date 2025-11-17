@@ -1,0 +1,9 @@
+services:
+  app:
+    container_name: shortly
+    image: tinyops/shortly:0.1.0
+    restart: always
+    volumes:
+      - ./config.yml:/app/config.yml
+    ports:
+      - "31100:8080"
