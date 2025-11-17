@@ -12,20 +12,20 @@ pub struct AppConfig {
 
     pub db_cnn: String,
 
-    pub short_url: ShortUrl,
+    pub short_url: ShortUrlConfig,
 
-    pub scheduler: Scheduler,
+    pub scheduler: SchedulerConfig,
 }
 
 #[derive(PartialEq, Deserialize, Clone, Debug)]
 #[serde(rename_all = "kebab-case")]
-pub struct ShortUrl {
+pub struct ShortUrlConfig {
     pub ttl: u32,
 }
 
 #[derive(PartialEq, Deserialize, Clone, Debug)]
 #[serde(rename_all = "kebab-case")]
-pub struct Scheduler {
+pub struct SchedulerConfig {
     pub cleanup_expired_urls: String,
 }
 
