@@ -46,8 +46,6 @@ check-cve:
     - export IMAGE_TAG=$(cat version)
 
   script:
-    - echo $PATH
-    - find / -name trivy
     - trivy image --disable-telemetry -s HIGH,CRITICAL --exit-code 1 $IMAGE_NAME:$IMAGE_TAG
 
 deploy-dev:
