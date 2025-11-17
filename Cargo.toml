@@ -23,6 +23,9 @@ thiserror = { version = "2.0.17" }
 
 config = { version = "0.15.19", features = ["yaml"] }
 
+rand = "0.8.5"
+base62 = "2.2.3"
+
 axum = { version = "0.8.7", features = ["json", "http1", "tokio"] }
 axum-extra = { version = "0.12.2", features = ["cookie"] }
 time = { version = "0.3.44" }

@@ -25,13 +25,12 @@ impl Sqlite {
 
         sqlx::query(
             r#"
-            CREATE TABLE IF NOT EXISTS entities (
-            path varchar,
-            filename varchar,
-            size integer,
-            optimized integer,
-            optimization_date integer,
-            UNIQUE(path)
+            CREATE TABLE IF NOT EXISTS urls (
+            id varchar,
+            original_url text,
+            ttl integer,
+            created integer,
+            UNIQUE(id)
             );"#,
         )
         .execute(&pool)

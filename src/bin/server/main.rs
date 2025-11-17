@@ -18,9 +18,6 @@ pub mod logger;
 pub mod outbound;
 pub mod route;
 
-#[cfg(test)]
-pub mod tests;
-
 #[derive(Clone)]
 pub struct AppState {
     pub config: AppConfig,

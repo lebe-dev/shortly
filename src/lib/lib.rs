@@ -1,4 +1,5 @@
 pub mod domain;
+pub mod outbound;
 
 #[cfg(test)]
 pub mod tests;
