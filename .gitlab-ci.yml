@@ -11,10 +11,10 @@ build-image:
 
   when: manual
 
-  image: docker:28.4
+  image: docker:29.0.1
 
   services:
-    - docker:28.4-dind-rootless
+    - docker:29.0.1-dind-alpine3.22
 
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
