@@ -1,34 +1,50 @@
 stages:
   - build
+  - security
   - deploy
+
+variables:
+  IMAGE_NAME: tinyops/shortly
 
 build-image:
   stage: build
 
   when: manual
 
-  image: docker:20.10.16
+  image: docker:28.4
+
   services:
-    - docker:28.1.1-dind-rootless
+    - docker:28.4-dind-rootless
+
   before_script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
 
   script:
     - APP_VERSION=`cat Cargo.toml | grep "version = " | head -1 | cut -d "=" -f2 | tr -d '"' | tr -d ' '`
     - "echo $APP_VERSION > version"
-    - DOCKER_IMAGE=$CI_REGISTRY_IMAGE:$APP_VERSION
-    - docker build --progress=plain -t $DOCKER_IMAGE .
+    - DOCKER_IMAGE=$IMAGE_NAME:$APP_VERSION
+    - docker build --progress=plain --platform=linux/amd64 -t $DOCKER_IMAGE .
     - docker push $DOCKER_IMAGE
-    - DOCKER_DEV_IMAGE=$CI_REGISTRY_IMAGE:dev
-    - docker tag $DOCKER_IMAGE $DOCKER_DEV_IMAGE
-    - docker push $DOCKER_DEV_IMAGE
 
   artifacts:
     paths:
       - version
 
-  tags:
-    - rust
+check-cve:
+  stage: security
+
+  allow_failure: false
+
+  needs:
+    - build-image
+
+  image:
+    name: aquasec/trivy:latest
+    entrypoint: [""]
+
+  script:
+    - export IMAGE_TAG=$(cat version)
+    - trivy image --disable-telemetry -s HIGH,CRITICAL --exit-code 1 $IMAGE_NAME:$IMAGE_TAG
 
 deploy-dev:
   stage: deploy
@@ -36,11 +52,11 @@ deploy-dev:
   needs:
     - build-image
 
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-
   script:
-    - cd /opt/myapp
+    - APP_VERSION=`cat Cargo.toml | grep "version = " | head -1 | cut -d "=" -f2 | tr -d '"' | tr -d ' '`
+    - echo "Deploying version $APP_VERSION"
+    - yq eval ".services.app.image = \"$IMAGE_NAME:$APP_VERSION\"" -i /opt/shortly/docker-compose.yml
+    - cd /opt/shortly
     - docker compose down
     - docker compose pull
     - docker compose up -d
