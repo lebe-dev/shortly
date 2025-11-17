@@ -61,7 +61,7 @@ deploy-dev:
 
   script:
     - echo "Deploying version $APP_VERSION"
-    - yq -i '.services.app.image = "'$IMAGE_NAME':'$IMAGE_TAG'"' /opt/shortly/docker-compose.yml
+    - yq -yi '.services.app.image = "'$IMAGE_NAME':'$IMAGE_TAG'"' /opt/shortly/docker-compose.yml
     - cd /opt/shortly
     - docker compose down
     - docker compose pull
