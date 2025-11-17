@@ -19,7 +19,7 @@ build-image:
       alias: docker
 
   before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN
 
   script:
     - APP_VERSION=`cat Cargo.toml | grep "version = " | head -1 | cut -d "=" -f2 | tr -d '"' | tr -d ' '`
