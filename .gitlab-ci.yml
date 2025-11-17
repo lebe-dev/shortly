@@ -43,7 +43,7 @@ check-cve:
     entrypoint: [""]
 
   before_script:
-    - export IMAGE_TAG=$(cat version.txt)
+    - export IMAGE_TAG=$(cat version)
 
   script:
     - trivy image --disable-telemetry -s HIGH,CRITICAL --exit-code 1 $IMAGE_NAME:$IMAGE_TAG
@@ -54,10 +54,12 @@ deploy-dev:
   needs:
     - build-image
 
+  before_script:
+    - export IMAGE_TAG=$(cat version)
+
   script:
-    - APP_VERSION=`cat Cargo.toml | grep "version = " | head -1 | cut -d "=" -f2 | tr -d '"' | tr -d ' '`
     - echo "Deploying version $APP_VERSION"
-    - yq eval ".services.app.image = \"$IMAGE_NAME:$APP_VERSION\"" -i /opt/shortly/docker-compose.yml
+    - yq eval ".services.app.image = \"$IMAGE_NAME:$IMAGE_TAG\"" -i /opt/shortly/docker-compose.yml
     - cd /opt/shortly
     - docker compose down
     - docker compose pull
