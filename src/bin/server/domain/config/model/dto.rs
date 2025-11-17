@@ -9,8 +9,6 @@ pub struct AppConfigDto {
 
     pub log_level: String,
     pub log_target: String,
-
-    pub data_path: String,
 }
 
 impl From<AppConfig> for AppConfigDto {
@@ -19,7 +17,6 @@ impl From<AppConfig> for AppConfigDto {
             bind: config.bind,
             log_level: config.log_level,
             log_target: config.log_target,
-            data_path: config.data_path,
         }
     }
 }

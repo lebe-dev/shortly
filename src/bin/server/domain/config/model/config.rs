@@ -10,8 +10,6 @@ pub struct AppConfig {
     pub log_level: String,
     pub log_target: String,
 
-    pub data_path: String,
-
     pub db_cnn: String,
 }
 
