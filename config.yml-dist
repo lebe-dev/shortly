@@ -4,3 +4,11 @@ log-level: info
 log-target: file
 
 db-cnn: "sqlite://./data/app.db?mode=rwc"
+
+short-url:
+  # TTL in hours
+  ttl: 168 # 7 days
+
+scheduler:
+  # Cleanup expired URLs every day at midnight
+  cleanup-expired-urls: '0 0 * * *'

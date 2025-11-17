@@ -19,3 +19,27 @@ impl AppConfigService for AppConfigServiceImpl {
         Ok(app_config)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+
+    #[test]
+    fn test_load_config_success() {
+        let service = AppConfigServiceImpl;
+        let config_path = PathBuf::from("test-data/config.yml");
+
+        let result = service.load_from_file(&config_path);
+
+        assert!(result.is_ok(), "Config loading should succeed");
+
+        let config = result.unwrap();
+        assert_eq!(config.bind, "0.0.0.0:8080");
+        assert_eq!(config.log_level, "debug");
+        assert_eq!(config.log_target, "console");
+        assert_eq!(config.db_cnn, "sqlite://./data/app.db?mode=rwc");
+        assert_eq!(config.short_url.ttl, 168);
+        assert_eq!(config.scheduler.cleanup_expired_urls, "0 0 * * *");
+    }
+}
