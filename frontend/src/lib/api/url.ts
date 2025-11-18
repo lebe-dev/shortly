@@ -1,3 +1,5 @@
+import { HttpError } from './error';
+
 export class RegisterUrlRequest {
 	constructor(url: string) {
 		this.url = url;
@@ -21,8 +23,14 @@ export async function fetchUrlById(urlId: string): Promise<RegisterUrlResponse> 
 
 	if (response.status === 200) {
 		return response.json();
+	} else if (response.status === 400) {
+		throw new HttpError(response.status, 'Not found');
+	} else if (response.status !== 0) {
+		throw new HttpError(response.status, response.statusText);
+	} else if (response.status == 0) {
+		throw new HttpError(response.status, 'Network error');
 	} else {
-		throw new Error('config load error');
+		throw new Error('fetch error');
 	}
 }
 
