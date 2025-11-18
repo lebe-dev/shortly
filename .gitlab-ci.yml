@@ -14,6 +14,11 @@ build-image:
 
   image: docker:29.0.1
 
+  cache:
+    paths:
+      - frontend/npm_modules/
+      - target/
+
   services:
     - name: docker:29.0.1-dind-alpine3.22
       alias: docker
