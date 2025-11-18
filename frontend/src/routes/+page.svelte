@@ -29,6 +29,11 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Create short url :: SHRTLY</title>
+	<meta name="description" content="Create convenient short url from long one" />
+</svelte:head>
+
 <div class="border-secondary w-full max-w-3xl rounded border-3 px-24 py-10 text-center">
 	{#if shortUrl === ''}
 		<div class="mb-1 text-left">Paste long URL here</div>

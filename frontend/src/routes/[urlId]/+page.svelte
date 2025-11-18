@@ -32,6 +32,11 @@
 	});
 </script>
 
+<svelte:head>
+	<title>URL page</title>
+	<meta name="description" content="Page with original URL" />
+</svelte:head>
+
 <div class="border-secondary w-full max-w-3xl rounded border-3 px-24 py-10 text-left">
 	{#if inProgress}
 		<div>Loading...</div>
