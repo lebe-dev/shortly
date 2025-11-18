@@ -4,6 +4,8 @@ services:
     image: tinyops/shortly:0.1.0
     restart: always
     volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
       - ./config.yml:/app/config.yml
     ports:
       - "31100:8080"
