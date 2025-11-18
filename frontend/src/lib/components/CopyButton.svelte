@@ -15,7 +15,7 @@
 </script>
 
 <div use:copy={data}>
-	<Button size="sm" class="h-8" onclick={toggle} disabled={flag}>
+	<Button size="sm" class="h-8 hover:cursor-pointer" onclick={toggle} disabled={flag}>
 		<div class="flex items-center">
 			{#if flag}
 				<svg
