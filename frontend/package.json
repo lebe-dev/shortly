@@ -43,6 +43,7 @@
 		"vite": "^6.2.6"
 	},
 	"dependencies": {
-		"mode-watcher": "^1.1.0"
+		"mode-watcher": "^1.1.0",
+		"svelte-copy": "^2.0.0"
 	}
 }

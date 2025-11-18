@@ -1766,6 +1766,11 @@ svelte-check@^4.0.0:
     picocolors "^1.0.0"
     sade "^1.7.4"
 
+svelte-copy@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/svelte-copy/-/svelte-copy-2.0.0.tgz#69aefac533dd0266cea13794d133f55fd68ee91f"
+  integrity sha512-wJ784qrc9CF7EtrlT2kwJfHnqae/pp4fkgzYeUxex4iFBm6HosT2904t5cZZ1GAZzg/z9V+lCZVP5rpiYsN6Tw==
+
 svelte-eslint-parser@^1.4.0:
   version "1.4.0"
   resolved "https://registry.yarnpkg.com/svelte-eslint-parser/-/svelte-eslint-parser-1.4.0.tgz#bcb6bf3cf0812313c4230cebfad3c6588abaa71f"
