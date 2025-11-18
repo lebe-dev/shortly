@@ -16,7 +16,7 @@ build-image:
 
   cache:
     paths:
-      - frontend/npm_modules/
+      - frontend/node_modules/
       - target/
 
   services:
