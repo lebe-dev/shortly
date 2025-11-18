@@ -19,13 +19,15 @@
 	});
 </script>
 
-{#if inProgress}
-	<div>Loading...</div>
-{:else}
-	<div class="justify-start text-left">
-		<div>Full URL:</div>
-		<div class="mb-4 text-3xl">{url}</div>
+<div class="border-secondary w-full max-w-3xl rounded border-3 px-24 py-10 text-center">
+	{#if inProgress}
+		<div>Loading...</div>
+	{:else}
+		<div class="justify-start text-left">
+			<div>Full URL:</div>
+			<div class="mb-4 text-3xl wrap-break-word">{url}</div>
 
-		<CopyButton data={url} label="Copy URL" />
-	</div>
-{/if}
+			<CopyButton data={url} label="Copy URL" />
+		</div>
+	{/if}
+</div>
