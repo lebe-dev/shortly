@@ -4,6 +4,8 @@
 	import { ModeWatcher } from 'mode-watcher';
 
 	let { children } = $props();
+
+	let showFullAppName: boolean = $state(false);
 </script>
 
 <Toaster position="top-right" />
@@ -14,8 +16,51 @@
 	<!-- Header -->
 	<div class="bg-blue-800">
 		<div class="mx-auto flex max-w-7xl items-center gap-5 px-62">
-			<div class="bg-blue-700 ps-3 pe-4 pt-3 pb-3 text-sm text-gray-300">SHORTLY</div>
-			<div class="text-secondary flex items-center gap-5 text-sm">
+			<a href="/" title="Go to main page">
+				<div
+					class="block w-32 bg-blue-700 ps-3 pe-4 pt-3 pb-3 text-sm font-medium text-gray-300"
+					onmouseenter={() => (showFullAppName = true)}
+					onmouseleave={() => (showFullAppName = false)}
+				>
+					<div class="flex items-center">
+						{#if showFullAppName}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="15"
+								height="15"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="lucide lucide-tally4-icon lucide-tally-4 me-0.5 inline-block"
+								><path d="M4 4v16" /><path d="M9 4v16" /><path d="M14 4v16" /><path
+									d="M19 4v16"
+								/></svg
+							>
+
+							SHORTLY
+						{:else}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="15"
+								height="15"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								class="lucide lucide-tally3-icon lucide-tally-3 me-0.5 inline-block"
+								><path d="M4 4v16" /><path d="M9 4v16" /><path d="M14 4v16" /></svg
+							> SHRTLY
+						{/if}
+					</div>
+				</div>
+			</a>
+
+			<div class="text-secondary flex items-center gap-5 text-xs">
 				<div>ITEM1</div>
 				<div>ITEM2</div>
 				<div>ITEM3</div>
