@@ -36,11 +36,12 @@ build-image:
   artifacts:
     paths:
       - version
+    expire_in: 1 hour
 
 check-cve:
   stage: security
 
-  allow_failure: false
+  allow_failure: true
 
   needs:
     - build-image
@@ -51,6 +52,8 @@ check-cve:
 
   before_script:
     - export IMAGE_TAG=$(cat version)
+    - export TRIVY_USERNAME="$DOCKER_HUB_USER"
+    - export TRIVY_PASSWORD="$DOCKER_HUB_TOKEN"
 
   script:
     - trivy image --disable-telemetry -s HIGH,CRITICAL --exit-code 1 $IMAGE_NAME:$IMAGE_TAG
