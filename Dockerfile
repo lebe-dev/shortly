@@ -5,6 +5,7 @@ WORKDIR /build
 COPY frontend/ /build
 
 RUN yarn && \
+    yarn test run && \
     yarn build
 
 FROM rust:1.91.1-alpine3.22 AS app-build

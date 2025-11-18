@@ -3,7 +3,9 @@
 	import CopyButton from '$lib/components/CopyButton.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
+	import { isUrlValid } from '$lib/validator';
 	import { onMount, tick } from 'svelte';
+	import { toast } from 'svelte-sonner';
 
 	let urlInputRef: HTMLInputElement | null = $state(null);
 
@@ -18,14 +20,21 @@
 	});
 
 	async function generateUrl() {
-		await generateShortUrl(url)
-			.then((data) => {
-				shortUrl = data.url;
-				console.log('short url:', shortUrl);
-			})
-			.catch((e) => {
-				console.error(e);
-			});
+		if (isUrlValid(url)) {
+			await generateShortUrl(url)
+				.then((data) => {
+					shortUrl = data.url;
+					console.log('short url:', shortUrl);
+				})
+				.catch((e) => {
+					console.error(e);
+				});
+		} else {
+			toast.error('Invalid URL');
+			if (urlInputRef) {
+				urlInputRef.focus();
+			}
+		}
 	}
 </script>
 
