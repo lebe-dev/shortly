@@ -3,7 +3,6 @@
 	import { fetchUrlById } from '$lib/api/url';
 	import CopyButton from '$lib/components/CopyButton.svelte';
 	import { formatRemainingTime } from '$lib/date';
-	import { toast } from 'svelte-sonner';
 	import { onMount } from 'svelte';
 
 	let { data } = $props();
