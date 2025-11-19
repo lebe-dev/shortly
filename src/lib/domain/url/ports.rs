@@ -18,10 +18,13 @@ pub trait UrlService: Clone + Send + Sync + 'static {
         &self,
         id: &str,
     ) -> impl Future<Output = Result<Option<Url>, FindUrlError>> + Send;
+
+    fn cleanup_expired_urls(&self) -> impl Future<Output = Result<(), FindUrlError>> + Send;
 }
 
 pub trait UrlRepository: Send + Sync + Clone + 'static {
     fn save(&self, url: &Url) -> impl Future<Output = Result<(), sqlx::Error>> + Send;
     fn find_by_id(&self, id: &str)
     -> impl Future<Output = Result<Option<Url>, sqlx::Error>> + Send;
+    fn delete_expired(&self) -> impl Future<Output = Result<(), sqlx::Error>> + Send;
 }

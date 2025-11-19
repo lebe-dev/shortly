@@ -21,6 +21,8 @@ pub enum ShortUrlGenerationError {
     Unknown(#[from] anyhow::Error),
 }
 
+pub type CleanupExpiredUrlsError = FindUrlError;
+
 #[derive(Debug, Error)]
 pub enum FindUrlError {
     #[error(transparent)]

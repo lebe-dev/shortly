@@ -15,9 +15,13 @@ use route::{config::get_app_config_route, version::get_version_route};
 use rust_embed::Embed;
 use server_lib::{
     VERSION,
-    domain::url::{ports::UrlRepository, service::UrlServiceImpl},
+    domain::url::{
+        ports::{UrlRepository, UrlService},
+        service::UrlServiceImpl,
+    },
     outbound::sqlite::init::Sqlite,
 };
+use tokio_cron_scheduler::{Job, JobScheduler};
 
 use crate::route::url::{generate::generate_short_url_route, get::get_short_url_by_id_route};
 
@@ -60,6 +64,33 @@ async fn main() -> anyhow::Result<()> {
                         config: app_config.clone(),
                         url_service: url_service.clone(),
                     };
+
+                    // SCHEDULER - START
+
+                    let sched = JobScheduler::new()
+                        .await
+                        .expect("scheduler initialization error");
+
+                    let service = url_service.clone();
+
+                    sched
+                        .add(
+                            Job::new_async(
+                                app_config.scheduler.cleanup_expired_urls.clone().as_str(),
+                                move |_, _| {
+                                    let service = service.clone();
+
+                                    Box::pin(async move {
+                                        let _ = service.cleanup_expired_urls().await;
+                                    })
+                                },
+                            )
+                            .expect("unable to create cronjob for sync container images"),
+                        )
+                        .await
+                        .expect("unable to add sync container images cronjob to scheduler");
+
+                    // SCHEDULER - END
 
                     let app = Router::new()
                         .route("/api/version", get(get_version_route))

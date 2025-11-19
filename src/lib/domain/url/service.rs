@@ -2,7 +2,10 @@ use log::{error, info};
 use rand::Rng;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-use crate::domain::url::ports::{UrlRepository, UrlService};
+use crate::domain::url::{
+    model::CleanupExpiredUrlsError,
+    ports::{UrlRepository, UrlService},
+};
 
 const MAX_RETRIES: usize = 100;
 
@@ -122,6 +125,14 @@ where
 
     async fn generate_short_url(&self, url: &super::model::Url) -> String {
         format!("{}/{}", self.base_url, url.id)
+    }
+
+    async fn cleanup_expired_urls(&self) -> Result<(), CleanupExpiredUrlsError> {
+        self.repo.delete_expired().await?;
+
+        info!("all expired urls have been removed");
+
+        Ok(())
     }
 }
 
