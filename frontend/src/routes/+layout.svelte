@@ -2,6 +2,7 @@
 	import '../app.css';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import { ModeWatcher } from 'mode-watcher';
+	import LightSwitch from '$lib/components/LightSwitch.svelte';
 
 	let { children } = $props();
 
@@ -10,15 +11,15 @@
 
 <Toaster position="top-right" />
 
-<ModeWatcher defaultMode="light" />
+<ModeWatcher />
 
 <div class="flex min-h-screen flex-col">
 	<!-- Header -->
-	<div class="bg-blue-800">
-		<div class="mx-auto flex max-w-7xl items-center gap-5 px-62">
+	<div class="bg-blue-800 dark:bg-black">
+		<div class="mx-auto flex max-w-7xl items-center justify-between gap-5 px-62">
 			<a href="/" title="Go to main page">
 				<div
-					class="block w-32 bg-blue-700 ps-3 pe-4 pt-3 pb-3 text-sm font-medium text-gray-300"
+					class="block w-32 bg-blue-700 ps-3 pe-4 pt-3 pb-3 text-sm font-medium text-gray-300 dark:bg-blue-700"
 					onmouseenter={() => (showFullAppName = true)}
 					onmouseleave={() => (showFullAppName = false)}
 				>
@@ -60,21 +61,27 @@
 				</div>
 			</a>
 
-			<div class="text-secondary flex items-center gap-5 text-xs">
+			<div class="text-secondary flex items-center gap-5 text-left text-xs dark:text-gray-500">
 				<!-- <div class="border-b-2">URL</div>
 				<div class="border-b-2 border-transparent text-gray-500">QRCODE</div> -->
 				Generate short URL
+			</div>
+
+			<div class="me-3 text-right">
+				<LightSwitch />
 			</div>
 		</div>
 	</div>
 
 	<!-- Main Content -->
-	<div class="flex flex-1 items-start justify-center bg-white pt-10">
+	<div class="flex flex-1 items-start justify-center">
 		{@render children()}
 	</div>
 
 	<!-- Footer -->
-	<div class="flex items-center justify-center bg-gray-50 p-2 text-center text-xs text-gray-500">
+	<div
+		class="flex items-center justify-center bg-gray-50 p-2 text-center text-xs text-gray-500 dark:bg-gray-900 dark:text-gray-400"
+	>
 		<span class="">v0.1.0</span> <span class="ms-1.5 me-1.5">|</span>
 		<span class="">TINYOPS</span>
 	</div>

@@ -50,7 +50,9 @@
 	--sidebar-ring: oklch(0.623 0.214 259.815);
 
 	background-color: #ffffff;
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4' viewBox='0 0 4 4'%3E%3Cpath fill='%237e7e7e' fill-opacity='0.4' d='M1 3h1v1H1V3zm2-2h1v1H3V1z'%3E%3C/path%3E%3C/svg%3E");
+	opacity: 0.9;
+	background-image: radial-gradient(#363636 0.5px, #ffffff 0.5px);
+	background-size: 10px 10px;
 }
 
 .dark {
@@ -85,6 +87,11 @@
 	--sidebar-accent-foreground: oklch(0.985 0 0);
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.488 0.243 264.376);
+
+	background-color: #0b0b0b;
+	opacity: 0.9;
+	background-image: radial-gradient(#6b6b6b 0.5px, #0b0b0b 0.5px);
+	background-size: 10px 10px;
 }
 
 @theme inline {
@@ -123,6 +130,10 @@
 	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
 	--color-sidebar-border: var(--sidebar-border);
 	--color-sidebar-ring: var(--sidebar-ring);
+}
+
+.bg-dark-gray {
+	background-color: #121111;
 }
 
 @layer base {

@@ -43,7 +43,9 @@
 	<meta name="description" content="Page with original URL" />
 </svelte:head>
 
-<div class="border-secondary w-full max-w-3xl rounded border-3 px-24 py-10 text-left">
+<div
+	class="border-secondary w-full max-w-3xl rounded border-3 px-24 py-10 text-left dark:border-gray-600"
+>
 	{#if inProgress}
 		<div>Loading...</div>
 	{:else if notFound}
