@@ -5,6 +5,8 @@ use crate::domain::url::model::FindUrlError;
 use super::model::{ShortUrlGenerationError, Url};
 
 pub trait UrlService: Clone + Send + Sync + 'static {
+    fn is_url_valid(&self, url: &str) -> impl Future<Output = bool> + Send;
+
     fn register_url(
         &self,
         url: &str,

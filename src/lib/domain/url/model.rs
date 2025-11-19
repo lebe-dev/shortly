@@ -13,6 +13,8 @@ pub struct Url {
 
 #[derive(Debug, Error)]
 pub enum ShortUrlGenerationError {
+    #[error("Invalid original URL")]
+    InvalidOriginalUrl,
     #[error(transparent)]
     DatabaseError(#[from] sqlx::Error),
     #[error(transparent)]

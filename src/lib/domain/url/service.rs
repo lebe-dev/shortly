@@ -33,11 +33,23 @@ impl<R> UrlService for UrlServiceImpl<R>
 where
     R: UrlRepository,
 {
+    async fn is_url_valid(&self, url: &str) -> bool {
+        if url.trim().is_empty() {
+            return false;
+        }
+
+        url::Url::parse(url).is_ok()
+    }
+
     async fn register_url(
         &self,
         url: &str,
     ) -> Result<super::model::Url, super::model::ShortUrlGenerationError> {
         info!("registering url '{}'..", url);
+
+        if !self.is_url_valid(url).await {
+            return Err(super::model::ShortUrlGenerationError::InvalidOriginalUrl);
+        }
 
         for attempt in 0..MAX_RETRIES {
             let random_number: u64 = rand::thread_rng().gen_range(100_000..1_000_000);
@@ -182,5 +194,151 @@ mod tests {
             format!("http://localhost:8080/{}", registered_url.id)
         );
         assert!(short_url.starts_with("http://localhost:8080/"));
+    }
+
+    // Tests for is_url_valid
+
+    #[tokio::test]
+    async fn test_is_url_valid_with_http() {
+        let db = get_in_memory_db().await;
+        let service = UrlServiceImpl::new("http://localhost:8080", 3600, db);
+
+        assert!(service.is_url_valid("http://example.com").await);
+        assert!(service.is_url_valid("http://example.com/path").await);
+        assert!(
+            service
+                .is_url_valid("http://example.com:8080/path?query=value")
+                .await
+        );
+    }
+
+    #[tokio::test]
+    async fn test_is_url_valid_with_https() {
+        let db = get_in_memory_db().await;
+        let service = UrlServiceImpl::new("http://localhost:8080", 3600, db);
+
+        assert!(service.is_url_valid("https://example.com").await);
+        assert!(
+            service
+                .is_url_valid("https://www.example.com/path/to/resource")
+                .await
+        );
+        assert!(
+            service
+                .is_url_valid("https://subdomain.example.com:443/")
+                .await
+        );
+    }
+
+    #[tokio::test]
+    async fn test_is_url_valid_with_various_schemes() {
+        let db = get_in_memory_db().await;
+        let service = UrlServiceImpl::new("http://localhost:8080", 3600, db);
+
+        // FTP
+        assert!(service.is_url_valid("ftp://ftp.example.com/file.txt").await);
+
+        // WebSocket
+        assert!(service.is_url_valid("ws://websocket.example.com").await);
+        assert!(
+            service
+                .is_url_valid("wss://secure.websocket.example.com")
+                .await
+        );
+
+        // File
+        assert!(service.is_url_valid("file:///path/to/file.txt").await);
+
+        // Mailto
+        assert!(service.is_url_valid("mailto:test@example.com").await);
+
+        // Custom schemes
+        assert!(service.is_url_valid("custom://example.com/resource").await);
+    }
+
+    #[tokio::test]
+    async fn test_is_url_valid_empty_string() {
+        let db = get_in_memory_db().await;
+        let service = UrlServiceImpl::new("http://localhost:8080", 3600, db);
+
+        assert!(!service.is_url_valid("").await);
+    }
+
+    #[tokio::test]
+    async fn test_is_url_valid_whitespace_only() {
+        let db = get_in_memory_db().await;
+        let service = UrlServiceImpl::new("http://localhost:8080", 3600, db);
+
+        assert!(!service.is_url_valid("   ").await);
+        assert!(!service.is_url_valid("\t").await);
+        assert!(!service.is_url_valid("\n").await);
+    }
+
+    #[tokio::test]
+    async fn test_is_url_valid_missing_scheme() {
+        let db = get_in_memory_db().await;
+        let service = UrlServiceImpl::new("http://localhost:8080", 3600, db);
+
+        assert!(!service.is_url_valid("example.com").await);
+        assert!(!service.is_url_valid("www.example.com").await);
+        assert!(!service.is_url_valid("example.com/path").await);
+    }
+
+    #[tokio::test]
+    async fn test_is_url_valid_relative_paths() {
+        let db = get_in_memory_db().await;
+        let service = UrlServiceImpl::new("http://localhost:8080", 3600, db);
+
+        assert!(!service.is_url_valid("/path/to/resource").await);
+        assert!(!service.is_url_valid("../relative/path").await);
+        assert!(!service.is_url_valid("./current/path").await);
+    }
+
+    #[tokio::test]
+    async fn test_is_url_valid_invalid_format() {
+        let db = get_in_memory_db().await;
+        let service = UrlServiceImpl::new("http://localhost:8080", 3600, db);
+
+        assert!(!service.is_url_valid("not a url at all").await);
+        assert!(!service.is_url_valid("http://").await);
+        assert!(!service.is_url_valid("://missing-scheme").await);
+        assert!(!service.is_url_valid("ht!tp://invalid-scheme.com").await);
+    }
+
+    #[tokio::test]
+    async fn test_is_url_valid_with_special_characters() {
+        let db = get_in_memory_db().await;
+        let service = UrlServiceImpl::new("http://localhost:8080", 3600, db);
+
+        // Valid URLs with encoded characters
+        assert!(
+            service
+                .is_url_valid("https://example.com/path%20with%20spaces")
+                .await
+        );
+        assert!(
+            service
+                .is_url_valid("https://example.com/search?q=hello+world")
+                .await
+        );
+        assert!(service.is_url_valid("https://user:pass@example.com/").await);
+
+        // Fragment identifiers
+        assert!(
+            service
+                .is_url_valid("https://example.com/page#section")
+                .await
+        );
+    }
+
+    #[tokio::test]
+    async fn test_is_url_valid_with_ip_addresses() {
+        let db = get_in_memory_db().await;
+        let service = UrlServiceImpl::new("http://localhost:8080", 3600, db);
+
+        assert!(service.is_url_valid("http://192.168.1.1").await);
+        assert!(service.is_url_valid("http://127.0.0.1:8080/path").await);
+        assert!(service.is_url_valid("http://[::1]/ipv6").await);
+        assert!(service.is_url_valid("http://[2001:db8::1]:8080/").await);
     }
 }

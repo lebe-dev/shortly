@@ -25,6 +25,7 @@ config = { version = "0.15.19", features = ["yaml"] }
 
 rand = "0.8.5"
 base62 = "2.2.3"
+url = "2.5.7"
 
 axum = { version = "0.8.7", features = ["json", "http1", "tokio"] }
 axum-extra = { version = "0.12.2", features = ["cookie"] }
