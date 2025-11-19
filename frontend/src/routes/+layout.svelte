@@ -61,9 +61,9 @@
 			</a>
 
 			<div class="text-secondary flex items-center gap-5 text-xs">
-				<div>ITEM1</div>
-				<div>ITEM2</div>
-				<div>ITEM3</div>
+				<!-- <div class="border-b-2">URL</div>
+				<div class="border-b-2 border-transparent text-gray-500">QRCODE</div> -->
+				Generate short URL
 			</div>
 		</div>
 	</div>
@@ -76,8 +76,6 @@
 	<!-- Footer -->
 	<div class="flex items-center justify-center bg-gray-50 p-2 text-center text-xs text-gray-500">
 		<span class="">v0.1.0</span> <span class="ms-1.5 me-1.5">|</span>
-		<span class="">FAQ</span>
-		<span class="ms-1.5 me-1.5">|</span>
-		<span class="">GITHUB</span>
+		<span class="">TINYOPS</span>
 	</div>
 </div>

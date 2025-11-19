@@ -9,6 +9,8 @@
 	import { onMount, tick } from 'svelte';
 	import { toast } from 'svelte-sonner';
 
+	let inProgress = $state(true);
+
 	let urlInputRef: HTMLInputElement | null = $state(null);
 
 	let url: string = $state('');
@@ -21,10 +23,12 @@
 		await fetchConfig()
 			.then((data) => {
 				shortUrlTtl = data.shortUrlTtl;
+				inProgress = false;
 			})
 			.catch((e) => {
 				console.error(e);
 				toast.error('Unable to load app config');
+				inProgress = false;
 			});
 
 		await tick();
@@ -35,13 +39,16 @@
 
 	async function generateUrl() {
 		if (isUrlValid(url)) {
+			inProgress = true;
 			await generateShortUrl(url)
 				.then((data) => {
 					shortUrl = data.url;
 					console.log('short url:', shortUrl);
+					inProgress = false;
 				})
 				.catch((e) => {
 					console.error(e);
+					inProgress = false;
 				});
 		} else {
 			toast.error('Invalid URL');
@@ -64,6 +71,7 @@
 			bind:ref={urlInputRef}
 			type="text"
 			bind:value={url}
+			disabled={inProgress}
 			placeholder="https://my.super-long-url.com/article/12345"
 			class="mb-2 inline-block text-2xl font-medium"
 		/>
@@ -71,7 +79,7 @@
 			<div class="text-muted-foreground mb-3 text-sm">Links will be stored for {ttlFormatted}</div>
 		{/if}
 		<div class="flex items-center justify-center gap-3">
-			<Button size="lg" onclick={generateUrl}>GENERATE</Button>
+			<Button size="lg" disabled={inProgress} onclick={generateUrl}>GENERATE</Button>
 		</div>
 	{:else}
 		<div>
