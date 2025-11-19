@@ -21,7 +21,8 @@ RUN mkdir -p /build/static && \
 COPY . /build
 COPY --from=frontend-build /build/build/ /build/static/
 
-RUN cargo test && \
+RUN cargo test --lib && \
+    cargo test --bin server && \
     cargo build --bin server --release && \
     eu-elfcompress target/release/server && \
     strip target/release/server && \
@@ -38,10 +39,10 @@ RUN apk add libressl-dev && \
     chown -R app: /app
 
 COPY --from=app-build /build/config.yml-dist /app/config.yml
-COPY --from=app-build /build/target/release/server /app/server
+COPY --from=app-build /build/target/release/server /app/shortly
 
-RUN chown -R app: /app && chmod +x /app/server
+RUN chown -R app: /app && chmod +x /app/shortly
 
 USER app
 
-CMD ["/app/server"]
+CMD ["/app/shortly"]
