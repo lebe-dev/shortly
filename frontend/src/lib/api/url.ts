@@ -16,7 +16,21 @@ export class RegisterUrlResponse {
 	url: string;
 }
 
-export async function fetchUrlById(urlId: string): Promise<RegisterUrlResponse> {
+export class UrlDetailsResponse {
+	constructor(url: string, ttl: number, created: number) {
+		this.url = url;
+		this.ttl = ttl;
+		this.created = created;
+	}
+
+	url: string;
+	/** TTL in seconds */
+	ttl: number;
+	/** Creation timestamp in seconds */
+	created: number;
+}
+
+export async function fetchUrlById(urlId: string): Promise<UrlDetailsResponse> {
 	const response = await fetch(`/api/url/${urlId}`, {
 		method: 'GET'
 	});

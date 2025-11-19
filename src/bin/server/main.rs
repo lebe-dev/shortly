@@ -9,6 +9,7 @@ use axum::{
     routing::{get, post},
 };
 use domain::config::model::{config::AppConfig, ports::AppConfigService};
+use log::info;
 use logger::get_logging_config;
 use outbound::config::file::AppConfigServiceImpl;
 use route::{config::get_app_config_route, version::get_version_route};
@@ -52,6 +53,8 @@ async fn main() -> anyhow::Result<()> {
             let logging_config = get_logging_config(&app_config.log_level, &app_config.log_target);
             log4rs::init_config(logging_config).expect("unable to init logging configuration");
 
+            info!("config: {:?}", app_config);
+
             match Sqlite::new(&app_config.db_cnn).await {
                 Ok(db_pool) => {
                     let url_service = UrlServiceImpl::new(
@@ -85,10 +88,12 @@ async fn main() -> anyhow::Result<()> {
                                     })
                                 },
                             )
-                            .expect("unable to create cronjob for sync container images"),
+                            .expect("unable to create cronjob for cleanup expired urls"),
                         )
                         .await
-                        .expect("unable to add sync container images cronjob to scheduler");
+                        .expect("unable to add cleanup expired urls cronjob to scheduler");
+
+                    sched.start().await?;
 
                     // SCHEDULER - END
 

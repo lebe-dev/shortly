@@ -5,10 +5,20 @@ use axum::extract::Path;
 use axum::http::StatusCode;
 use axum::{extract::State, response::IntoResponse};
 use log::error;
+use serde::Serialize;
 use server_lib::domain::url::ports::UrlService;
 
 use crate::SharedAppState;
-use crate::route::url::generate::RegisterUrlResponse;
+
+#[derive(Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct UrlDetailsResponse {
+    pub url: String,
+    /// TTL in seconds
+    pub ttl: u32,
+    /// Creation timestamp in seconds
+    pub created: i64,
+}
 
 pub async fn get_short_url_by_id_route(
     State(state): State<Arc<SharedAppState>>,
@@ -19,8 +29,10 @@ pub async fn get_short_url_by_id_route(
             if let Some(url) = url {
                 (
                     StatusCode::OK,
-                    Json(RegisterUrlResponse {
+                    Json(UrlDetailsResponse {
                         url: url.original_url,
+                        ttl: url.ttl,
+                        created: url.created,
                     }),
                 )
                     .into_response()

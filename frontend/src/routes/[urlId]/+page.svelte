@@ -2,6 +2,7 @@
 	import { HttpError } from '$lib/api/error.js';
 	import { fetchUrlById } from '$lib/api/url';
 	import CopyButton from '$lib/components/CopyButton.svelte';
+	import { formatRemainingTime } from '$lib/date';
 	import { toast } from 'svelte-sonner';
 	import { onMount } from 'svelte';
 
@@ -9,7 +10,11 @@
 
 	let inProgress = $state(true);
 	let url = $state('');
+	let ttl = $state(0);
+	let created = $state(0);
 	let notFound: boolean = $state(false);
+
+	const remainingTime = $derived(formatRemainingTime(ttl, created));
 
 	onMount(async () => {
 		console.log('url-id', data.urlId);
@@ -18,6 +23,8 @@
 			.then((response) => {
 				console.log('url: ', response.url);
 				url = response.url;
+				ttl = response.ttl;
+				created = response.created;
 				inProgress = false;
 			})
 			.catch((e) => {
@@ -49,7 +56,16 @@
 	{:else}
 		<div>
 			<div>Full URL:</div>
-			<div class="mb-4 text-3xl wrap-break-word">{url}</div>
+			<div class="mb-2 text-3xl wrap-break-word">{url}</div>
+			{#if remainingTime}
+				<div class="text-muted-foreground mb-4 text-sm">
+					{#if remainingTime === 'expired'}
+						This link has expired
+					{:else}
+						This link will expire in {remainingTime}
+					{/if}
+				</div>
+			{/if}
 
 			<CopyButton data={url} label="Copy URL" />
 		</div>

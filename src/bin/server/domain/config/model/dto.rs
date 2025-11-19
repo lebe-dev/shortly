@@ -5,18 +5,14 @@ use super::config::AppConfig;
 #[derive(PartialEq, Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct AppConfigDto {
-    pub bind: String,
-
-    pub log_level: String,
-    pub log_target: String,
+    /// Short URL TTL in hours
+    pub short_url_ttl: u32,
 }
 
 impl From<AppConfig> for AppConfigDto {
     fn from(config: AppConfig) -> Self {
         AppConfigDto {
-            bind: config.bind,
-            log_level: config.log_level,
-            log_target: config.log_target,
+            short_url_ttl: config.short_url.ttl,
         }
     }
 }
