@@ -1,5 +1,7 @@
 # Shortly
 
+![Shortly Logo](logo.png "Shortly Logo")
+
 URL shortener service.
 
 ## Quick start
