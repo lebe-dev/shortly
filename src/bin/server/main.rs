@@ -60,6 +60,7 @@ async fn main() -> anyhow::Result<()> {
                     let url_service = UrlServiceImpl::new(
                         &app_config.base_url,
                         app_config.short_url.ttl,
+                        app_config.short_url.max_length,
                         db_pool.clone(),
                     );
 

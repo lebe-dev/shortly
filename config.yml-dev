@@ -11,6 +11,8 @@ short-url:
   # TTL in hours
   ttl: 168 # 7 days
 
+  max-length: 2048
+
 scheduler:
   # Cleanup expired URLs every day at midnight
   cleanup-expired-urls: '0 0 0 * * *'

@@ -17,6 +17,8 @@ where
     base_url: String,
     /// TTL in seconds
     ttl: u32,
+    /// Maximum URL length in characters
+    max_url_length: usize,
     repo: R,
 }
 
@@ -29,11 +31,13 @@ where
     /// # Arguments
     /// * `base_url` - Base URL for generating short URLs
     /// * `ttl_hours` - TTL in hours (will be converted to seconds)
+    /// * `max_url_length` - Maximum URL length in characters
     /// * `repo` - URL repository implementation
-    pub fn new(base_url: &str, ttl_hours: u32, repo: R) -> Self {
+    pub fn new(base_url: &str, ttl_hours: u32, max_url_length: usize, repo: R) -> Self {
         Self {
             base_url: base_url.to_string(),
             ttl: ttl_hours * 3600, // Convert hours to seconds
+            max_url_length,
             repo,
         }
     }
@@ -45,6 +49,10 @@ where
 {
     async fn is_url_valid(&self, url: &str) -> bool {
         if url.trim().is_empty() {
+            return false;
+        }
+
+        if url.len() > self.max_url_length {
             return false;
         }
 
@@ -151,7 +159,7 @@ mod tests {
     #[tokio::test]
     async fn test_register_url_success() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080/", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080/", 1, 2048, db); // 1 hour
 
         let result = service.register_url("https://example.com").await;
 
@@ -165,7 +173,7 @@ mod tests {
     #[tokio::test]
     async fn test_register_url_generates_unique_id() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080/", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080/", 1, 2048, db); // 1 hour
 
         let url1 = service.register_url("https://example.com").await.unwrap();
         let url2 = service.register_url("https://google.com").await.unwrap();
@@ -176,7 +184,7 @@ mod tests {
     #[tokio::test]
     async fn test_find_by_id_existing_url() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080/", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080/", 1, 2048, db); // 1 hour
 
         let registered_url = service.register_url("https://example.com").await.unwrap();
         let found_url = service.find_by_id(&registered_url.id).await.unwrap();
@@ -191,7 +199,7 @@ mod tests {
     #[tokio::test]
     async fn test_find_by_id_non_existing_url() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080/", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080/", 1, 2048, db); // 1 hour
 
         let result = service.find_by_id("nonexistent").await;
 
@@ -202,7 +210,7 @@ mod tests {
     #[tokio::test]
     async fn test_generate_short_url() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
         let registered_url = service.register_url("https://example.com").await.unwrap();
         let short_url = service.generate_short_url(&registered_url).await;
@@ -219,7 +227,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_with_http() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
         assert!(service.is_url_valid("http://example.com").await);
         assert!(service.is_url_valid("http://example.com/path").await);
@@ -233,7 +241,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_with_https() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
         assert!(service.is_url_valid("https://example.com").await);
         assert!(
@@ -251,7 +259,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_with_various_schemes() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
         // FTP
         assert!(service.is_url_valid("ftp://ftp.example.com/file.txt").await);
@@ -277,7 +285,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_empty_string() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
         assert!(!service.is_url_valid("").await);
     }
@@ -285,7 +293,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_whitespace_only() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
         assert!(!service.is_url_valid("   ").await);
         assert!(!service.is_url_valid("\t").await);
@@ -295,7 +303,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_missing_scheme() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
         assert!(!service.is_url_valid("example.com").await);
         assert!(!service.is_url_valid("www.example.com").await);
@@ -305,7 +313,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_relative_paths() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
         assert!(!service.is_url_valid("/path/to/resource").await);
         assert!(!service.is_url_valid("../relative/path").await);
@@ -315,7 +323,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_invalid_format() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
         assert!(!service.is_url_valid("not a url at all").await);
         assert!(!service.is_url_valid("http://").await);
@@ -326,7 +334,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_with_special_characters() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
         // Valid URLs with encoded characters
         assert!(
@@ -352,7 +360,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_with_ip_addresses() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
         assert!(service.is_url_valid("http://192.168.1.1").await);
         assert!(service.is_url_valid("http://127.0.0.1:8080/path").await);
@@ -363,7 +371,7 @@ mod tests {
     #[tokio::test]
     async fn test_register_url_generates_six_character_id() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new("http://localhost:8080/", 1, db); // 1 hour
+        let service = UrlServiceImpl::new("http://localhost:8080/", 1, 2048, db); // 1 hour
 
         // Generate multiple URLs to test consistency
         for i in 0..50 {

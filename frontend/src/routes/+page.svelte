@@ -16,6 +16,7 @@
 	let url: string = $state('');
 	let shortUrl: string = $state('');
 	let shortUrlTtl = $state(0);
+	let maxUrlLength = $state(2048);
 
 	const ttlFormatted = $derived(formatDuration(shortUrlTtl));
 
@@ -23,6 +24,7 @@
 		await fetchConfig()
 			.then((data) => {
 				shortUrlTtl = data.shortUrlTtl;
+				maxUrlLength = data.maxUrlLength;
 				inProgress = false;
 			})
 			.catch((e) => {
@@ -38,22 +40,26 @@
 	});
 
 	async function generateUrl() {
-		if (isUrlValid(url)) {
-			inProgress = true;
-			await generateShortUrl(url)
-				.then((data) => {
-					shortUrl = data.url;
-					console.log('short url:', shortUrl);
-					inProgress = false;
-				})
-				.catch((e) => {
-					console.error(e);
-					inProgress = false;
-				});
+		if (url.length >= maxUrlLength) {
+			toast.error('Max URL length exceeded: ' + maxUrlLength);
 		} else {
-			toast.error('Invalid URL');
-			if (urlInputRef) {
-				urlInputRef.focus();
+			if (isUrlValid(url, maxUrlLength)) {
+				inProgress = true;
+				await generateShortUrl(url)
+					.then((data) => {
+						shortUrl = data.url;
+						console.log('short url:', shortUrl);
+						inProgress = false;
+					})
+					.catch((e) => {
+						console.error(e);
+						inProgress = false;
+					});
+			} else {
+				toast.error('Invalid URL');
+				if (urlInputRef) {
+					urlInputRef.focus();
+				}
 			}
 		}
 	}
@@ -73,10 +79,13 @@
 			bind:value={url}
 			disabled={inProgress}
 			placeholder="https://my.long-url.com"
+			maxlength={maxUrlLength}
 			class="md:text-md mb-2 w-full text-lg"
 		/>
 		{#if ttlFormatted}
 			<div class="text-muted-foreground mb-3 text-sm">Links will be stored for {ttlFormatted}</div>
+		{:else}
+			<div class="text-muted-foreground mb-3 text-sm">...</div>
 		{/if}
 		<div class="flex items-center justify-center gap-3">
 			<Button size="lg" disabled={inProgress} onclick={generateUrl}>GENERATE</Button>

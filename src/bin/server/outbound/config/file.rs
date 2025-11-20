@@ -31,6 +31,9 @@ impl AppConfigService for AppConfigServiceImpl {
         if let Ok(val) = std::env::var("SHORT_URL_TTL") {
             builder = builder.set_override("short-url.ttl", val)?;
         }
+        if let Ok(val) = std::env::var("SHORT_URL_MAX_LENGTH") {
+            builder = builder.set_override("short-url.max-length", val)?;
+        }
         if let Ok(val) = std::env::var("SCHEDULER_CLEANUP_EXPIRED_URLS") {
             builder = builder.set_override("scheduler.cleanup-expired-urls", val)?;
         }
@@ -55,6 +58,7 @@ mod tests {
             std::env::remove_var("LOG_LEVEL");
             std::env::remove_var("BASE_URL");
             std::env::remove_var("SHORT_URL_TTL");
+            std::env::remove_var("SHORT_URL_MAX_LENGTH");
             std::env::remove_var("SCHEDULER_CLEANUP_EXPIRED_URLS");
         }
 
@@ -72,6 +76,7 @@ mod tests {
         assert_eq!(config.base_url, "http://localhost:8080");
         assert_eq!(config.db_cnn, "sqlite://./data/app.db?mode=rwc");
         assert_eq!(config.short_url.ttl, 168);
+        assert_eq!(config.short_url.max_length, 2048);
         assert_eq!(config.scheduler.cleanup_expired_urls, "0 0 * * *");
     }
 
@@ -111,6 +116,7 @@ mod tests {
     fn test_env_override_nested_fields() {
         unsafe {
             std::env::set_var("SHORT_URL_TTL", "720");
+            std::env::set_var("SHORT_URL_MAX_LENGTH", "4096");
             std::env::set_var("SCHEDULER_CLEANUP_EXPIRED_URLS", "0 0 12 * * *");
         }
 
@@ -123,10 +129,12 @@ mod tests {
         let config = result.unwrap();
 
         assert_eq!(config.short_url.ttl, 720);
+        assert_eq!(config.short_url.max_length, 4096);
         assert_eq!(config.scheduler.cleanup_expired_urls, "0 0 12 * * *");
 
         unsafe {
             std::env::remove_var("SHORT_URL_TTL");
+            std::env::remove_var("SHORT_URL_MAX_LENGTH");
             std::env::remove_var("SCHEDULER_CLEANUP_EXPIRED_URLS");
         }
     }

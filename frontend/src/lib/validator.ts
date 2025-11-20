@@ -6,11 +6,18 @@
  * - Spaces and special characters (including non-encoded characters like Cyrillic)
  *
  * @param url - The URL string to validate
+ * @param maxLength - Maximum allowed URL length in characters
  * @returns true if the URL is valid, false otherwise
  */
-export function isUrlValid(url: string): boolean {
+export function isUrlValid(url: string, maxLength: number): boolean {
 	// Check if URL is not empty
 	if (!url || url.trim().length === 0) {
+		return false;
+	}
+
+	// Check URL length
+	if (url.length > maxLength) {
+		console.warn('url length exceeded > ', maxLength);
 		return false;
 	}
 

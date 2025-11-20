@@ -27,6 +27,8 @@ base-url: 'https://shortly.company.com'
 short-url:
   # Link TTL in hours (ENV: SHORT_URL_TTL)
   ttl: 168 # 7 days
+  # Maximum URL length in characters (ENV: SHORT_URL_MAX_LENGTH)
+  max-length: 2048
 
 scheduler:
   # Cron expression for cleanup job (ENV: SCHEDULER_CLEANUP_EXPIRED_URLS)

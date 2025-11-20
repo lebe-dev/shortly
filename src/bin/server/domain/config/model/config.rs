@@ -29,6 +29,7 @@ pub struct AppConfig {
 #[serde(rename_all = "kebab-case")]
 pub struct ShortUrlConfig {
     pub ttl: u32,
+    pub max_length: usize,
 }
 
 #[derive(PartialEq, Deserialize, Clone, Debug)]
