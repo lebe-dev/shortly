@@ -21,24 +21,20 @@ docker run --name shortly -p 8080:8080 tinyops/shortly:0.1.0
 
 ### v0.2.0
 
-- [ ] Security:
-  - [ ] Backend: add captcha support
-  - [ ] Frontend: add captcha support
+- [ ] Locales support: en, ru, es, fr, de, jp
 
 ### v0.3.0
 
-- [ ] Chrome extension
-  - [ ] Click: create short URL from current page
+- [ ] Security:
+  - [ ] URL filters support
 
 ### v0.4.0
 
 - [ ] Security:
-  - [ ] Backend: url filters support
-  - [ ] Frontend: url filters support
+  - [ ] Add captcha support
 
 ### v1.0.0
 
-- [ ] Locales support: en, ru, es, fr, de, jp
 - [ ] QRCode generation
   - [ ] Backend: QRCode generation
   - [ ] Frontend: Show QRCode result
@@ -55,3 +51,8 @@ docker run --name shortly -p 8080:8080 tinyops/shortly:0.1.0
 
 - [ ] Account management
   - [ ] Account limits
+  
+### v1.4.0
+
+- [ ] Chrome extension
+  - [ ] Click: create short URL from current page
