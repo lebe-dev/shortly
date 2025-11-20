@@ -44,7 +44,7 @@
 </svelte:head>
 
 <div
-	class="border-secondary w-full max-w-3xl rounded border-3 px-24 py-10 text-left dark:border-gray-600"
+	class="border-secondary w-full max-w-3xl rounded border-3 bg-white px-24 py-10 text-left dark:border-gray-600 dark:bg-gray-900"
 >
 	{#if inProgress}
 		<div>Loading...</div>

@@ -64,7 +64,7 @@
 	<meta name="description" content="Create convenient short url from long one" />
 </svelte:head>
 
-<div class="h-96 w-full max-w-3xl rounded bg-white px-24 py-24 text-center shadow dark:bg-gray-900">
+<div class="h-80 w-full max-w-3xl rounded bg-white px-24 py-22 text-center shadow dark:bg-gray-900">
 	{#if shortUrl === ''}
 		<div class="mb-1 text-left">Paste long URL here</div>
 		<Input

@@ -10,7 +10,7 @@
 	onclick={() => toggleMode()}
 	variant="outline"
 	size="icon"
-	class="hover:bg-primary/50 border-0 bg-transparent align-middle dark:bg-transparent"
+	class="border-0 bg-transparent align-middle hover:cursor-pointer hover:bg-blue-700 dark:bg-transparent"
 	title="Toggle theme"
 >
 	<Sun

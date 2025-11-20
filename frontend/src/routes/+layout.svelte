@@ -19,7 +19,7 @@
 		<div class="mx-auto flex max-w-7xl items-center justify-between gap-5 px-62">
 			<a href="/" title="Go to main page">
 				<div
-					class="block w-32 bg-blue-200 ps-3 pe-4 pt-3 pb-3 text-sm font-medium text-gray-300 dark:bg-blue-700"
+					class="dark:text-primary-foreground block w-32 bg-blue-700 ps-3 pe-4 pt-3 pb-3 text-sm font-medium text-gray-300 dark:bg-blue-400"
 					onmouseenter={() => (showFullAppName = true)}
 					onmouseleave={() => (showFullAppName = false)}
 				>
@@ -61,11 +61,9 @@
 				</div>
 			</a>
 
-			<div class="text-secondary flex items-center gap-5 text-left text-xs dark:text-gray-500">
-				<!-- <div class="border-b-2">URL</div>
-				<div class="border-b-2 border-transparent text-gray-500">QRCODE</div> -->
-				Generate short URL
-			</div>
+			<div
+				class="text-secondary flex items-center gap-5 text-left text-xs dark:text-gray-500"
+			></div>
 
 			<div class="me-3 text-right">
 				<LightSwitch />
