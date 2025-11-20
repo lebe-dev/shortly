@@ -64,7 +64,7 @@
 	<meta name="description" content="Create convenient short url from long one" />
 </svelte:head>
 
-<div class="h-80 w-full max-w-3xl rounded bg-white px-24 py-22 text-center shadow dark:bg-gray-900">
+<div class="h-80 w-full rounded bg-white px-8 py-22 text-center shadow md:px-24 dark:bg-gray-900">
 	{#if shortUrl === ''}
 		<div class="mb-1 text-left">Paste long URL here</div>
 		<Input
@@ -73,7 +73,7 @@
 			bind:value={url}
 			disabled={inProgress}
 			placeholder="https://my.super-long-url.com/article/12345"
-			class="mb-2 inline-block text-2xl font-medium"
+			class="mb-2 w-full text-2xl font-medium"
 		/>
 		{#if ttlFormatted}
 			<div class="text-muted-foreground mb-3 text-sm">Links will be stored for {ttlFormatted}</div>

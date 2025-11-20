@@ -16,7 +16,7 @@
 <div class="flex min-h-screen flex-col">
 	<!-- Header -->
 	<div class="bg-black dark:bg-black">
-		<div class="mx-auto flex max-w-7xl items-center justify-between gap-5 px-62">
+		<div class="mx-auto flex items-center justify-between gap-5 sm:px-62">
 			<a href="/" title="Go to main page">
 				<div
 					class="dark:text-primary-foreground block w-32 bg-blue-700 ps-3 pe-4 pt-3 pb-3 text-sm font-medium text-gray-300 dark:bg-blue-400"
@@ -72,7 +72,7 @@
 	</div>
 
 	<!-- Main Content -->
-	<div class="flex flex-1 items-start justify-center">
+	<div class="flex flex-1 items-start justify-center sm:px-62">
 		{@render children()}
 	</div>
 
