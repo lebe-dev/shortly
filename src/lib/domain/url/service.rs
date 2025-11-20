@@ -62,7 +62,7 @@ where
         }
 
         for attempt in 0..MAX_RETRIES {
-            let random_number: u64 = rand::thread_rng().gen_range(100_000..1_000_000);
+            let random_number: u64 = rand::thread_rng().gen_range(916_132_832..56_800_235_584);
 
             let short_id = base62::encode(random_number);
 
@@ -358,5 +358,26 @@ mod tests {
         assert!(service.is_url_valid("http://127.0.0.1:8080/path").await);
         assert!(service.is_url_valid("http://[::1]/ipv6").await);
         assert!(service.is_url_valid("http://[2001:db8::1]:8080/").await);
+    }
+
+    #[tokio::test]
+    async fn test_register_url_generates_six_character_id() {
+        let db = get_in_memory_db().await;
+        let service = UrlServiceImpl::new("http://localhost:8080/", 1, db); // 1 hour
+
+        // Generate multiple URLs to test consistency
+        for i in 0..50 {
+            let url = format!("https://example{}.com", i);
+            let result = service.register_url(&url).await;
+
+            assert!(result.is_ok());
+            let registered_url = result.unwrap();
+            assert_eq!(
+                registered_url.id.len(),
+                6,
+                "ID should be exactly 6 characters: '{}'",
+                registered_url.id
+            );
+        }
     }
 }
