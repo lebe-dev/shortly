@@ -65,7 +65,7 @@
 				class="text-secondary flex items-center gap-5 text-left text-xs dark:text-gray-500"
 			></div>
 
-			<div class="me-3 text-right">
+			<div class="me-1 text-right">
 				<LightSwitch />
 			</div>
 		</div>
