@@ -44,7 +44,7 @@
 </svelte:head>
 
 <div
-	class="border-secondary w-full max-w-3xl rounded border-3 bg-white px-24 py-10 text-left dark:border-gray-600 dark:bg-gray-900"
+	class="border-secondary w-full rounded border-3 bg-white px-8 py-10 text-left md:px-24 dark:border-gray-600 dark:bg-gray-900"
 >
 	{#if inProgress}
 		<div>Loading...</div>
@@ -57,7 +57,7 @@
 	{:else}
 		<div>
 			<div>Full URL:</div>
-			<div class="mb-2 text-3xl wrap-break-word">{url}</div>
+			<div class="mb-2 text-2xl wrap-break-word md:text-3xl">{url}</div>
 			{#if remainingTime}
 				<div class="text-muted-foreground mb-4 text-sm">
 					{#if remainingTime === 'expired'}
