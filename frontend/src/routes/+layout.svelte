@@ -11,7 +11,7 @@
 
 <Toaster position="top-right" />
 
-<ModeWatcher />
+<ModeWatcher defaultMode="light" />
 
 <div class="flex min-h-screen flex-col">
 	<!-- Header -->
