@@ -15,11 +15,11 @@
 
 <div class="flex min-h-screen flex-col">
 	<!-- Header -->
-	<div class="bg-blue-800 dark:bg-black">
+	<div class="bg-black dark:bg-black">
 		<div class="mx-auto flex max-w-7xl items-center justify-between gap-5 px-62">
 			<a href="/" title="Go to main page">
 				<div
-					class="block w-32 bg-blue-700 ps-3 pe-4 pt-3 pb-3 text-sm font-medium text-gray-300 dark:bg-blue-700"
+					class="block w-32 bg-blue-200 ps-3 pe-4 pt-3 pb-3 text-sm font-medium text-gray-300 dark:bg-blue-700"
 					onmouseenter={() => (showFullAppName = true)}
 					onmouseleave={() => (showFullAppName = false)}
 				>
