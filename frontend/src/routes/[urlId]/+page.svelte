@@ -68,7 +68,7 @@
 				</div>
 			{/if}
 
-			<CopyButton data={url} label="Copy URL" />
+			<CopyButton data={url} label="Copy" />
 		</div>
 	{/if}
 </div>
