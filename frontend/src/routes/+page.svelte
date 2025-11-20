@@ -72,8 +72,8 @@
 			type="text"
 			bind:value={url}
 			disabled={inProgress}
-			placeholder="https://my.super-long-url.com/article/12345"
-			class="mb-2 w-full text-2xl font-medium"
+			placeholder="https://my.long-url.com"
+			class="md:text-md mb-2 w-full text-lg"
 		/>
 		{#if ttlFormatted}
 			<div class="text-muted-foreground mb-3 text-sm">Links will be stored for {ttlFormatted}</div>
