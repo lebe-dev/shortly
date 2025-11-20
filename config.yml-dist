@@ -1,16 +1,34 @@
+# Shortly Configuration File
+#
+# All values can be overridden using environment variables.
+# Environment variables have HIGHER priority than values in this file.
+#
+# Environment variable naming:
+#   - Top-level fields: UPPERCASE (e.g., BIND, LOG_LEVEL)
+#   - Nested fields: PARENT_CHILD (e.g., SHORT_URL_TTL, SCHEDULER_CLEANUP_EXPIRED_URLS)
+#
+# Example: Override server bind address
+#   export BIND="0.0.0.0:9090"
+
+# Server bind address (ENV: BIND)
 bind: '0.0.0.0:8080'
 
+# Logging level: debug, info, warn, error (ENV: LOG_LEVEL)
 log-level: info
+# Logging target: console, file (ENV: LOG_TARGET)
 log-target: file
 
+# SQLite database connection string (ENV: DB_CNN)
 db-cnn: "sqlite://./data/app.db?mode=rwc"
 
+# Base URL for generating short links (ENV: BASE_URL)
 base-url: 'https://shortly.company.com'
 
 short-url:
-  # TTL in hours
+  # Link TTL in hours (ENV: SHORT_URL_TTL)
   ttl: 168 # 7 days
 
 scheduler:
-  # Cleanup expired URLs every day at midnight
-  cleanup-expired-urls: '0 0 0 * * *'
+  # Cron expression for cleanup job (ENV: SCHEDULER_CLEANUP_EXPIRED_URLS)
+  # Format: "sec min hour day-of-month month day-of-week"
+  cleanup-expired-urls: '0 0 0 * * *' # Every day at midnight
