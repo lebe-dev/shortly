@@ -6,6 +6,27 @@ services:
     volumes:
       - ./data:/app/data
       - ./logs:/app/logs
-      - ./config.yml:/app/config.yml
+      #- ./config.yml:/app/config.yml
     ports:
-      - "31100:8080"
+      - "8080:8080"
+    # Environment variables to override config.yml values
+    # Method 1: Create .env file (recommended)
+    #   - Copy .env.example to .env
+    #   - Uncomment and set your values in .env
+    #   - docker-compose will automatically load .env
+    #
+    # Method 2: Set directly below (uncomment as needed)
+    environment:
+      # Server bind address
+      - BIND=${BIND:-}
+      # Logging configuration
+      - LOG_LEVEL=${LOG_LEVEL:-}
+      - LOG_TARGET=${LOG_TARGET:-}
+      # Database connection
+      - DB_CNN=${DB_CNN:-}
+      # Base URL for short links
+      - BASE_URL=${BASE_URL:-}
+      # Link TTL in hours
+      - SHORT_URL_TTL=${SHORT_URL_TTL:-}
+      # Cleanup schedule (cron expression)
+      - SCHEDULER_CLEANUP_EXPIRED_URLS=${SCHEDULER_CLEANUP_EXPIRED_URLS:-}

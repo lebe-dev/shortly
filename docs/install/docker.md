@@ -100,6 +100,56 @@ scheduler:
 - `short-url.ttl`: URL expiration time in hours (default: 7 days)
 - `log-level`: `debug`, `info`, `warn`, or `error`
 
+#### Environment Variables (Alternative Configuration Method)
+
+You can override any configuration value using environment variables, which have **higher priority** than `config.yml` values.
+
+**Method 1: Using .env file (Recommended)**
+
+```bash
+# Copy the example file
+cp .env.example .env
+
+# Edit .env with your values
+nano .env
+```
+
+Example `.env` file:
+```bash
+# Override base URL for production
+BASE_URL=https://shortly.example.com
+
+# Increase link TTL to 30 days
+SHORT_URL_TTL=720
+
+# Set logging level
+LOG_LEVEL=info
+```
+
+The `docker-compose.yml` automatically loads variables from `.env` file.
+
+**Method 2: Direct environment variables in docker-compose.yml**
+
+Uncomment and set values in the `environment` section of `docker-compose.yml`:
+```yaml
+environment:
+  - BASE_URL=https://shortly.example.com
+  - SHORT_URL_TTL=720
+  - LOG_LEVEL=info
+```
+
+**Available environment variables:**
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `BIND` | Server bind address | `0.0.0.0:8080` |
+| `LOG_LEVEL` | Logging level | `info` |
+| `LOG_TARGET` | Logging target | `file` |
+| `DB_CNN` | Database connection | `sqlite://./data/app.db?mode=rwc` |
+| `BASE_URL` | Base URL for short links | From config.yml |
+| `SHORT_URL_TTL` | Link TTL in hours | `168` |
+| `SCHEDULER_CLEANUP_EXPIRED_URLS` | Cleanup cron | `0 0 0 * * *` |
+
 ### 2. nginx Virtual Host Configuration
 
 Edit `nginx/conf.d/shortly.conf`:
