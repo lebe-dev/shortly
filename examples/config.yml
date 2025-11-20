@@ -1,0 +1,48 @@
+# Shortly URL Shortener Configuration
+# Version: 0.1.0
+
+# Server binding address and port
+# In Docker environment, always use 0.0.0.0 to listen on all interfaces
+# The port should match the EXPOSE directive in Dockerfile (8080)
+bind: '0.0.0.0:8080'
+
+# Logging configuration
+# Levels: debug, info, warn, error
+# Target: file (logs to /app/logs/app.log) or console
+log-level: info
+log-target: file
+
+# Database configuration
+# SQLite connection string with Write-Ahead Logging (WAL) mode
+# The database file will be created in /app/data/ directory
+# WAL mode provides better concurrency for read/write operations
+db-cnn: "sqlite://./data/app.db?mode=rwc"
+
+# Base URL for generated short links
+# IMPORTANT: Change this to your actual domain name
+# This URL will be used to construct short links returned by the API
+# Examples:
+#   - https://shortly.example.com
+#   - https://s.company.com
+#   - https://go.mysite.io
+base-url: 'https://shortly.example.com'
+
+# Short URL configuration
+short-url:
+  # Time-to-live (TTL) for short URLs in hours
+  # Default: 168 hours (7 days)
+  # After this period, URLs will be cleaned up by the scheduler
+  # Set to 0 for unlimited TTL (not recommended)
+  ttl: 168
+
+# Scheduler configuration
+# Cron expressions for automated tasks
+scheduler:
+  # Cleanup expired URLs
+  # Format: minute hour day month weekday
+  # Default: '0 0 * * *' - runs daily at midnight
+  # Examples:
+  #   - '0 0 * * *'     - daily at 00:00
+  #   - '0 */6 * * *'   - every 6 hours
+  #   - '30 2 * * *'    - daily at 02:30
+  cleanup-expired-urls: '0 0 * * *'
