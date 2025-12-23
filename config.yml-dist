@@ -11,7 +11,7 @@
 #   export BIND="0.0.0.0:9090"
 
 # Server bind address (ENV: BIND)
-bind: '0.0.0.0:8080'
+bind: "0.0.0.0:8080"
 
 # Logging level: debug, info, warn, error (ENV: LOG_LEVEL)
 log-level: info
@@ -22,7 +22,32 @@ log-target: file
 db-cnn: "sqlite://./data/app.db?mode=rwc"
 
 # Base URL for generating short links (ENV: BASE_URL)
-base-url: 'https://shortly.company.com'
+base-url: "https://shortly.company.com"
+
+# Feature flags for application functionality
+features:
+  create-url:
+    # Enable/disable URL creation endpoint (ENV: FEATURES_CREATE_URL_ENABLED)
+    enabled: true
+    # Require authentication to create URLs (ENV: FEATURES_CREATE_URL_AUTH_ONLY)
+    auth-only: true
+
+# Authentication configuration
+auth:
+  # Enable/disable authentication (ENV: AUTH_ENABLED)
+  enabled: true
+
+  # Authentication provider type: gitlab (ENV: AUTH_TYPE)
+  type: gitlab
+
+  providers:
+    gitlab:
+      # GitLab instance base URL (ENV: AUTH_PROVIDERS_GITLAB_BASE_URL)
+      base-url: https://gitlab.com
+      # GitLab OAuth application ID (ENV: AUTH_PROVIDERS_GITLAB_APPLICATION_ID)
+      application-id: CHANGE-ME
+      # GitLab OAuth application secret (ENV: AUTH_PROVIDERS_GITLAB_SECRET)
+      secret: CHANGE-ME
 
 short-url:
   # Link TTL in hours (ENV: SHORT_URL_TTL)
@@ -33,4 +58,4 @@ short-url:
 scheduler:
   # Cron expression for cleanup job (ENV: SCHEDULER_CLEANUP_EXPIRED_URLS)
   # Format: "sec min hour day-of-month month day-of-week"
-  cleanup-expired-urls: '0 0 0 * * *' # Every day at midnight
+  cleanup-expired-urls: "0 0 0 * * *" # Every day at midnight

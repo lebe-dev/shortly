@@ -23,19 +23,6 @@ impl Sqlite {
         .await
         .with_context(|| format!("failed to open database at {}", path))?;
 
-        sqlx::query(
-            r#"
-            CREATE TABLE IF NOT EXISTS urls (
-            id varchar,
-            original_url text,
-            ttl integer,
-            created integer,
-            UNIQUE(id)
-            );"#,
-        )
-        .execute(&pool)
-        .await?;
-
         Ok(Sqlite { pool })
     }
 }

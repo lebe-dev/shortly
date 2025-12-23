@@ -1,0 +1,90 @@
+{
+	"id": "de",
+	"common": {
+		"buttons": {
+			"copy": "Kopieren",
+			"generate": "GENERIEREN"
+		},
+		"loading": "Laden...",
+		"loadingEllipsis": "..."
+	},
+	"layout": {
+		"homeLink": "Zur Hauptseite gehen",
+		"toggleTheme": "Design wechseln",
+		"darkTheme": "Dunkles Design",
+		"lightTheme": "Helles Design",
+		"language": "Sprache",
+		"login": "Anmelden",
+		"logout": "Abmelden",
+		"myLinks": "Meine Links"
+	},
+	"homePage": {
+		"title": "Kurzen URL erstellen :: SHRTLY",
+		"description": "Erstellen Sie eine bequeme kurze URL aus einer langen",
+		"form": {
+			"label": "Lange URL hier einfügen",
+			"placeholder": "https://meine.lange-url.com",
+			"storageInfo": "Links werden {ttl} gespeichert"
+		},
+		"result": {
+			"title": "Ihre kurze URL:",
+			"expirationInfo": "Dieser Link läuft in {ttl} ab"
+		},
+		"errors": {
+			"configLoadFailed": "App-Konfiguration konnte nicht geladen werden",
+			"urlTooLong": "Maximale URL-Länge überschritten: {maxLength}",
+			"invalidUrl": "Ungültige URL",
+			"authRequired": "Authentifizierung ist erforderlich, um Kurz-URLs zu erstellen",
+			"serviceTitle": "Kurz-URL-Dienst"
+		}
+	},
+	"urlPage": {
+		"title": "URL-Seite",
+		"description": "Seite mit ursprünglicher URL",
+		"notFound": {
+			"title": "Link nicht gefunden",
+			"wrongUrl": "Der eingegebene Kurz-Link ist falsch oder existiert nicht",
+			"expired": "Der Link ist möglicherweise abgelaufen oder wurde gelöscht"
+		},
+		"display": {
+			"fullUrlLabel": "Vollständige URL:",
+			"expired": "Dieser Link ist abgelaufen",
+			"expirationInfo": "Dieser Link läuft in {remainingTime} ab"
+		}
+	},
+	"loginPage": {
+		"title": "Anmelden :: SHRTLY",
+		"description": "Beim Shortly-Dienst anmelden",
+		"buttons": {
+			"gitlab": "Mit GitLab anmelden"
+		},
+		"backToHome": "Zurück zur Startseite",
+		"errors": {
+			"configLoadFailed": "App-Konfiguration konnte nicht geladen werden",
+			"authDisabled": "Authentifizierung ist nicht verfügbar"
+		}
+	},
+	"linksPage": {
+		"title": "Meine Links :: SHRTLY",
+		"description": "Verwalten Sie Ihre Kurz-Links",
+		"header": "Meine Links",
+		"empty": "Sie haben noch keine Kurz-Links erstellt",
+		"createFirst": "Erstellen Sie Ihren ersten Link",
+		"expired": "Abgelaufen",
+		"deleteConfirm": "Sind Sie sicher, dass Sie diesen Link löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
+		"deleteSuccess": "Link erfolgreich gelöscht",
+		"copySuccess": "Link in die Zwischenablage kopiert",
+		"table": {
+			"shortUrl": "Kurz-URL",
+			"originalUrl": "Original-URL",
+			"created": "Erstellt",
+			"expires": "Läuft ab in",
+			"actions": "Aktionen"
+		},
+		"errors": {
+			"loadFailed": "Ihre Links konnten nicht geladen werden",
+			"deleteFailed": "Link konnte nicht gelöscht werden",
+			"copyFailed": "Link konnte nicht kopiert werden"
+		}
+	}
+}

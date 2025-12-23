@@ -7,21 +7,29 @@ URL shortener service.
 ## Quick start
 
 ```bash
-docker run --name shortly -p 8080:8080 tinyops/shortly:0.1.0 
+docker run --name shortly -p 8080:8080 tinyops/shortly:1.0.0 
 ```
+
+## Features
+
+- BLAZING FAST 🌝 (Svelte+Rust)
+- Locales support: en, ru, es, fr, de, jp, ge
+- Dark theme support
+- Low resource usage:
+  ```bash
+  CONTAINER ID   NAME                          CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O         PIDS
+  c63264ba615e   shortly                       0.03%     4.98MiB / 1.921GiB    0.25%     207kB / 1.35MB    106kB / 295kB     3
+  ```
 
 ## Documentation
 
 - Installation
   - [Docker](docs/install/docker.md)
-- [Configuration](docs/configuration.md)
+- [Configuration](docs/configuration/configuration.md)
+  - [Add locale](docs/locale.md)
 - [Development](DEV.md)
 
 ## RoadMap
-
-### v0.2.0
-
-- [ ] Locales support: en, ru, es, fr, de, jp
 
 ### v0.3.0
 

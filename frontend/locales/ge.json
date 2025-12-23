@@ -1,0 +1,90 @@
+{
+	"id": "ge",
+	"common": {
+		"buttons": {
+			"copy": "კოპირება",
+			"generate": "გენერირება"
+		},
+		"loading": "იტვირთება...",
+		"loadingEllipsis": "..."
+	},
+	"layout": {
+		"homeLink": "მთავარ გვერდზე გადასვლა",
+		"toggleTheme": "თემის შეცვლა",
+		"darkTheme": "მუქი თემა",
+		"lightTheme": "ღია თემა",
+		"language": "ენა",
+		"login": "შესვლა",
+		"logout": "გასვლა",
+		"myLinks": "ჩემი ბმულები"
+	},
+	"homePage": {
+		"title": "მოკლე URL-ის შექმნა :: SHRTLY",
+		"description": "შექმენით მოსახერხებელი მოკლე URL გრძელიდან",
+		"form": {
+			"label": "ჩასვით გრძელი URL აქ",
+			"placeholder": "https://my.long-url.com",
+			"storageInfo": "ბმულები შენახული იქნება {ttl}"
+		},
+		"result": {
+			"title": "თქვენი მოკლე URL:",
+			"expirationInfo": "ეს ბმული ამოიწურება {ttl}-ში"
+		},
+		"errors": {
+			"configLoadFailed": "აპლიკაციის კონფიგურაციის ჩატვირთვა ვერ მოხერხდა",
+			"urlTooLong": "URL-ის მაქსიმალური სიგრძე გადაჭარბებულია: {maxLength}",
+			"invalidUrl": "არასწორი URL",
+			"authRequired": "მოკლე URL-ების შესაქმნელად საჭიროა ავთენტიფიკაცია",
+			"serviceTitle": "მოკლე URL-ების სერვისი"
+		}
+	},
+	"urlPage": {
+		"title": "URL გვერდი",
+		"description": "ორიგინალური URL-ის გვერდი",
+		"notFound": {
+			"title": "ბმული ვერ მოიძებნა",
+			"wrongUrl": "თქვენს მიერ შეყვანილი მოკლე ბმული არასწორია ან არ არსებობს",
+			"expired": "ბმულის ვადა შესაძლოა ამოიწურა ან წაშლილია"
+		},
+		"display": {
+			"fullUrlLabel": "სრული URL:",
+			"expired": "ამ ბმულის ვადა ამოიწურა",
+			"expirationInfo": "ამ ბმულის ვადა ამოიწურება {remainingTime}-ში"
+		}
+	},
+	"loginPage": {
+		"title": "შესვლა :: SHRTLY",
+		"description": "Shortly სერვისში შესვლა",
+		"buttons": {
+			"gitlab": "შესვლა GitLab-ით"
+		},
+		"backToHome": "მთავარ გვერდზე დაბრუნება",
+		"errors": {
+			"configLoadFailed": "აპლიკაციის კონფიგურაციის ჩატვირთვა ვერ მოხერხდა",
+			"authDisabled": "აუთენტიფიკაცია არ არის ხელმისაწვდომი"
+		}
+	},
+	"linksPage": {
+		"title": "ჩემი ბმულები :: SHRTLY",
+		"description": "მართეთ თქვენი მოკლე ბმულები",
+		"header": "ჩემი ბმულები",
+		"empty": "თქვენ ჯერ არ შექმნილხართ მოკლე ბმულები",
+		"createFirst": "შექმენით თქვენი პირველი ბმული",
+		"expired": "ვადაგასული",
+		"deleteConfirm": "დარწმუნებული ხართ, რომ გსურთ ამ ბმულის წაშლა? ეს მოქმედება ვერ გაუქმდება.",
+		"deleteSuccess": "ბმული წარმატებით წაიშალა",
+		"copySuccess": "ბმული კოპირებულია ბუფერში",
+		"table": {
+			"shortUrl": "მოკლე URL",
+			"originalUrl": "ორიგინალური URL",
+			"created": "შექმნილია",
+			"expires": "ამოიწურება",
+			"actions": "მოქმედებები"
+		},
+		"errors": {
+			"loadFailed": "ბმულების ჩატვირთვა ვერ მოხერხდა",
+			"deleteFailed": "ბმულის წაშლა ვერ მოხერხდა",
+			"copyFailed": "ბმულის კოპირება ვერ მოხერხდა"
+		}
+	}
+}

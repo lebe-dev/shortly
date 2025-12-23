@@ -1,0 +1,90 @@
+{
+	"id": "zh",
+	"common": {
+		"buttons": {
+			"copy": "复制",
+			"generate": "生成"
+		},
+		"loading": "加载中...",
+		"loadingEllipsis": "..."
+	},
+	"layout": {
+		"homeLink": "返回主页",
+		"toggleTheme": "切换主题",
+		"darkTheme": "深色主题",
+		"lightTheme": "浅色主题",
+		"language": "语言",
+		"login": "登录",
+		"logout": "登出",
+		"myLinks": "我的链接"
+	},
+	"homePage": {
+		"title": "创建短链接 :: SHRTLY",
+		"description": "将长网址转换为便捷的短链接",
+		"form": {
+			"label": "在此粘贴长网址",
+			"placeholder": "https://my.long-url.com",
+			"storageInfo": "链接将保存 {ttl}"
+		},
+		"result": {
+			"title": "您的短链接：",
+			"expirationInfo": "此链接将在 {ttl} 后过期"
+		},
+		"errors": {
+			"configLoadFailed": "无法加载应用配置",
+			"urlTooLong": "超过最大网址长度：{maxLength}",
+			"invalidUrl": "无效的网址",
+			"authRequired": "创建短链接需要身份验证",
+			"serviceTitle": "短链接服务"
+		}
+	},
+	"urlPage": {
+		"title": "网址页面",
+		"description": "原始网址页面",
+		"notFound": {
+			"title": "未找到链接",
+			"wrongUrl": "您输入的短链接不正确或不存在",
+			"expired": "链接可能已过期或被删除"
+		},
+		"display": {
+			"fullUrlLabel": "完整网址：",
+			"expired": "此链接已过期",
+			"expirationInfo": "此链接将在 {remainingTime} 后过期"
+		}
+	},
+	"loginPage": {
+		"title": "登录 :: SHRTLY",
+		"description": "登录 Shortly 服务",
+		"buttons": {
+			"gitlab": "使用 GitLab 登录"
+		},
+		"backToHome": "返回主页",
+		"errors": {
+			"configLoadFailed": "无法加载应用配置",
+			"authDisabled": "身份验证不可用"
+		}
+	},
+	"linksPage": {
+		"title": "我的链接 :: SHRTLY",
+		"description": "管理您的短链接",
+		"header": "我的链接",
+		"empty": "您还没有创建任何短链接",
+		"createFirst": "创建您的第一个链接",
+		"expired": "已过期",
+		"deleteConfirm": "您确定要删除此链接吗？此操作无法撤消。",
+		"deleteSuccess": "链接删除成功",
+		"copySuccess": "链接已复制到剪贴板",
+		"table": {
+			"shortUrl": "短链接",
+			"originalUrl": "原始网址",
+			"created": "创建时间",
+			"expires": "过期时间",
+			"actions": "操作"
+		},
+		"errors": {
+			"loadFailed": "加载链接失败",
+			"deleteFailed": "删除链接失败",
+			"copyFailed": "复制链接失败"
+		}
+	}
+}

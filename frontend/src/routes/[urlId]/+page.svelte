@@ -4,6 +4,7 @@
 	import CopyButton from '$lib/components/CopyButton.svelte';
 	import { formatRemainingTime } from '$lib/date';
 	import { onMount } from 'svelte';
+	import { t } from 'svelte-intl-precompile';
 
 	let { data } = $props();
 
@@ -39,36 +40,32 @@
 </script>
 
 <svelte:head>
-	<title>URL page</title>
-	<meta name="description" content="Page with original URL" />
+	<title>{$t('urlPage.title')}</title>
+	<meta name="description" content={$t('urlPage.description')} />
 </svelte:head>
 
 <div
-	class="border-secondary w-full rounded border-3 bg-white px-8 py-10 text-left md:px-24 dark:border-gray-600 dark:bg-gray-900"
+	class="xs:w-[100px] h-80 w-[1300px] max-w-[1300px] rounded bg-white px-6 py-22 text-left shadow md:px-24 dark:bg-gray-900"
 >
 	{#if inProgress}
-		<div>Loading...</div>
-	{:else if notFound}
-		<div class="mb-4 text-xl font-bold">URL was not found</div>
+		<div>{$t('common.loading')}</div>
+	{:else if notFound || remainingTime === 'expired'}
+		<div class="mb-4 text-xl font-bold">{$t('urlPage.notFound.title')}</div>
 		<ul class="ms-4 list-disc">
-			<li>Wrong URL</li>
-			<li>URL has been expired</li>
+			<li>{$t('urlPage.notFound.wrongUrl')}</li>
+			<li>{$t('urlPage.notFound.expired')}</li>
 		</ul>
 	{:else}
 		<div>
-			<div>Full URL:</div>
+			<div>{$t('urlPage.display.fullUrlLabel')}</div>
 			<div class="mb-2 text-2xl wrap-break-word md:text-3xl">{url}</div>
 			{#if remainingTime}
 				<div class="text-muted-foreground mb-4 text-sm">
-					{#if remainingTime === 'expired'}
-						This link has expired
-					{:else}
-						This link will expire in {remainingTime}
-					{/if}
+					{$t('urlPage.display.expirationInfo', { values: { remainingTime } })}
 				</div>
 			{/if}
 
-			<CopyButton data={url} label="Copy" />
+			<CopyButton data={url} label={$t('common.buttons.copy')} />
 		</div>
 	{/if}
 </div>

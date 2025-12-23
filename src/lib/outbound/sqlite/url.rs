@@ -15,14 +15,16 @@ impl UrlRepository for Sqlite {
                 id,
                 original_url,
                 ttl,
-                created
-            ) VALUES ($1, $2, $3, $4);
+                created,
+                user_id
+            ) VALUES ($1, $2, $3, $4, $5);
             "#,
         )
         .bind(&url.id)
         .bind(&url.original_url)
         .bind(&url.ttl)
         .bind(&url.created)
+        .bind(&url.user_id)
         .execute(self.get_pool())
         .await?;
 
@@ -40,6 +42,7 @@ impl UrlRepository for Sqlite {
                 original_url: row.get("original_url"),
                 ttl: row.get("ttl"),
                 created: row.get("created"),
+                user_id: row.get("user_id"),
             })
             .fetch_optional(self.get_pool())
             .await?;
@@ -52,6 +55,35 @@ impl UrlRepository for Sqlite {
             sqlx::query("DELETE FROM urls WHERE created + ttl < $1").bind(Utc::now().timestamp());
 
         query.execute(self.get_pool()).await?;
+
+        Ok(())
+    }
+
+    async fn find_by_user_id(&self, user_id: i64) -> Result<Vec<Url>, sqlx::Error> {
+        let query = sqlx::query("SELECT * FROM urls WHERE user_id = $1 ORDER BY created DESC")
+            .bind(user_id);
+
+        let urls = query
+            .map(|row: SqliteRow| Url {
+                id: row.get("id"),
+                original_url: row.get("original_url"),
+                ttl: row.get("ttl"),
+                created: row.get("created"),
+                user_id: row.get("user_id"),
+            })
+            .fetch_all(self.get_pool())
+            .await?;
+
+        Ok(urls)
+    }
+
+    async fn delete_by_id(&self, id: &str) -> Result<(), sqlx::Error> {
+        sqlx::query("DELETE FROM urls WHERE id = $1")
+            .bind(id)
+            .execute(self.get_pool())
+            .await?;
+
+        info!("url '{}' has been deleted", id);
 
         Ok(())
     }
@@ -81,6 +113,7 @@ mod tests {
             original_url: "https://example.com/expired".to_string(),
             ttl: 3600,                              // 1 hour in seconds
             created: Utc::now().timestamp() - 7200, // 2 hours ago
+            user_id: None,
         };
 
         db.save(&expired_url).await.unwrap();
@@ -108,6 +141,7 @@ mod tests {
             original_url: "https://example.com/expired".to_string(),
             ttl: 3600,                              // 1 hour
             created: Utc::now().timestamp() - 7200, // 2 hours ago
+            user_id: None,
         };
 
         // Create a valid URL (created now with 1 week TTL)
@@ -116,6 +150,7 @@ mod tests {
             original_url: "https://example.com/valid".to_string(),
             ttl: 604800, // 1 week in seconds
             created: Utc::now().timestamp(),
+            user_id: None,
         };
 
         db.save(&expired_url).await.unwrap();

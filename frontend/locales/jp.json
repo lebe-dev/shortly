@@ -1,0 +1,90 @@
+{
+	"id": "jp",
+	"common": {
+		"buttons": {
+			"copy": "コピー",
+			"generate": "生成"
+		},
+		"loading": "読み込み中...",
+		"loadingEllipsis": "..."
+	},
+	"layout": {
+		"homeLink": "メインページに移動",
+		"toggleTheme": "テーマを切り替え",
+		"darkTheme": "ダークテーマ",
+		"lightTheme": "ライトテーマ",
+		"language": "言語",
+		"login": "ログイン",
+		"logout": "ログアウト",
+		"myLinks": "マイリンク"
+	},
+	"homePage": {
+		"title": "短縮URLを作成 :: SHRTLY",
+		"description": "長いURLから便利な短縮URLを作成",
+		"form": {
+			"label": "長いURLをここに貼り付け",
+			"placeholder": "https://my.long-url.com",
+			"storageInfo": "リンクは{ttl}保存されます"
+		},
+		"result": {
+			"title": "あなたの短縮URL：",
+			"expirationInfo": "このリンクは{ttl}後に期限切れになります"
+		},
+		"errors": {
+			"configLoadFailed": "アプリ設定を読み込めませんでした",
+			"urlTooLong": "URL最大長を超えました：{maxLength}",
+			"invalidUrl": "無効なURL",
+			"authRequired": "短縮URLを作成するには認証が必要です",
+			"serviceTitle": "短縮URLサービス"
+		}
+	},
+	"urlPage": {
+		"title": "URLページ",
+		"description": "元のURLのページ",
+		"notFound": {
+			"title": "リンクが見つかりません",
+			"wrongUrl": "入力された短縮URLが正しくないか存在しません",
+			"expired": "リンクの有効期限が切れたか削除された可能性があります"
+		},
+		"display": {
+			"fullUrlLabel": "完全なURL：",
+			"expired": "このリンクは期限切れです",
+			"expirationInfo": "このリンクは{remainingTime}後に期限切れになります"
+		}
+	},
+	"loginPage": {
+		"title": "ログイン :: SHRTLY",
+		"description": "Shortlyサービスにログイン",
+		"buttons": {
+			"gitlab": "GitLabでログイン"
+		},
+		"backToHome": "ホームに戻る",
+		"errors": {
+			"configLoadFailed": "アプリ設定を読み込めませんでした",
+			"authDisabled": "認証は利用できません"
+		}
+	},
+	"linksPage": {
+		"title": "マイリンク :: SHRTLY",
+		"description": "短縮URLを管理",
+		"header": "マイリンク",
+		"empty": "まだ短縮URLを作成していません",
+		"createFirst": "最初のリンクを作成",
+		"expired": "期限切れ",
+		"deleteConfirm": "このリンクを削除してもよろしいですか？この操作は元に戻せません。",
+		"deleteSuccess": "リンクを削除しました",
+		"copySuccess": "リンクをクリップボードにコピーしました",
+		"table": {
+			"shortUrl": "短縮URL",
+			"originalUrl": "元のURL",
+			"created": "作成日時",
+			"expires": "有効期限",
+			"actions": "操作"
+		},
+		"errors": {
+			"loadFailed": "リンクの読み込みに失敗しました",
+			"deleteFailed": "リンクの削除に失敗しました",
+			"copyFailed": "リンクのコピーに失敗しました"
+		}
+	}
+}

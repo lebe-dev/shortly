@@ -9,6 +9,7 @@ pub struct Url {
     /// TTL in seconds
     pub ttl: u32,
     pub created: i64,
+    pub user_id: Option<i64>,
 }
 
 #[derive(Debug, Error)]
@@ -25,6 +26,18 @@ pub type CleanupExpiredUrlsError = FindUrlError;
 
 #[derive(Debug, Error)]
 pub enum FindUrlError {
+    #[error(transparent)]
+    DatabaseError(#[from] sqlx::Error),
+    #[error(transparent)]
+    Unknown(#[from] anyhow::Error),
+}
+
+#[derive(Debug, Error)]
+pub enum DeleteUrlError {
+    #[error("URL not found")]
+    NotFound,
+    #[error("Unauthorized: you can only delete your own URLs")]
+    Unauthorized,
     #[error(transparent)]
     DatabaseError(#[from] sqlx::Error),
     #[error(transparent)]

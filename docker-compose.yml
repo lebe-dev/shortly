@@ -1,7 +1,7 @@
 services:
   app:
     container_name: shortly
-    image: tinyops/shortly:0.1.0
+    image: tinyops/shortly:0.2.1
     restart: always
     volumes:
       - ./data:/app/data
