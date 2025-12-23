@@ -1,0 +1,90 @@
+{
+	"id": "en",
+	"common": {
+		"buttons": {
+			"copy": "Copy",
+			"generate": "GENERATE"
+		},
+		"loading": "Loading...",
+		"loadingEllipsis": "..."
+	},
+	"layout": {
+		"homeLink": "Go to main page",
+		"toggleTheme": "Toggle theme",
+		"darkTheme": "Dark theme",
+		"lightTheme": "Light theme",
+		"language": "Language",
+		"login": "Login",
+		"logout": "Logout",
+		"myLinks": "My Links"
+	},
+	"homePage": {
+		"title": "Create short url :: SHRTLY",
+		"description": "Create convenient short url from long one",
+		"form": {
+			"label": "Paste long URL here",
+			"placeholder": "https://my.long-url.com",
+			"storageInfo": "Links will be stored for {ttl}"
+		},
+		"result": {
+			"title": "Your short url:",
+			"expirationInfo": "This link will expire in {ttl}"
+		},
+		"errors": {
+			"configLoadFailed": "Unable to load app config",
+			"urlTooLong": "Max URL length exceeded: {maxLength}",
+			"invalidUrl": "Invalid URL",
+			"authRequired": "Authentication is required to create short URLs",
+			"serviceTitle": "Short URL Service"
+		}
+	},
+	"urlPage": {
+		"title": "URL page",
+		"description": "Page with original URL",
+		"notFound": {
+			"title": "Link not found",
+			"wrongUrl": "The short link you entered is incorrect or doesn't exist",
+			"expired": "The link may have expired or been deleted"
+		},
+		"display": {
+			"fullUrlLabel": "Full URL:",
+			"expired": "This link has expired",
+			"expirationInfo": "This link will expire in {remainingTime}"
+		}
+	},
+	"loginPage": {
+		"title": "Login :: SHRTLY",
+		"description": "Login to Shortly service",
+		"buttons": {
+			"gitlab": "Login with GitLab"
+		},
+		"backToHome": "Back to home",
+		"errors": {
+			"configLoadFailed": "Unable to load app config",
+			"authDisabled": "Authentication is not available"
+		}
+	},
+	"linksPage": {
+		"title": "My Links :: SHRTLY",
+		"description": "Manage your short links",
+		"header": "My Links",
+		"empty": "You haven't created any short links yet",
+		"createFirst": "Create your first link",
+		"expired": "Expired",
+		"deleteConfirm": "Are you sure you want to delete this link? This action cannot be undone.",
+		"deleteSuccess": "Link deleted successfully",
+		"copySuccess": "Link copied to clipboard",
+		"table": {
+			"shortUrl": "Short URL",
+			"originalUrl": "Original URL",
+			"created": "Created",
+			"expires": "Expires In",
+			"actions": "Actions"
+		},
+		"errors": {
+			"loadFailed": "Failed to load your links",
+			"deleteFailed": "Failed to delete link",
+			"copyFailed": "Failed to copy link"
+		}
+	}
+}

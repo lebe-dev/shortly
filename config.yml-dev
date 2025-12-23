@@ -1,11 +1,27 @@
-bind: '0.0.0.0:8080'
+bind: "0.0.0.0:8080"
 
 log-level: debug
 log-target: console
 
 db-cnn: "sqlite://./data/app.db?mode=rwc"
 
-base-url: 'http://localhost:8080'
+base-url: "http://localhost:8080"
+
+features:
+  create-url:
+    enabled: true
+    auth-only: true
+
+auth:
+  enabled: true
+
+  type: gitlab
+
+  providers:
+    gitlab:
+      base-url: https://gitlab.com
+      application-id: CHANGE-ME
+      secret: CHANGE-ME
 
 short-url:
   # TTL in hours
@@ -15,4 +31,4 @@ short-url:
 
 scheduler:
   # Cleanup expired URLs every day at midnight
-  cleanup-expired-urls: '0 0 0 * * *'
+  cleanup-expired-urls: "0 0 0 * * *"

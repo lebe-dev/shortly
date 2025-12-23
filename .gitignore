@@ -3,3 +3,10 @@
 /.DS_Store
 /data
 /.env
+*.md
+!/docs
+!/docs/**/*.md
+!DEV.md
+!README.md
+!LICENSE.md
+/*.tgz

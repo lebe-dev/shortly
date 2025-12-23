@@ -1,6 +1,6 @@
 [package]
 name = "shortly"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2024"
 
 [profile.release]
@@ -34,6 +34,9 @@ time = { version = "0.3.44" }
 rust-embed = { version = "8.9.0" }
 mime_guess = { version = "2.0.5" }
 sqlx = { version = "0.8.6", features = ["runtime-tokio-rustls", "sqlite"] }
+
+reqwest = { version = "0.12", features = ["json"] }
+urlencoding = "2.1"
 
 tokio = { version = "1.48.0", features = ["full"] }
 tokio-cron-scheduler = "0.15.1"

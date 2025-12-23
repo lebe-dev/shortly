@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "helm-chart.fullname" . }}
+  labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+data:
+  {{- if .Values.config.nginx.enabled }}
+  BIND: {{ printf "0.0.0.0:%d" (int .Values.config.nginx.backendPort) | quote }}
+  {{- else }}
+  BIND: {{ .Values.config.bind | quote }}
+  {{- end }}
+  LOG_LEVEL: {{ .Values.config.logLevel | quote }}
+  LOG_TARGET: {{ .Values.config.logTarget | quote }}
+  BASE_URL: {{ .Values.config.baseUrl | quote }}
+  SHORT_URL_TTL: {{ .Values.config.shortUrl.ttl | quote }}
+  SHORT_URL_MAX_LENGTH: {{ .Values.config.shortUrl.maxLength | quote }}
+  SCHEDULER_CLEANUP_EXPIRED_URLS: {{ .Values.config.scheduler.cleanupExpiredUrls | quote }}
+  FEATURES_CREATE_URL_ENABLED: {{ .Values.config.features.createUrl.enabled | quote }}
+  FEATURES_CREATE_URL_AUTH_ONLY: {{ .Values.config.features.createUrl.authOnly | quote }}
+  AUTH_ENABLED: {{ .Values.config.auth.enabled | quote }}
+  AUTH_TYPE: {{ .Values.config.auth.type | quote }}
+  AUTH_PROVIDERS_GITLAB_BASE_URL: {{ .Values.config.auth.providers.gitlab.baseUrl | quote }}
+{{- if .Values.config.nginx.enabled }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "helm-chart.fullname" . }}-nginx
+  labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+data:
+  nginx.conf: |
+{{ .Values.config.nginx.config | indent 4 }}
+{{- end }}

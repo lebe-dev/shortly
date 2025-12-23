@@ -1,0 +1,90 @@
+{
+	"id": "es",
+	"common": {
+		"buttons": {
+			"copy": "Copiar",
+			"generate": "GENERAR"
+		},
+		"loading": "Cargando...",
+		"loadingEllipsis": "..."
+	},
+	"layout": {
+		"homeLink": "Ir a la página principal",
+		"toggleTheme": "Cambiar tema",
+		"darkTheme": "Tema oscuro",
+		"lightTheme": "Tema claro",
+		"language": "Idioma",
+		"login": "Iniciar sesión",
+		"logout": "Cerrar sesión",
+		"myLinks": "Mis Enlaces"
+	},
+	"homePage": {
+		"title": "Crear URL corta :: SHRTLY",
+		"description": "Cree una URL corta conveniente desde una larga",
+		"form": {
+			"label": "Pegue la URL larga aquí",
+			"placeholder": "https://mi.url-larga.com",
+			"storageInfo": "Los enlaces se almacenarán durante {ttl}"
+		},
+		"result": {
+			"title": "Su URL corta:",
+			"expirationInfo": "Este enlace expirará en {ttl}"
+		},
+		"errors": {
+			"configLoadFailed": "No se pudo cargar la configuración de la aplicación",
+			"urlTooLong": "Longitud máxima de URL excedida: {maxLength}",
+			"invalidUrl": "URL inválida",
+			"authRequired": "Se requiere autenticación para crear URLs cortas",
+			"serviceTitle": "Servicio de URLs Cortas"
+		}
+	},
+	"urlPage": {
+		"title": "Página de URL",
+		"description": "Página con URL original",
+		"notFound": {
+			"title": "Enlace no encontrado",
+			"wrongUrl": "El enlace corto que ingresó es incorrecto o no existe",
+			"expired": "El enlace puede haber expirado o sido eliminado"
+		},
+		"display": {
+			"fullUrlLabel": "URL completa:",
+			"expired": "Este enlace ha expirado",
+			"expirationInfo": "Este enlace expirará en {remainingTime}"
+		}
+	},
+	"loginPage": {
+		"title": "Iniciar sesión :: SHRTLY",
+		"description": "Iniciar sesión en el servicio Shortly",
+		"buttons": {
+			"gitlab": "Iniciar sesión con GitLab"
+		},
+		"backToHome": "Volver a inicio",
+		"errors": {
+			"configLoadFailed": "No se pudo cargar la configuración de la aplicación",
+			"authDisabled": "La autenticación no está disponible"
+		}
+	},
+	"linksPage": {
+		"title": "Mis Enlaces :: SHRTLY",
+		"description": "Administre sus enlaces cortos",
+		"header": "Mis Enlaces",
+		"empty": "Aún no ha creado ningún enlace corto",
+		"createFirst": "Crear su primer enlace",
+		"expired": "Expirado",
+		"deleteConfirm": "¿Está seguro de que desea eliminar este enlace? Esta acción no se puede deshacer.",
+		"deleteSuccess": "Enlace eliminado exitosamente",
+		"copySuccess": "Enlace copiado al portapapeles",
+		"table": {
+			"shortUrl": "URL Corta",
+			"originalUrl": "URL Original",
+			"created": "Creado",
+			"expires": "Expira en",
+			"actions": "Acciones"
+		},
+		"errors": {
+			"loadFailed": "Error al cargar sus enlaces",
+			"deleteFailed": "Error al eliminar el enlace",
+			"copyFailed": "Error al copiar el enlace"
+		}
+	}
+}

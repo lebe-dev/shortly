@@ -7,6 +7,20 @@ db-cnn: "sqlite://./data/app.db?mode=rwc"
 
 base-url: "http://localhost:8080"
 
+features:
+  create-url:
+    enabled: true
+    auth-only: true
+
+auth:
+  enabled: true
+  type: gitlab
+  providers:
+    gitlab:
+      base-url: https://gitlab.com
+      application-id: test-app-id
+      secret: test-secret
+
 short-url:
   ttl: 168
   max-length: 2048

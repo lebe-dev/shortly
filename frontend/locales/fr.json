@@ -1,0 +1,90 @@
+{
+	"id": "fr",
+	"common": {
+		"buttons": {
+			"copy": "Copier",
+			"generate": "GÉNÉRER"
+		},
+		"loading": "Chargement...",
+		"loadingEllipsis": "..."
+	},
+	"layout": {
+		"homeLink": "Aller à la page principale",
+		"toggleTheme": "Changer le thème",
+		"darkTheme": "Thème sombre",
+		"lightTheme": "Thème clair",
+		"language": "Langue",
+		"login": "Se connecter",
+		"logout": "Se déconnecter",
+		"myLinks": "Mes Liens"
+	},
+	"homePage": {
+		"title": "Créer une URL courte :: SHRTLY",
+		"description": "Créez une URL courte pratique à partir d'une longue",
+		"form": {
+			"label": "Collez l'URL longue ici",
+			"placeholder": "https://mon.url-longue.com",
+			"storageInfo": "Les liens seront stockés pendant {ttl}"
+		},
+		"result": {
+			"title": "Votre URL courte:",
+			"expirationInfo": "Ce lien expirera dans {ttl}"
+		},
+		"errors": {
+			"configLoadFailed": "Impossible de charger la configuration de l'application",
+			"urlTooLong": "Longueur maximale de l'URL dépassée: {maxLength}",
+			"invalidUrl": "URL invalide",
+			"authRequired": "L'authentification est requise pour créer des URLs courtes",
+			"serviceTitle": "Service d'URLs Courtes"
+		}
+	},
+	"urlPage": {
+		"title": "Page URL",
+		"description": "Page avec l'URL d'origine",
+		"notFound": {
+			"title": "Lien introuvable",
+			"wrongUrl": "Le lien court que vous avez saisi est incorrect ou n'existe pas",
+			"expired": "Le lien a peut-être expiré ou été supprimé"
+		},
+		"display": {
+			"fullUrlLabel": "URL complète:",
+			"expired": "Ce lien a expiré",
+			"expirationInfo": "Ce lien expirera dans {remainingTime}"
+		}
+	},
+	"loginPage": {
+		"title": "Connexion :: SHRTLY",
+		"description": "Se connecter au service Shortly",
+		"buttons": {
+			"gitlab": "Se connecter avec GitLab"
+		},
+		"backToHome": "Retour à l'accueil",
+		"errors": {
+			"configLoadFailed": "Impossible de charger la configuration de l'application",
+			"authDisabled": "L'authentification n'est pas disponible"
+		}
+	},
+	"linksPage": {
+		"title": "Mes Liens :: SHRTLY",
+		"description": "Gérez vos liens courts",
+		"header": "Mes Liens",
+		"empty": "Vous n'avez pas encore créé de liens courts",
+		"createFirst": "Créer votre premier lien",
+		"expired": "Expiré",
+		"deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce lien ? Cette action ne peut pas être annulée.",
+		"deleteSuccess": "Lien supprimé avec succès",
+		"copySuccess": "Lien copié dans le presse-papiers",
+		"table": {
+			"shortUrl": "URL Courte",
+			"originalUrl": "URL d'Origine",
+			"created": "Créé",
+			"expires": "Expire dans",
+			"actions": "Actions"
+		},
+		"errors": {
+			"loadFailed": "Échec du chargement de vos liens",
+			"deleteFailed": "Échec de la suppression du lien",
+			"copyFailed": "Échec de la copie du lien"
+		}
+	}
+}

@@ -6,6 +6,9 @@ use crate::domain::config::model::{
     ports::AppConfigService,
 };
 
+#[cfg(test)]
+use crate::domain::config::model::config::AuthType;
+
 #[derive(Debug, Clone)]
 pub struct AppConfigServiceImpl;
 
@@ -38,6 +41,29 @@ impl AppConfigService for AppConfigServiceImpl {
             builder = builder.set_override("scheduler.cleanup-expired-urls", val)?;
         }
 
+        if let Ok(val) = std::env::var("FEATURES_CREATE_URL_ENABLED") {
+            builder = builder.set_override("features.create-url.enabled", val)?;
+        }
+        if let Ok(val) = std::env::var("FEATURES_CREATE_URL_AUTH_ONLY") {
+            builder = builder.set_override("features.create-url.auth-only", val)?;
+        }
+
+        if let Ok(val) = std::env::var("AUTH_ENABLED") {
+            builder = builder.set_override("auth.enabled", val)?;
+        }
+        if let Ok(val) = std::env::var("AUTH_TYPE") {
+            builder = builder.set_override("auth.type", val)?;
+        }
+        if let Ok(val) = std::env::var("AUTH_PROVIDERS_GITLAB_BASE_URL") {
+            builder = builder.set_override("auth.providers.gitlab.base-url", val)?;
+        }
+        if let Ok(val) = std::env::var("AUTH_PROVIDERS_GITLAB_APPLICATION_ID") {
+            builder = builder.set_override("auth.providers.gitlab.application-id", val)?;
+        }
+        if let Ok(val) = std::env::var("AUTH_PROVIDERS_GITLAB_SECRET") {
+            builder = builder.set_override("auth.providers.gitlab.secret", val)?;
+        }
+
         let config = builder.build()?;
         let app_config: AppConfig = config.try_deserialize()?;
         Ok(app_config)
@@ -60,6 +86,13 @@ mod tests {
             std::env::remove_var("SHORT_URL_TTL");
             std::env::remove_var("SHORT_URL_MAX_LENGTH");
             std::env::remove_var("SCHEDULER_CLEANUP_EXPIRED_URLS");
+            std::env::remove_var("FEATURES_CREATE_URL_ENABLED");
+            std::env::remove_var("FEATURES_CREATE_URL_AUTH_ONLY");
+            std::env::remove_var("AUTH_ENABLED");
+            std::env::remove_var("AUTH_TYPE");
+            std::env::remove_var("AUTH_PROVIDERS_GITLAB_BASE_URL");
+            std::env::remove_var("AUTH_PROVIDERS_GITLAB_APPLICATION_ID");
+            std::env::remove_var("AUTH_PROVIDERS_GITLAB_SECRET");
         }
 
         let service = AppConfigServiceImpl;
@@ -78,6 +111,13 @@ mod tests {
         assert_eq!(config.short_url.ttl, 168);
         assert_eq!(config.short_url.max_length, 2048);
         assert_eq!(config.scheduler.cleanup_expired_urls, "0 0 * * *");
+        assert_eq!(config.features.create_url.enabled, true);
+        assert_eq!(config.features.create_url.auth_only, true);
+        assert_eq!(config.auth.enabled, true);
+        assert_eq!(config.auth.auth_type, AuthType::Gitlab);
+        assert_eq!(config.auth.providers.gitlab.base_url, "https://gitlab.com");
+        assert_eq!(config.auth.providers.gitlab.application_id, "test-app-id");
+        assert_eq!(config.auth.providers.gitlab.secret, "test-secret");
     }
 
     #[test]
@@ -136,6 +176,55 @@ mod tests {
             std::env::remove_var("SHORT_URL_TTL");
             std::env::remove_var("SHORT_URL_MAX_LENGTH");
             std::env::remove_var("SCHEDULER_CLEANUP_EXPIRED_URLS");
+        }
+    }
+
+    #[test]
+    #[serial]
+    fn test_env_override_features_and_auth() {
+        unsafe {
+            std::env::set_var("FEATURES_CREATE_URL_ENABLED", "false");
+            std::env::set_var("FEATURES_CREATE_URL_AUTH_ONLY", "false");
+            std::env::set_var("AUTH_ENABLED", "false");
+            std::env::set_var("AUTH_TYPE", "gitlab");
+            std::env::set_var(
+                "AUTH_PROVIDERS_GITLAB_BASE_URL",
+                "https://gitlab.example.com",
+            );
+            std::env::set_var("AUTH_PROVIDERS_GITLAB_APPLICATION_ID", "override-app-id");
+            std::env::set_var("AUTH_PROVIDERS_GITLAB_SECRET", "override-secret");
+        }
+
+        let service = AppConfigServiceImpl;
+        let config_path = PathBuf::from("test-data/config.yml");
+
+        let result = service.load_from_file(&config_path);
+        assert!(result.is_ok(), "Config loading should succeed");
+
+        let config = result.unwrap();
+
+        assert_eq!(config.features.create_url.enabled, false);
+        assert_eq!(config.features.create_url.auth_only, false);
+        assert_eq!(config.auth.enabled, false);
+        assert_eq!(config.auth.auth_type, AuthType::Gitlab);
+        assert_eq!(
+            config.auth.providers.gitlab.base_url,
+            "https://gitlab.example.com"
+        );
+        assert_eq!(
+            config.auth.providers.gitlab.application_id,
+            "override-app-id"
+        );
+        assert_eq!(config.auth.providers.gitlab.secret, "override-secret");
+
+        unsafe {
+            std::env::remove_var("FEATURES_CREATE_URL_ENABLED");
+            std::env::remove_var("FEATURES_CREATE_URL_AUTH_ONLY");
+            std::env::remove_var("AUTH_ENABLED");
+            std::env::remove_var("AUTH_TYPE");
+            std::env::remove_var("AUTH_PROVIDERS_GITLAB_BASE_URL");
+            std::env::remove_var("AUTH_PROVIDERS_GITLAB_APPLICATION_ID");
+            std::env::remove_var("AUTH_PROVIDERS_GITLAB_SECRET");
         }
     }
 }

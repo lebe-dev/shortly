@@ -62,6 +62,7 @@ where
     async fn register_url(
         &self,
         url: &str,
+        user_id: Option<i64>,
     ) -> Result<super::model::Url, super::model::ShortUrlGenerationError> {
         info!("registering url '{}'..", url);
 
@@ -99,6 +100,7 @@ where
                         original_url: url.to_string(),
                         ttl: self.ttl,
                         created: timestamp,
+                        user_id,
                     };
 
                     self.repo
@@ -149,6 +151,43 @@ where
 
         Ok(())
     }
+
+    async fn list_user_urls(
+        &self,
+        user_id: i64,
+    ) -> Result<Vec<super::model::Url>, super::model::FindUrlError> {
+        info!("listing urls for user {}", user_id);
+        self.repo.find_by_user_id(user_id).await.map_err(Into::into)
+    }
+
+    async fn delete_url(
+        &self,
+        url_id: &str,
+        user_id: i64,
+    ) -> Result<(), super::model::DeleteUrlError> {
+        info!("attempting to delete url '{}' by user {}", url_id, user_id);
+
+        // First check if URL exists and belongs to user
+        match self.repo.find_by_id(url_id).await? {
+            Some(url) => {
+                if url.user_id == Some(user_id) {
+                    self.repo.delete_by_id(url_id).await?;
+                    info!("url '{}' deleted successfully", url_id);
+                    Ok(())
+                } else {
+                    error!(
+                        "unauthorized delete attempt: url '{}' does not belong to user {}",
+                        url_id, user_id
+                    );
+                    Err(super::model::DeleteUrlError::Unauthorized)
+                }
+            }
+            None => {
+                error!("url '{}' not found", url_id);
+                Err(super::model::DeleteUrlError::NotFound)
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -161,7 +200,7 @@ mod tests {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new("http://localhost:8080/", 1, 2048, db); // 1 hour
 
-        let result = service.register_url("https://example.com").await;
+        let result = service.register_url("https://example.com", None).await;
 
         assert!(result.is_ok());
         let url = result.unwrap();
@@ -175,8 +214,14 @@ mod tests {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new("http://localhost:8080/", 1, 2048, db); // 1 hour
 
-        let url1 = service.register_url("https://example.com").await.unwrap();
-        let url2 = service.register_url("https://google.com").await.unwrap();
+        let url1 = service
+            .register_url("https://example.com", None)
+            .await
+            .unwrap();
+        let url2 = service
+            .register_url("https://google.com", None)
+            .await
+            .unwrap();
 
         assert_ne!(url1.id, url2.id);
     }
@@ -186,7 +231,10 @@ mod tests {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new("http://localhost:8080/", 1, 2048, db); // 1 hour
 
-        let registered_url = service.register_url("https://example.com").await.unwrap();
+        let registered_url = service
+            .register_url("https://example.com", None)
+            .await
+            .unwrap();
         let found_url = service.find_by_id(&registered_url.id).await.unwrap();
 
         assert!(found_url.is_some());
@@ -212,7 +260,10 @@ mod tests {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new("http://localhost:8080", 1, 2048, db); // 1 hour
 
-        let registered_url = service.register_url("https://example.com").await.unwrap();
+        let registered_url = service
+            .register_url("https://example.com", None)
+            .await
+            .unwrap();
         let short_url = service.generate_short_url(&registered_url).await;
 
         assert_eq!(
@@ -376,7 +427,7 @@ mod tests {
         // Generate multiple URLs to test consistency
         for i in 0..50 {
             let url = format!("https://example{}.com", i);
-            let result = service.register_url(&url).await;
+            let result = service.register_url(&url, None).await;
 
             assert!(result.is_ok());
             let registered_url = result.unwrap();
