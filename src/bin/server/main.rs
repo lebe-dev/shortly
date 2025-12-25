@@ -23,6 +23,7 @@ use route::{
     version::get_version_route,
 };
 use rust_embed::Embed;
+use server_lib::domain::url::service::BASE_RESERVED_NAMES;
 use server_lib::{
     VERSION,
     domain::{
@@ -38,8 +39,8 @@ use tokio_cron_scheduler::{Job, JobScheduler};
 
 use crate::route::{
     url::{
-        delete::delete_url_route, generate::generate_short_url_route,
-        get::get_short_url_by_id_route,
+        check::check_custom_name_route, delete::delete_url_route,
+        generate::generate_short_url_route, get::get_short_url_by_id_route,
     },
     user::urls::list_user_urls_route,
 };
@@ -93,6 +94,12 @@ async fn main() -> anyhow::Result<()> {
                         app_config.short_url.ttl,
                         app_config.short_url.max_length,
                         db_pool.clone(),
+                        app_config.features.named_urls.enabled,
+                        app_config.features.named_urls.min_length,
+                        app_config.features.named_urls.max_length,
+                        app_config.features.named_urls.reserved_names.clone(),
+                        app_config.features.create_url.max_per_user,
+                        app_config.features.create_url.max_per_day,
                     );
 
                     let auth_service = if app_config.auth.enabled {
@@ -184,6 +191,7 @@ async fn main() -> anyhow::Result<()> {
                         .route("/api/url/{url_id}", get(get_short_url_by_id_route))
                         .route("/api/url/{url_id}", axum::routing::delete(delete_url_route))
                         .route("/api/url", post(generate_short_url_route))
+                        .route("/api/url/check", get(check_custom_name_route))
                         .route("/api/user/urls", get(list_user_urls_route))
                         .fallback(static_handler)
                         .layer(from_fn_with_state(app_state_arc.clone(), auth_middleware))
@@ -196,7 +204,8 @@ async fn main() -> anyhow::Result<()> {
                         .expect("unable to bind tcp socket");
 
                     println!("SHORTLY v{}", VERSION);
-                    println!("URL: http://{bind}");
+                    println!("Bind: http://{bind}");
+                    println!("URL: {}", app_config.base_url);
 
                     axum::serve(listener, app)
                         .await
@@ -219,8 +228,8 @@ async fn main() -> anyhow::Result<()> {
 
 static INDEX_HTML: &str = "index.html";
 
-// Frontend routes that should never be treated as short URLs
-static RESERVED_FRONTEND_ROUTES: &[&str] = &["links", "login"];
+// Use the same base reserved names as the URL service to ensure consistency
+static RESERVED_FRONTEND_ROUTES: &[&str] = BASE_RESERVED_NAMES;
 
 async fn index_html() -> Response {
     match Assets::get(INDEX_HTML) {
@@ -255,8 +264,6 @@ async fn static_handler(State(state): State<Arc<SharedAppState>>, uri: Uri) -> i
 
     debug!("static_handler: path = '{}'", path);
 
-    // Check if this might be a short URL ID
-    // Criteria: not a reserved frontend route, not empty, not index.html, no dots (not a file), no slashes (not a path)
     if !RESERVED_FRONTEND_ROUTES.contains(&path)
         && !path.is_empty()
         && path != INDEX_HTML
@@ -265,7 +272,6 @@ async fn static_handler(State(state): State<Arc<SharedAppState>>, uri: Uri) -> i
     {
         info!("checking database for potential short URL: '{}'", path);
 
-        // Try to find URL in database
         match state.url_service.find_by_id(path).await {
             Ok(Some(url)) => {
                 info!("redirecting short URL '{}' to '{}'", path, url.original_url);

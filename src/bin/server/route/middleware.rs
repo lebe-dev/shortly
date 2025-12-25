@@ -14,7 +14,7 @@ use crate::AppState;
 /// # How it works
 ///
 /// 1. **Path exemption**: Always allows certain paths without authentication:
-///    - `/api/version` and `/api/config` (public endpoints)
+///    - `/api/version` (public endpoint)
 ///    - `/api/auth/*` (authentication endpoints)
 ///    - Non-API paths (static assets, frontend routes)
 ///
@@ -46,12 +46,33 @@ pub async fn auth_middleware(
     let method = request.method();
 
     // Exempt paths
-    if path == "/api/version"
-        || path == "/api/config"
-        || path.starts_with("/api/auth/")
-        || !path.starts_with("/api/")
-    {
+    if path == "/api/version" || path.starts_with("/api/auth/") || !path.starts_with("/api/") {
         debug!("path '{}' '{}' exempted from authentication", method, path);
+        return next.run(request).await;
+    }
+
+    // Optional auth for /api/config (to include user consumption data)
+    if path == "/api/config" && method == "GET" {
+        debug!("Config request: attempting optional auth");
+
+        // Try to extract and validate session token
+        if let Some(token) = extract_session_token(request.headers()) {
+            if let Some(auth_service) = &state.auth_service {
+                match auth_service.validate_session(&token).await {
+                    Ok(user) => {
+                        debug!("Optional auth successful for user: {}", user.username);
+                        request.extensions_mut().insert(user);
+                        return next.run(request).await;
+                    }
+                    Err(e) => {
+                        debug!("Session validation failed: {:?}", e);
+                        // Continue without user context
+                    }
+                }
+            }
+        }
+
+        // Continue without authentication
         return next.run(request).await;
     }
 

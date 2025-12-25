@@ -1,33 +1,189 @@
 <script lang="ts">
 	import { fetchConfig } from '$lib/api/config';
 	import { generateShortUrl } from '$lib/api/url';
+	import ConsumptionBadge from '$lib/components/ConsumptionBadge.svelte';
 	import CopyButton from '$lib/components/CopyButton.svelte';
+	import CustomNameInput from '$lib/components/CustomNameInput.svelte';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
-	import { formatDuration } from '$lib/date';
+	import { Kbd } from '$lib/components/ui/kbd';
+	import { formatDuration, formatExpiryDate } from '$lib/date';
 	import { isUrlValid } from '$lib/validator';
 	import { onMount, tick } from 'svelte';
+	import { slide } from 'svelte/transition';
 	import { toast } from 'svelte-sonner';
 	import { t } from 'svelte-intl-precompile';
 	import type { AppConfig } from '$lib/domain/config';
 	import { authStore, authLoading } from '$lib/stores/auth';
+	import { copy } from 'svelte-copy';
 
 	let inProgress = $state(true);
 
-	let urlInputRef: HTMLInputElement | null = $state(null);
+	let urlInputRef = $state<HTMLInputElement | null>(null);
 
 	let url: string = $state('');
 	let shortUrl: string = $state('');
 	let config: AppConfig | null = $state(null);
 	let shortUrlTtl = $state(0);
 	let maxUrlLength = $state(2048);
+	let shortUrlExpiryDate: string = $state('');
 
-	const ttlFormatted = $derived(formatDuration(shortUrlTtl));
+	let customName: string = $state('');
+	let customNameAvailable = $state<boolean | null>(null);
+	let customNameError = $state<string | null>(null);
+	let showAvailableMessage = $state(false);
+	let availableMessageTimer: ReturnType<typeof setTimeout> | null = null;
+
+	let showUrlValidationError = $state(false);
+	let urlValidationTimer: ReturnType<typeof setTimeout> | null = null;
+
+	let urlInputFocused = $state(false);
+	let customNameInputFocused = $state(false);
+	let customNameInputRef = $state<HTMLInputElement | null>(null);
+
+	const ttlFormatted = $derived(formatDuration(shortUrlTtl, $t));
+
+	const showCustomNameInput = $derived.by(() => {
+		if (!config) return false;
+		return config.features.namedUrls.enabled && $authStore.authenticated;
+	});
+
+	const userAtLimit = $derived.by(() => {
+		if (!config || !showCustomNameInput) return false;
+
+		const totalLimit =
+			config.features.createUrl.currentUrls !== undefined &&
+			config.features.createUrl.currentUrls >= config.features.createUrl.maxPerUser;
+
+		const dailyLimit =
+			config.features.createUrl.currentUrlsToday !== undefined &&
+			config.features.createUrl.currentUrlsToday >= config.features.createUrl.maxPerDay;
+
+		return totalLimit || dailyLimit;
+	});
+
+	const canGenerate = $derived.by(() => {
+		// URL must not be empty
+		if (url.trim().length === 0) {
+			return false;
+		}
+
+		// URL must pass validation
+		if (validationError !== null) {
+			return false;
+		}
+
+		// If custom name is provided, it must be available
+		if (customName.length > 0 && customNameAvailable !== true) {
+			return false;
+		}
+
+		// Check if user is at limit (applies to all URL creation when authenticated)
+		if (userAtLimit) {
+			return false;
+		}
+
+		return true;
+	});
+
+	const validationError = $derived.by(() => {
+		const trimmedUrl = url.trim();
+
+		// Don't show error if field is empty
+		if (trimmedUrl.length === 0) {
+			return null;
+		}
+
+		// Check length
+		if (trimmedUrl.length >= maxUrlLength) {
+			return $t('homePage.errors.urlTooLong', { values: { maxLength: maxUrlLength } });
+		}
+
+		// Check if valid URL
+		if (!isUrlValid(trimmedUrl, maxUrlLength, config?.baseUrl)) {
+			return $t('homePage.errors.invalidUrl');
+		}
+
+		return null;
+	});
+
+	const showUrlHint = $derived.by(() => {
+		return urlInputFocused && canGenerate;
+	});
+
+	const showCustomNameHint = $derived.by(() => {
+		if (!customNameInputFocused) return false;
+		if (customName.length === 0) return false;
+		return canGenerate;
+	});
+
+	function handleUrlKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter' && canGenerate) {
+			event.preventDefault();
+			generateUrl();
+		}
+	}
+
+	function handleCustomNameKeydown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
+			event.preventDefault();
+
+			if (url.trim().length === 0) {
+				if (urlInputRef) {
+					urlInputRef.focus();
+				}
+			} else if (canGenerate) {
+				generateUrl();
+			}
+		}
+	}
+
+	function handleUrlInput() {
+		// Reset validation error display when user types
+		showUrlValidationError = false;
+
+		// Clear previous timer
+		if (urlValidationTimer) {
+			clearTimeout(urlValidationTimer);
+			urlValidationTimer = null;
+		}
+
+		// Don't show validation error if field is empty
+		if (url.trim().length === 0) {
+			return;
+		}
+
+		// Set timer to show validation error after user stops typing
+		urlValidationTimer = setTimeout(() => {
+			showUrlValidationError = true;
+		}, 500);
+	}
+
+	function handleAvailabilityChange(available: boolean | null) {
+		customNameAvailable = available;
+
+		if (availableMessageTimer) {
+			clearTimeout(availableMessageTimer);
+			availableMessageTimer = null;
+		}
+
+		if (available === true) {
+			showAvailableMessage = true;
+
+			availableMessageTimer = setTimeout(() => {
+				showAvailableMessage = false;
+			}, 3000);
+		} else {
+			showAvailableMessage = false;
+		}
+	}
 
 	onMount(async () => {
 		await fetchConfig()
 			.then((data) => {
 				config = data;
+				console.log('Config loaded on mount:', data);
+				console.log('Named URLs consumption:', data.features.namedUrls);
 				shortUrlTtl = data.shortUrlTtl;
 				maxUrlLength = data.maxUrlLength;
 				inProgress = false;
@@ -45,28 +201,57 @@
 	});
 
 	async function generateUrl() {
-		if (url.length >= maxUrlLength) {
+		// Trim URL before validation
+		const trimmedUrl = url.trim();
+
+		if (trimmedUrl.length >= maxUrlLength) {
 			toast.error($t('homePage.errors.urlTooLong', { values: { maxLength: maxUrlLength } }));
-		} else {
-			if (isUrlValid(url, maxUrlLength)) {
-				inProgress = true;
-				await generateShortUrl(url)
-					.then((data) => {
-						shortUrl = data.url;
-						console.log('short url:', shortUrl);
-						inProgress = false;
-					})
-					.catch((e) => {
-						console.error(e);
-						inProgress = false;
-					});
-			} else {
-				toast.error($t('homePage.errors.invalidUrl'));
-				if (urlInputRef) {
-					urlInputRef.focus();
-				}
-			}
+			return;
 		}
+
+		if (customName.length > 0 && customNameAvailable !== true) {
+			toast.error($t('homePage.errors.customNameNotAvailable'));
+			return;
+		}
+
+		if (!isUrlValid(trimmedUrl, maxUrlLength, config?.baseUrl)) {
+			toast.error($t('homePage.errors.invalidUrl'));
+			if (urlInputRef) {
+				urlInputRef.focus();
+			}
+			return;
+		}
+
+		inProgress = true;
+		try {
+			const nameToUse = customName.length > 0 ? customName : undefined;
+			const data = await generateShortUrl(trimmedUrl, nameToUse);
+			shortUrl = data.url;
+			console.log('short url:', shortUrl);
+
+			// Calculate expiry date for non-named URLs
+			if (!nameToUse && shortUrlTtl > 0) {
+				const nowSeconds = Math.floor(Date.now() / 1000);
+				const ttlSeconds = shortUrlTtl * 3600; // Convert hours to seconds
+				shortUrlExpiryDate = formatExpiryDate(nowSeconds, ttlSeconds);
+			}
+
+			// Reload config to update consumption counters
+			if (nameToUse) {
+				const updatedConfig = await fetchConfig();
+				config = updatedConfig;
+				console.log('Config reloaded after URL creation:', updatedConfig.features.namedUrls);
+			}
+		} catch (e: any) {
+			console.error(e);
+			toast.error(e.message || $t('homePage.errors.generateFailed'));
+		} finally {
+			inProgress = false;
+		}
+	}
+
+	function handleShortUrlClick() {
+		toast.success($t('homePage.result.linkCopied'));
 	}
 </script>
 
@@ -76,17 +261,17 @@
 </svelte:head>
 
 <div
-	class="xs:w-[100px] h-80 w-[1300px] max-w-[1300px] rounded bg-white px-6 py-22 text-center shadow md:px-24 dark:bg-gray-900"
+	class="xs:w-[100px] w-[1300px] max-w-[1300px] rounded bg-white px-6 pt-22 pb-18 text-center shadow md:px-24 dark:bg-gray-900"
 >
 	{#if !config}
 		<div class="text-muted-foreground">{$t('common.loading')}</div>
 	{:else if $authLoading}
 		<div class="text-muted-foreground">{$t('common.loadingEllipsis')}</div>
-	{:else if !config.features.createUrlEnabled}
+	{:else if !config.features.createUrl.enabled}
 		<div class="text-muted-foreground text-lg">
 			{$t('homePage.errors.serviceTitle')}
 		</div>
-	{:else if config.features.createUrlAuthOnly && !$authStore.authenticated}
+	{:else if config.features.createUrl.authOnly && !$authStore.authenticated}
 		<div class="flex flex-col items-center justify-center gap-3">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -115,33 +300,132 @@
 			bind:ref={urlInputRef}
 			type="text"
 			bind:value={url}
+			oninput={handleUrlInput}
+			onkeydown={handleUrlKeydown}
+			onfocus={() => (urlInputFocused = true)}
+			onblur={() => (urlInputFocused = false)}
 			disabled={inProgress}
 			placeholder={$t('homePage.form.placeholder')}
 			maxlength={maxUrlLength}
 			class="md:text-md mb-2 w-full text-lg"
+			autofocus
 		/>
-		{#if ttlFormatted}
-			<div class="text-muted-foreground mb-3 text-sm">
-				{$t('homePage.form.storageInfo', { values: { ttl: ttlFormatted } })}
+		{#if showUrlHint}
+			<div
+				transition:slide={{ duration: 200 }}
+				class="text-muted-foreground mt-1 mb-2 text-left text-xs"
+			>
+				{$t('homePage.hints.urlField.prefix')}<Kbd>Enter</Kbd>{$t('homePage.hints.urlField.suffix')}
 			</div>
-		{:else}
-			<div class="text-muted-foreground mb-3 text-sm">{$t('common.loadingEllipsis')}</div>
 		{/if}
+		{#if showCustomNameInput && config}
+			<div class="mb-8">
+				<div
+					class="mt-3 mb-1 text-left text-xs {customName.length === 0
+						? 'text-muted-foreground'
+						: ''}"
+				>
+					{$t('homePage.customName.label')}
+				</div>
+				<CustomNameInput
+					bind:value={customName}
+					bind:inputRef={customNameInputRef}
+					config={config.features.namedUrls}
+					disabled={inProgress}
+					hideStatus={true}
+					onAvailabilityChange={handleAvailabilityChange}
+					onErrorChange={(error) => {
+						customNameError = error;
+					}}
+					onKeydown={handleCustomNameKeydown}
+					onFocus={() => (customNameInputFocused = true)}
+					onBlur={() => (customNameInputFocused = false)}
+				/>
+				{#if showCustomNameHint}
+					<div
+						transition:slide={{ duration: 200 }}
+						class="text-muted-foreground mt-1 text-left text-xs"
+					>
+						{$t('homePage.hints.customNameField.prefix')}<Kbd>Enter</Kbd>{$t(
+							'homePage.hints.customNameField.suffixCreate'
+						)}
+					</div>
+				{/if}
+			</div>
+		{/if}
+		<div class="mb-3 min-h-[1.25rem] text-sm">
+			{#if showUrlValidationError && validationError}
+				<div class="text-red-600 dark:text-red-400">
+					{validationError}
+				</div>
+			{:else if customNameError}
+				<div class="text-red-600 dark:text-red-400">
+					{customNameError}
+				</div>
+			{:else if userAtLimit}
+				<div class="text-red-600 dark:text-red-400">
+					{$t('homePage.errors.limitReached')}
+				</div>
+			{:else if showAvailableMessage}
+				<div class="text-green-600 dark:text-green-400">
+					{$t('homePage.customName.available')}
+				</div>
+			{:else if showCustomNameInput && customName.length > 0}
+				<div class="text-muted-foreground">
+					{$t('homePage.customName.noExpiration')}
+				</div>
+			{:else if ttlFormatted}
+				<div class="text-muted-foreground">
+					{$t('homePage.form.storageInfo', { values: { ttl: ttlFormatted } })}
+				</div>
+			{:else if !ttlFormatted}
+				<div class="text-muted-foreground">{$t('common.loadingEllipsis')}</div>
+			{/if}
+		</div>
 		<div class="flex items-center justify-center gap-3">
-			<Button size="lg" disabled={inProgress} onclick={generateUrl}
+			<Button size="lg" disabled={inProgress || !canGenerate} onclick={generateUrl}
 				>{$t('common.buttons.generate')}</Button
 			>
 		</div>
+		{#if showCustomNameInput && config}
+			<div class="mt-4"><ConsumptionBadge config={config.features.createUrl} /></div>
+		{/if}
 	{:else}
 		<div>
 			<div>{$t('homePage.result.title')}</div>
-			<div class="mb-2 text-3xl">{shortUrl}</div>
-			{#if ttlFormatted}
+			<div
+				use:copy={shortUrl}
+				onclick={handleShortUrlClick}
+				class="mb-2 cursor-pointer text-3xl transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+			>
+				{shortUrl}
+			</div>
+			<div class="text-muted-foreground mb-4 text-xs">
+				{$t('homePage.result.clickToCopy')}
+			</div>
+			{#if customName.length > 0}
 				<div class="text-muted-foreground mb-4 text-sm">
-					{$t('homePage.result.expirationInfo', { values: { ttl: ttlFormatted } })}
+					{$t('homePage.result.namedUrlInfo')}
+				</div>
+			{:else if shortUrlExpiryDate}
+				<div class="text-muted-foreground mb-4 text-sm">
+					{$t('homePage.result.expirationDate', { values: { date: shortUrlExpiryDate } })}
 				</div>
 			{/if}
-			<CopyButton data={shortUrl} label={$t('common.buttons.copy')} />
+			<div class="flex flex-col items-center gap-3">
+				<CopyButton data={shortUrl} label={$t('common.buttons.copy')} />
+				<button
+					onclick={() => {
+						url = '';
+						shortUrl = '';
+						customName = '';
+						shortUrlExpiryDate = '';
+					}}
+					class="text-muted-foreground text-sm hover:cursor-pointer hover:underline"
+				>
+					{$t('common.backToHome')}
+				</button>
+			</div>
 		</div>
 	{/if}
 </div>

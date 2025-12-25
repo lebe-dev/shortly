@@ -12,10 +12,33 @@ features:
     enabled: true
     auth-only: true
 
+    # Maximum URLs per user (ENV: FEATURES_CREATE_URL_MAX_PER_USER)
+    max-per-user: 100
+    # Maximum URLs per day (ENV: FEATURES_CREATE_URL_MAX_PER_DAY)
+    max-per-day: 10
+
+  named-urls:
+    enabled: true
+    min-length: 3
+    max-length: 32
+
+    # Reserved names that cannot be used
+    # Note: The following names are ALWAYS reserved (hardcoded in application):
+    #   links, api, login, logout, assets, static, health, metrics, auth, admin
+    # You can add additional custom reserved names below:
+    reserved-names: []
+      # Examples of additional names you might want to reserve:
+      # - admin-panel
+      # - dashboard
+      # - settings
+      # - profile
+
 auth:
   enabled: true
 
   type: gitlab
+
+  note: ""
 
   providers:
     gitlab:

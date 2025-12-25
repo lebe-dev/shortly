@@ -1,11 +1,13 @@
 import { HttpError } from './error';
 
 export class RegisterUrlRequest {
-	constructor(url: string) {
+	constructor(url: string, name?: string) {
 		this.url = url;
+		this.name = name;
 	}
 
 	url: string;
+	name?: string;
 }
 
 export class RegisterUrlResponse {
@@ -48,20 +50,48 @@ export async function fetchUrlById(urlId: string): Promise<UrlDetailsResponse> {
 	}
 }
 
-export async function generateShortUrl(url: string): Promise<RegisterUrlResponse> {
+export async function generateShortUrl(url: string, name?: string): Promise<RegisterUrlResponse> {
 	const response = await fetch('/api/url', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		body: JSON.stringify(new RegisterUrlRequest(url)),
+		body: JSON.stringify(new RegisterUrlRequest(url, name)),
 		credentials: 'include'
 	});
 
 	if (response.status === 200) {
 		return response.json();
+	} else if (response.status === 400) {
+		const data = await response.json().catch(() => ({ error: 'Invalid request' }));
+		throw new Error(data.error || 'Invalid request');
+	} else if (response.status === 409) {
+		throw new Error('Custom name already exists or is reserved');
+	} else if (response.status === 429) {
+		throw new Error('Rate limit exceeded');
+	} else if (response.status === 401) {
+		throw new Error('Authentication required for named URLs');
 	} else {
-		throw new Error('unable to generate short url');
+		throw new Error('Unable to generate short url');
+	}
+}
+
+export interface CheckNameResponse {
+	available: boolean;
+}
+
+export async function checkCustomName(name: string): Promise<boolean> {
+	const response = await fetch(`/api/url/check?name=${encodeURIComponent(name)}`, {
+		method: 'GET'
+	});
+
+	if (response.status === 200) {
+		const data: CheckNameResponse = await response.json();
+		return data.available;
+	} else if (response.status === 409) {
+		return false;
+	} else {
+		throw new Error('Failed to check name availability');
 	}
 }
 
@@ -71,13 +101,22 @@ export class UserUrlResponse {
 	original_url: string;
 	created: number;
 	ttl: number;
+	custom_name?: string;
 
-	constructor(id: string, url: string, original_url: string, created: number, ttl: number) {
+	constructor(
+		id: string,
+		url: string,
+		original_url: string,
+		created: number,
+		ttl: number,
+		custom_name?: string
+	) {
 		this.id = id;
 		this.url = url;
 		this.original_url = original_url;
 		this.created = created;
 		this.ttl = ttl;
+		this.custom_name = custom_name;
 	}
 }
 

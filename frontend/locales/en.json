@@ -6,7 +6,33 @@
 			"generate": "GENERATE"
 		},
 		"loading": "Loading...",
-		"loadingEllipsis": "..."
+		"loadingEllipsis": "...",
+		"backToHome": "Back to home",
+		"consumption": {
+			"title": "Limits",
+			"totalLinks": "Total Links",
+			"createdToday": "Created Today",
+			"total": "Total",
+			"today": "Today",
+			"reachedBothLimits": "You have reached both your total and daily limits.",
+			"reachedTotalLimit": "You have reached your total link limit.",
+			"reachedDailyLimit": "You have reached your daily link limit.",
+			"badge": {
+				"remainingToday": "Remaining: {remaining} of {total} today",
+				"remainingTotal": "Remaining: {remaining} of {total} total"
+			},
+			"hint": {
+				"limits": "Delete unused links to free up space.\n\nExpired links are deleted automatically."
+			}
+		},
+		"timeUnits": {
+			"minute": "{count, plural, one {# minute} other {# minutes}}",
+			"hour": "{count, plural, one {# hour} other {# hours}}",
+			"day": "{count, plural, one {# day} other {# days}}",
+			"week": "{count, plural, one {# week} other {# weeks}}",
+			"month": "{count, plural, one {# month} other {# months}}",
+			"lessThanMinute": "less than a minute"
+		}
 	},
 	"layout": {
 		"homeLink": "Go to main page",
@@ -26,16 +52,46 @@
 			"placeholder": "https://my.long-url.com",
 			"storageInfo": "Links will be stored for {ttl}"
 		},
+		"hints": {
+			"urlField": {
+				"prefix": "Press ",
+				"suffix": " to create link"
+			},
+			"customNameField": {
+				"prefix": "Press ",
+				"suffixCreate": " to create link",
+				"suffixFocusUrl": " to focus URL field"
+			}
+		},
+		"customName": {
+			"label": "Custom short name (optional)",
+			"placeholder": "e.g., onboarding",
+			"hint": "Short name for your link. For example, 'onboarding'",
+			"tooShort": "Name must be at least {minLength} characters",
+			"tooLong": "Name must be at most {maxLength} characters",
+			"reserved": "This name is reserved",
+			"checking": "Checking availability...",
+			"available": "✓ Available",
+			"taken": "✗ Name already taken",
+			"noExpiration": "Named links never expire"
+		},
 		"result": {
 			"title": "Your short url:",
-			"expirationInfo": "This link will expire in {ttl}"
+			"expirationInfo": "This link will expire in {ttl}",
+			"expirationDate": "Link will be stored until {date}",
+			"namedUrlInfo": "This named link will never expire",
+			"clickToCopy": "Click on the link to copy to clipboard",
+			"linkCopied": "Link copied"
 		},
 		"errors": {
 			"configLoadFailed": "Unable to load app config",
 			"urlTooLong": "Max URL length exceeded: {maxLength}",
 			"invalidUrl": "Invalid URL",
 			"authRequired": "Authentication is required to create short URLs",
-			"serviceTitle": "Short URL Service"
+			"serviceTitle": "Short URL Service",
+			"customNameNotAvailable": "Custom name is not available",
+			"generateFailed": "Failed to generate short URL",
+			"limitReached": "You have reached your link creation limit"
 		}
 	},
 	"urlPage": {
@@ -58,7 +114,6 @@
 		"buttons": {
 			"gitlab": "Login with GitLab"
 		},
-		"backToHome": "Back to home",
 		"errors": {
 			"configLoadFailed": "Unable to load app config",
 			"authDisabled": "Authentication is not available"
@@ -74,12 +129,20 @@
 		"deleteConfirm": "Are you sure you want to delete this link? This action cannot be undone.",
 		"deleteSuccess": "Link deleted successfully",
 		"copySuccess": "Link copied to clipboard",
+		"hints": {
+			"limits": "Limits are set by the service administrator"
+		},
 		"table": {
 			"shortUrl": "Short URL",
 			"originalUrl": "Original URL",
 			"created": "Created",
 			"expires": "Expires In",
 			"actions": "Actions"
+		},
+		"timeRemaining": {
+			"dayShort": "{count}d",
+			"hourShort": "{count}h",
+			"minuteShort": "{count}m"
 		},
 		"errors": {
 			"loadFailed": "Failed to load your links",

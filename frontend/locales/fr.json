@@ -6,7 +6,33 @@
 			"generate": "GÉNÉRER"
 		},
 		"loading": "Chargement...",
-		"loadingEllipsis": "..."
+		"loadingEllipsis": "...",
+		"backToHome": "Retour à l'accueil",
+		"consumption": {
+			"title": "Limites",
+			"totalLinks": "Liens totaux",
+			"createdToday": "Créés aujourd'hui",
+			"total": "Total",
+			"today": "Aujourd'hui",
+			"reachedBothLimits": "Vous avez atteint à la fois votre limite totale et quotidienne.",
+			"reachedTotalLimit": "Vous avez atteint votre limite totale de liens.",
+			"reachedDailyLimit": "Vous avez atteint votre limite quotidienne de liens.",
+			"badge": {
+				"remainingToday": "Restants: {remaining} sur {total} aujourd'hui",
+				"remainingTotal": "Restants: {remaining} sur {total} au total"
+			},
+			"hint": {
+				"limits": "Supprimez les liens inutilisés.\n\nLes liens expirés sont supprimés automatiquement."
+			}
+		},
+		"timeUnits": {
+			"minute": "{count, plural, one {# minute} other {# minutes}}",
+			"hour": "{count, plural, one {# heure} other {# heures}}",
+			"day": "{count, plural, one {# jour} other {# jours}}",
+			"week": "{count, plural, one {# semaine} other {# semaines}}",
+			"month": "{count, plural, one {# mois} other {# mois}}",
+			"lessThanMinute": "moins d'une minute"
+		}
 	},
 	"layout": {
 		"homeLink": "Aller à la page principale",
@@ -26,16 +52,46 @@
 			"placeholder": "https://mon.url-longue.com",
 			"storageInfo": "Les liens seront stockés pendant {ttl}"
 		},
+		"hints": {
+			"urlField": {
+				"prefix": "Appuyez sur ",
+				"suffix": " pour créer le lien"
+			},
+			"customNameField": {
+				"prefix": "Appuyez sur ",
+				"suffixCreate": " pour créer le lien",
+				"suffixFocusUrl": " pour aller au champ URL"
+			}
+		},
+		"customName": {
+			"label": "Nom court personnalisé (facultatif)",
+			"placeholder": "ex. onboarding",
+			"hint": "Nom court pour votre lien. Par exemple, 'onboarding'",
+			"tooShort": "Le nom doit comporter au moins {minLength} caractères",
+			"tooLong": "Le nom doit comporter au maximum {maxLength} caractères",
+			"reserved": "Ce nom est réservé",
+			"checking": "Vérification de la disponibilité...",
+			"available": "✓ Disponible",
+			"taken": "✗ Nom déjà pris",
+			"noExpiration": "Les liens nommés n'expirent jamais"
+		},
 		"result": {
 			"title": "Votre URL courte:",
-			"expirationInfo": "Ce lien expirera dans {ttl}"
+			"expirationInfo": "Ce lien expirera dans {ttl}",
+			"expirationDate": "Le lien sera stocké jusqu'au {date}",
+			"namedUrlInfo": "Ce lien nommé n'expirera jamais",
+			"clickToCopy": "Cliquez sur le lien pour copier dans le presse-papiers",
+			"linkCopied": "Lien copié"
 		},
 		"errors": {
 			"configLoadFailed": "Impossible de charger la configuration de l'application",
 			"urlTooLong": "Longueur maximale de l'URL dépassée: {maxLength}",
 			"invalidUrl": "URL invalide",
 			"authRequired": "L'authentification est requise pour créer des URLs courtes",
-			"serviceTitle": "Service d'URLs Courtes"
+			"serviceTitle": "Service d'URLs Courtes",
+			"customNameNotAvailable": "Le nom personnalisé n'est pas disponible",
+			"generateFailed": "Échec de la génération de l'URL courte",
+			"limitReached": "Vous avez atteint votre limite de création de liens"
 		}
 	},
 	"urlPage": {
@@ -58,7 +114,6 @@
 		"buttons": {
 			"gitlab": "Se connecter avec GitLab"
 		},
-		"backToHome": "Retour à l'accueil",
 		"errors": {
 			"configLoadFailed": "Impossible de charger la configuration de l'application",
 			"authDisabled": "L'authentification n'est pas disponible"
@@ -74,12 +129,20 @@
 		"deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce lien ? Cette action ne peut pas être annulée.",
 		"deleteSuccess": "Lien supprimé avec succès",
 		"copySuccess": "Lien copié dans le presse-papiers",
+		"hints": {
+			"limits": "Les limites sont définies par l'administrateur du service"
+		},
 		"table": {
 			"shortUrl": "URL Courte",
 			"originalUrl": "URL d'Origine",
 			"created": "Créé",
 			"expires": "Expire dans",
 			"actions": "Actions"
+		},
+		"timeRemaining": {
+			"dayShort": "{count}j",
+			"hourShort": "{count}h",
+			"minuteShort": "{count}m"
 		},
 		"errors": {
 			"loadFailed": "Échec du chargement de vos liens",

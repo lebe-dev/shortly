@@ -18,8 +18,16 @@ data:
   SCHEDULER_CLEANUP_EXPIRED_URLS: {{ .Values.config.scheduler.cleanupExpiredUrls | quote }}
   FEATURES_CREATE_URL_ENABLED: {{ .Values.config.features.createUrl.enabled | quote }}
   FEATURES_CREATE_URL_AUTH_ONLY: {{ .Values.config.features.createUrl.authOnly | quote }}
+  FEATURES_CREATE_URL_MAX_PER_USER: {{ .Values.config.features.createUrl.maxPerUser | quote }}
+  FEATURES_CREATE_URL_MAX_PER_DAY: {{ .Values.config.features.createUrl.maxPerDay | quote }}
+  FEATURES_NAMED_URLS_ENABLED: {{ .Values.config.features.namedUrls.enabled | quote }}
+  FEATURES_NAMED_URLS_MIN_LENGTH: {{ .Values.config.features.namedUrls.minLength | quote }}
+  FEATURES_NAMED_URLS_MAX_LENGTH: {{ .Values.config.features.namedUrls.maxLength | quote }}
   AUTH_ENABLED: {{ .Values.config.auth.enabled | quote }}
   AUTH_TYPE: {{ .Values.config.auth.type | quote }}
+  {{- if .Values.config.auth.note }}
+  AUTH_NOTE: {{ .Values.config.auth.note | quote }}
+  {{- end }}
   AUTH_PROVIDERS_GITLAB_BASE_URL: {{ .Values.config.auth.providers.gitlab.baseUrl | quote }}
 {{- if .Values.config.nginx.enabled }}
 ---

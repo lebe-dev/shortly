@@ -6,7 +6,33 @@
 			"generate": "生成"
 		},
 		"loading": "読み込み中...",
-		"loadingEllipsis": "..."
+		"loadingEllipsis": "...",
+		"backToHome": "ホームに戻る",
+		"consumption": {
+			"title": "制限",
+			"totalLinks": "合計リンク数",
+			"createdToday": "本日作成",
+			"total": "合計",
+			"today": "本日",
+			"reachedBothLimits": "合計制限と1日の制限の両方に達しました。",
+			"reachedTotalLimit": "リンクの合計制限に達しました。",
+			"reachedDailyLimit": "1日のリンク制限に達しました。",
+			"badge": {
+				"remainingToday": "残り：{remaining}/{total} 本日",
+				"remainingTotal": "残り：{remaining}/{total} 合計"
+			},
+			"hint": {
+				"limits": "未使用のリンクを削除してください。\n\n期限切れのリンクは自動的に削除されます。"
+			}
+		},
+		"timeUnits": {
+			"minute": "{count}分",
+			"hour": "{count}時間",
+			"day": "{count}日",
+			"week": "{count}週間",
+			"month": "{count}ヶ月",
+			"lessThanMinute": "1分未満"
+		}
 	},
 	"layout": {
 		"homeLink": "メインページに移動",
@@ -26,16 +52,46 @@
 			"placeholder": "https://my.long-url.com",
 			"storageInfo": "リンクは{ttl}保存されます"
 		},
+		"hints": {
+			"urlField": {
+				"prefix": "",
+				"suffix": " を押してリンクを作成"
+			},
+			"customNameField": {
+				"prefix": "",
+				"suffixCreate": " を押してリンクを作成",
+				"suffixFocusUrl": " を押してURLフィールドに移動"
+			}
+		},
+		"customName": {
+			"label": "カスタム短縮名（オプション）",
+			"placeholder": "例：onboarding",
+			"hint": "リンクの短縮名。例：'onboarding'",
+			"tooShort": "名前は{minLength}文字以上である必要があります",
+			"tooLong": "名前は{maxLength}文字以下である必要があります",
+			"reserved": "この名前は予約されています",
+			"checking": "利用可能性を確認中...",
+			"available": "✓ 利用可能",
+			"taken": "✗ 名前は既に使用されています",
+			"noExpiration": "名前付きリンクは期限切れになりません"
+		},
 		"result": {
 			"title": "あなたの短縮URL：",
-			"expirationInfo": "このリンクは{ttl}後に期限切れになります"
+			"expirationInfo": "このリンクは{ttl}後に期限切れになります",
+			"expirationDate": "リンクは{date}まで保存されます",
+			"namedUrlInfo": "この名前付きリンクは期限切れになりません",
+			"clickToCopy": "リンクをクリックしてクリップボードにコピー",
+			"linkCopied": "リンクをコピーしました"
 		},
 		"errors": {
 			"configLoadFailed": "アプリ設定を読み込めませんでした",
 			"urlTooLong": "URL最大長を超えました：{maxLength}",
 			"invalidUrl": "無効なURL",
 			"authRequired": "短縮URLを作成するには認証が必要です",
-			"serviceTitle": "短縮URLサービス"
+			"serviceTitle": "短縮URLサービス",
+			"customNameNotAvailable": "カスタム名は利用できません",
+			"generateFailed": "短縮URLの生成に失敗しました",
+			"limitReached": "リンク作成の上限に達しました"
 		}
 	},
 	"urlPage": {
@@ -58,7 +114,6 @@
 		"buttons": {
 			"gitlab": "GitLabでログイン"
 		},
-		"backToHome": "ホームに戻る",
 		"errors": {
 			"configLoadFailed": "アプリ設定を読み込めませんでした",
 			"authDisabled": "認証は利用できません"
@@ -74,12 +129,20 @@
 		"deleteConfirm": "このリンクを削除してもよろしいですか？この操作は元に戻せません。",
 		"deleteSuccess": "リンクを削除しました",
 		"copySuccess": "リンクをクリップボードにコピーしました",
+		"hints": {
+			"limits": "制限はサービス管理者によって設定されます"
+		},
 		"table": {
 			"shortUrl": "短縮URL",
 			"originalUrl": "元のURL",
 			"created": "作成日時",
 			"expires": "有効期限",
 			"actions": "操作"
+		},
+		"timeRemaining": {
+			"dayShort": "{count}日",
+			"hourShort": "{count}時",
+			"minuteShort": "{count}分"
 		},
 		"errors": {
 			"loadFailed": "リンクの読み込みに失敗しました",

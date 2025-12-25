@@ -6,7 +6,33 @@
 			"generate": "СОЗДАТЬ"
 		},
 		"loading": "Загрузка...",
-		"loadingEllipsis": "..."
+		"loadingEllipsis": "...",
+		"backToHome": "Вернуться на главную",
+		"consumption": {
+			"title": "Лимиты",
+			"totalLinks": "Всего ссылок",
+			"createdToday": "Создано сегодня",
+			"total": "Всего",
+			"today": "Сегодня",
+			"reachedBothLimits": "Вы достигли общего и дневного лимита.",
+			"reachedTotalLimit": "Вы достигли общего лимита ссылок.",
+			"reachedDailyLimit": "Вы достигли дневного лимита ссылок.",
+			"badge": {
+				"remainingToday": "Осталось: {remaining} из {total} сегодня",
+				"remainingTotal": "Осталось: {remaining} из {total} всего"
+			},
+			"hint": {
+				"limits": "Удалите неиспользуемые ссылки.\n\nИстёкшие ссылки удаляются автоматически."
+			}
+		},
+		"timeUnits": {
+			"minute": "{count, plural, one {# минута} few {# минуты} many {# минут} other {# минут}}",
+			"hour": "{count, plural, one {# час} few {# часа} many {# часов} other {# часов}}",
+			"day": "{count, plural, one {# день} few {# дня} many {# дней} other {# дней}}",
+			"week": "{count, plural, one {# неделя} few {# недели} many {# недель} other {# недель}}",
+			"month": "{count, plural, one {# месяц} few {# месяца} many {# месяцев} other {# месяцев}}",
+			"lessThanMinute": "меньше минуты"
+		}
 	},
 	"layout": {
 		"homeLink": "На главную",
@@ -24,18 +50,48 @@
 		"form": {
 			"label": "Вставьте длинную ссылку сюда",
 			"placeholder": "https://my.long-url.com",
-			"storageInfo": "Ссылки будут храниться {ttl}"
+			"storageInfo": "Срок хранения: {ttl}"
+		},
+		"hints": {
+			"urlField": {
+				"prefix": "Нажмите ",
+				"suffix": " для создания ссылки"
+			},
+			"customNameField": {
+				"prefix": "Нажмите ",
+				"suffixCreate": " для создания ссылки",
+				"suffixFocusUrl": " для фокуса на поле URL"
+			}
+		},
+		"customName": {
+			"label": "Короткое имя (опционально)",
+			"placeholder": "например, onboarding",
+			"hint": "Короткое имя для вашей ссылки. Например, 'onboarding'",
+			"tooShort": "Имя должно быть минимум {minLength} символов",
+			"tooLong": "Имя должно быть максимум {maxLength} символов",
+			"reserved": "Это имя зарезервировано",
+			"checking": "Проверка доступности...",
+			"available": "✓ Доступно",
+			"taken": "✗ Имя занято",
+			"noExpiration": "Срок хранения: без ограничений"
 		},
 		"result": {
 			"title": "Ваша короткая ссылка:",
-			"expirationInfo": "Эта ссылка истечёт через {ttl}"
+			"expirationInfo": "Эта ссылка истечёт через {ttl}",
+			"expirationDate": "Ссылка будет храниться до {date}",
+			"namedUrlInfo": "Срок хранения: без ограничений",
+			"clickToCopy": "Кликните по ссылке, чтобы скопировать в буфер обмена",
+			"linkCopied": "Ссылка скопирована"
 		},
 		"errors": {
 			"configLoadFailed": "Не удалось загрузить конфигурацию приложения",
 			"urlTooLong": "Превышена максимальная длина URL: {maxLength}",
 			"invalidUrl": "Неверный URL",
 			"authRequired": "Для создания коротких ссылок требуется аутентификация",
-			"serviceTitle": "Сервис коротких ссылок"
+			"serviceTitle": "Сервис коротких ссылок",
+			"customNameNotAvailable": "Выбранное имя недоступно",
+			"generateFailed": "Не удалось создать короткую ссылку",
+			"limitReached": "Вы достигли лимита создания ссылок"
 		}
 	},
 	"urlPage": {
@@ -58,7 +114,6 @@
 		"buttons": {
 			"gitlab": "Войти через GitLab"
 		},
-		"backToHome": "Вернуться на главную",
 		"errors": {
 			"configLoadFailed": "Не удалось загрузить конфигурацию приложения",
 			"authDisabled": "Аутентификация недоступна"
@@ -74,12 +129,20 @@
 		"deleteConfirm": "Вы уверены, что хотите удалить эту ссылку? Это действие нельзя отменить.",
 		"deleteSuccess": "Ссылка успешно удалена",
 		"copySuccess": "Ссылка скопирована в буфер обмена",
+		"hints": {
+			"limits": "Лимиты устанавливает администратор сервиса"
+		},
 		"table": {
 			"shortUrl": "Короткая ссылка",
 			"originalUrl": "Оригинальный URL",
 			"created": "Создана",
 			"expires": "Истекает через",
 			"actions": "Действия"
+		},
+		"timeRemaining": {
+			"dayShort": "{count}д",
+			"hourShort": "{count}ч",
+			"minuteShort": "{count}м"
 		},
 		"errors": {
 			"loadFailed": "Не удалось загрузить ваши ссылки",

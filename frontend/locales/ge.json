@@ -6,7 +6,33 @@
 			"generate": "გენერირება"
 		},
 		"loading": "იტვირთება...",
-		"loadingEllipsis": "..."
+		"loadingEllipsis": "...",
+		"backToHome": "მთავარ გვერდზე დაბრუნება",
+		"consumption": {
+			"title": "ლიმიტები",
+			"totalLinks": "სულ ბმულები",
+			"createdToday": "შექმნილია დღეს",
+			"total": "სულ",
+			"today": "დღეს",
+			"reachedBothLimits": "თქვენ მიაღწიეთ როგორც ჯამურ, ისე დღიურ ლიმიტს.",
+			"reachedTotalLimit": "თქვენ მიაღწიეთ ბმულების ჯამურ ლიმიტს.",
+			"reachedDailyLimit": "თქვენ მიაღწიეთ ბმულების დღიურ ლიმიტს.",
+			"badge": {
+				"remainingToday": "დარჩენილია: {remaining}/{total} დღეს",
+				"remainingTotal": "დარჩენილია: {remaining}/{total} სულ"
+			},
+			"hint": {
+				"limits": "წაშალეთ გამოუყენებელი ბმულები.\n\nვადაგასული ბმულები ავტომატურად იშლება."
+			}
+		},
+		"timeUnits": {
+			"minute": "{count, plural, one {# წუთი} other {# წუთი}}",
+			"hour": "{count, plural, one {# საათი} other {# საათი}}",
+			"day": "{count, plural, one {# დღე} other {# დღე}}",
+			"week": "{count, plural, one {# კვირა} other {# კვირა}}",
+			"month": "{count, plural, one {# თვე} other {# თვე}}",
+			"lessThanMinute": "ერთ წუთზე ნაკლები"
+		}
 	},
 	"layout": {
 		"homeLink": "მთავარ გვერდზე გადასვლა",
@@ -26,16 +52,46 @@
 			"placeholder": "https://my.long-url.com",
 			"storageInfo": "ბმულები შენახული იქნება {ttl}"
 		},
+		"hints": {
+			"urlField": {
+				"prefix": "დააჭირეთ ",
+				"suffix": " ბმულის შესაქმნელად"
+			},
+			"customNameField": {
+				"prefix": "დააჭირეთ ",
+				"suffixCreate": " ბმულის შესაქმნელად",
+				"suffixFocusUrl": " URL ველზე გადასასვლელად"
+			}
+		},
+		"customName": {
+			"label": "მოკლე სახელი (არასავალდებულო)",
+			"placeholder": "მაგ. onboarding",
+			"hint": "თქვენი ბმულის მოკლე სახელი. მაგალითად, 'onboarding'",
+			"tooShort": "სახელი უნდა იყოს მინიმუმ {minLength} სიმბოლო",
+			"tooLong": "სახელი უნდა იყოს მაქსიმუმ {maxLength} სიმბოლო",
+			"reserved": "ეს სახელი დაჯავშნულია",
+			"checking": "ხელმისაწვდომობის შემოწმება...",
+			"available": "✓ ხელმისაწვდომია",
+			"taken": "✗ სახელი უკვე დაკავებულია",
+			"noExpiration": "სახელიანი ბმულები არასოდეს ამოიწურება"
+		},
 		"result": {
 			"title": "თქვენი მოკლე URL:",
-			"expirationInfo": "ეს ბმული ამოიწურება {ttl}-ში"
+			"expirationInfo": "ეს ბმული ამოიწურება {ttl}-ში",
+			"expirationDate": "ბმული შენახული იქნება {date}-მდე",
+			"namedUrlInfo": "ეს სახელიანი ბმული არასოდეს ამოიწურება",
+			"clickToCopy": "დააწკაპუნეთ ბმულზე ბუფერში კოპირებისთვის",
+			"linkCopied": "ბმული კოპირებულია"
 		},
 		"errors": {
 			"configLoadFailed": "აპლიკაციის კონფიგურაციის ჩატვირთვა ვერ მოხერხდა",
 			"urlTooLong": "URL-ის მაქსიმალური სიგრძე გადაჭარბებულია: {maxLength}",
 			"invalidUrl": "არასწორი URL",
 			"authRequired": "მოკლე URL-ების შესაქმნელად საჭიროა ავთენტიფიკაცია",
-			"serviceTitle": "მოკლე URL-ების სერვისი"
+			"serviceTitle": "მოკლე URL-ების სერვისი",
+			"customNameNotAvailable": "მითითებული სახელი არ არის ხელმისაწვდომი",
+			"generateFailed": "მოკლე URL-ის შექმნა ვერ მოხერხდა",
+			"limitReached": "თქვენ მიაღწიეთ ბმულების შექმნის ლიმიტს"
 		}
 	},
 	"urlPage": {
@@ -58,7 +114,6 @@
 		"buttons": {
 			"gitlab": "შესვლა GitLab-ით"
 		},
-		"backToHome": "მთავარ გვერდზე დაბრუნება",
 		"errors": {
 			"configLoadFailed": "აპლიკაციის კონფიგურაციის ჩატვირთვა ვერ მოხერხდა",
 			"authDisabled": "აუთენტიფიკაცია არ არის ხელმისაწვდომი"
@@ -74,12 +129,20 @@
 		"deleteConfirm": "დარწმუნებული ხართ, რომ გსურთ ამ ბმულის წაშლა? ეს მოქმედება ვერ გაუქმდება.",
 		"deleteSuccess": "ბმული წარმატებით წაიშალა",
 		"copySuccess": "ბმული კოპირებულია ბუფერში",
+		"hints": {
+			"limits": "ლიმიტებს ადგენს სერვისის ადმინისტრატორი"
+		},
 		"table": {
 			"shortUrl": "მოკლე URL",
 			"originalUrl": "ორიგინალური URL",
 			"created": "შექმნილია",
 			"expires": "ამოიწურება",
 			"actions": "მოქმედებები"
+		},
+		"timeRemaining": {
+			"dayShort": "{count}დ",
+			"hourShort": "{count}სთ",
+			"minuteShort": "{count}წთ"
 		},
 		"errors": {
 			"loadFailed": "ბმულების ჩატვირთვა ვერ მოხერხდა",

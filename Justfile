@@ -7,9 +7,10 @@ run-backend:
   cargo run --bin server
 
 run-frontend:
-  cd frontend && npm run dev -- --port=4200
+  cd frontend && yarn && npm run dev -- --port=4200
 
 test-all:
+  cd frontend && yarn test run
   cargo test --lib
   cargo test --bin server
 
