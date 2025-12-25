@@ -202,6 +202,18 @@ config:
       enabled: true
       # Require authentication to create URLs
       authOnly: true
+      # Maximum URLs per user (applies to all URL types)
+      maxPerUser: 100
+      # Maximum URLs per day (applies to all URL types)
+      maxPerDay: 10
+
+    namedUrls:
+      # Enable/disable custom named URLs feature
+      enabled: false
+      # Minimum length for custom URL names
+      minLength: 3
+      # Maximum length for custom URL names
+      maxLength: 50
 
   # Authentication configuration
   auth:
@@ -209,6 +221,8 @@ config:
     enabled: true
     # Authentication provider type (supported: gitlab)
     type: "gitlab"
+    # Optional note to display on login page (e.g., "VPN must be enabled")
+    note: ""
 
     # Authentication provider settings
     providers:

@@ -15,6 +15,8 @@ pub struct UserUrlResponse {
     pub original_url: String,
     pub created: i64,
     pub ttl: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_name: Option<String>,
 }
 
 pub async fn list_user_urls_route(
@@ -25,12 +27,16 @@ pub async fn list_user_urls_route(
         Ok(urls) => {
             let response: Vec<UserUrlResponse> = urls
                 .into_iter()
-                .map(|url| UserUrlResponse {
-                    id: url.id.clone(),
-                    url: format!("{}/{}", state.config.base_url, url.id),
-                    original_url: url.original_url,
-                    created: url.created,
-                    ttl: url.ttl,
+                .map(|url| {
+                    let display_path = url.custom_name.as_ref().unwrap_or(&url.id);
+                    UserUrlResponse {
+                        id: url.id.clone(),
+                        url: format!("{}/{}", state.config.base_url, display_path),
+                        original_url: url.original_url,
+                        created: url.created,
+                        ttl: url.ttl,
+                        custom_name: url.custom_name,
+                    }
                 })
                 .collect();
             (StatusCode::OK, Json(response)).into_response()

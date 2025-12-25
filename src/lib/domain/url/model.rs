@@ -6,16 +6,38 @@ use thiserror::Error;
 pub struct Url {
     pub id: String,
     pub original_url: String,
-    /// TTL in seconds
+    /// TTL in seconds (0 = no expiration for named URLs)
     pub ttl: u32,
     pub created: i64,
     pub user_id: Option<i64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_name: Option<String>,
 }
 
 #[derive(Debug, Error)]
 pub enum ShortUrlGenerationError {
     #[error("Invalid original URL")]
     InvalidOriginalUrl,
+    #[error("Invalid custom name: {0}")]
+    InvalidCustomName(String),
+    #[error("Custom name already exists")]
+    CustomNameExists,
+    #[error("Custom name is reserved")]
+    CustomNameReserved,
+    #[error("Rate limit exceeded: too many URLs created today")]
+    RateLimitExceeded,
+    #[error("User URL limit exceeded")]
+    UserLimitExceeded,
+    #[error(transparent)]
+    DatabaseError(#[from] sqlx::Error),
+    #[error(transparent)]
+    Unknown(#[from] anyhow::Error),
+}
+
+#[derive(Debug, Error)]
+pub enum CheckCustomNameError {
+    #[error("Custom name already exists")]
+    AlreadyExists,
     #[error(transparent)]
     DatabaseError(#[from] sqlx::Error),
     #[error(transparent)]

@@ -11,6 +11,8 @@ pub struct User {
     pub avatar_url: Option<String>,
     pub created_at: i64,
     pub updated_at: i64,
+    pub max_urls_per_user: i32,
+    pub max_urls_per_day: i32,
 }
 
 #[derive(Debug, Clone, FromRow)]

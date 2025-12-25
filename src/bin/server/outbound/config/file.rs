@@ -48,6 +48,22 @@ impl AppConfigService for AppConfigServiceImpl {
             builder = builder.set_override("features.create-url.auth-only", val)?;
         }
 
+        if let Ok(val) = std::env::var("FEATURES_NAMED_URLS_ENABLED") {
+            builder = builder.set_override("features.named-urls.enabled", val)?;
+        }
+        if let Ok(val) = std::env::var("FEATURES_NAMED_URLS_MIN_LENGTH") {
+            builder = builder.set_override("features.named-urls.min-length", val)?;
+        }
+        if let Ok(val) = std::env::var("FEATURES_NAMED_URLS_MAX_LENGTH") {
+            builder = builder.set_override("features.named-urls.max-length", val)?;
+        }
+        if let Ok(val) = std::env::var("FEATURES_CREATE_URL_MAX_PER_USER") {
+            builder = builder.set_override("features.create-url.max-per-user", val)?;
+        }
+        if let Ok(val) = std::env::var("FEATURES_CREATE_URL_MAX_PER_DAY") {
+            builder = builder.set_override("features.create-url.max-per-day", val)?;
+        }
+
         if let Ok(val) = std::env::var("AUTH_ENABLED") {
             builder = builder.set_override("auth.enabled", val)?;
         }
@@ -62,6 +78,9 @@ impl AppConfigService for AppConfigServiceImpl {
         }
         if let Ok(val) = std::env::var("AUTH_PROVIDERS_GITLAB_SECRET") {
             builder = builder.set_override("auth.providers.gitlab.secret", val)?;
+        }
+        if let Ok(val) = std::env::var("AUTH_NOTE") {
+            builder = builder.set_override("auth.note", val)?;
         }
 
         let config = builder.build()?;

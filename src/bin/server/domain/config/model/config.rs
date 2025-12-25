@@ -48,7 +48,33 @@ pub struct SchedulerConfig {
 #[serde(rename_all = "kebab-case")]
 pub struct FeaturesConfig {
     #[serde(alias = "create_url")]
-    pub create_url: FeatureToggle,
+    pub create_url: CreateUrlConfig,
+    #[serde(alias = "named_urls")]
+    pub named_urls: NamedUrlsConfig,
+}
+
+#[derive(PartialEq, Deserialize, Clone, Debug)]
+#[serde(rename_all = "kebab-case")]
+pub struct NamedUrlsConfig {
+    pub enabled: bool,
+    #[serde(alias = "min_length")]
+    pub min_length: usize,
+    #[serde(alias = "max_length")]
+    pub max_length: usize,
+    #[serde(alias = "reserved_names")]
+    pub reserved_names: Vec<String>,
+}
+
+#[derive(PartialEq, Deserialize, Clone, Debug)]
+#[serde(rename_all = "kebab-case")]
+pub struct CreateUrlConfig {
+    pub enabled: bool,
+    #[serde(alias = "auth_only")]
+    pub auth_only: bool,
+    #[serde(alias = "max_per_user")]
+    pub max_per_user: u32,
+    #[serde(alias = "max_per_day")]
+    pub max_per_day: u32,
 }
 
 #[derive(PartialEq, Deserialize, Clone, Debug)]
@@ -65,6 +91,7 @@ pub struct AuthConfig {
     pub enabled: bool,
     #[serde(rename = "type")]
     pub auth_type: AuthType,
+    pub note: Option<String>,
     pub providers: AuthProviders,
 }
 
@@ -137,7 +164,21 @@ impl fmt::Display for SchedulerConfig {
 
 impl fmt::Display for FeaturesConfig {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "FeaturesConfig {{ create_url: {} }}", self.create_url)
+        write!(
+            f,
+            "FeaturesConfig {{ create_url: {}, named_urls: {} }}",
+            self.create_url, self.named_urls
+        )
+    }
+}
+
+impl fmt::Display for NamedUrlsConfig {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "NamedUrlsConfig {{ enabled: {}, min_length: {}, max_length: {}, reserved_names: {:?} }}",
+            self.enabled, self.min_length, self.max_length, self.reserved_names
+        )
     }
 }
 
@@ -151,12 +192,22 @@ impl fmt::Display for FeatureToggle {
     }
 }
 
+impl fmt::Display for CreateUrlConfig {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "CreateUrlConfig {{ enabled: {}, auth_only: {}, max_per_user: {}, max_per_day: {} }}",
+            self.enabled, self.auth_only, self.max_per_user, self.max_per_day
+        )
+    }
+}
+
 impl fmt::Display for AuthConfig {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "AuthConfig {{ enabled: {}, type: {}, providers: {} }}",
-            self.enabled, self.auth_type, self.providers
+            "AuthConfig {{ enabled: {}, type: {}, note: {:?}, providers: {} }}",
+            self.enabled, self.auth_type, self.note, self.providers
         )
     }
 }

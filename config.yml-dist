@@ -32,6 +32,30 @@ features:
     # Require authentication to create URLs (ENV: FEATURES_CREATE_URL_AUTH_ONLY)
     auth-only: true
 
+    # Maximum URLs per user (ENV: FEATURES_CREATE_URL_MAX_PER_USER)
+    max-per-user: 100
+    # Maximum URLs per day (ENV: FEATURES_CREATE_URL_MAX_PER_DAY)
+    max-per-day: 10
+
+  named-urls:
+    # Enable/disable custom named URLs (ENV: FEATURES_NAMED_URLS_ENABLED)
+    enabled: true
+    # Minimum length for custom names (ENV: FEATURES_NAMED_URLS_MIN_LENGTH)
+    min-length: 3
+    # Maximum length for custom names (ENV: FEATURES_NAMED_URLS_MAX_LENGTH)
+    max-length: 32
+
+    # Reserved names that cannot be used
+    # Note: The following names are ALWAYS reserved (hardcoded in application):
+    #   links, api, login, logout, assets, static, health, metrics, auth, admin
+    # You can add additional custom reserved names below:
+    reserved-names: []
+      # Examples of additional names you might want to reserve:
+      # - admin-panel
+      # - dashboard
+      # - settings
+      # - profile
+
 # Authentication configuration
 auth:
   # Enable/disable authentication (ENV: AUTH_ENABLED)
@@ -39,6 +63,10 @@ auth:
 
   # Authentication provider type: gitlab (ENV: AUTH_TYPE)
   type: gitlab
+
+  # Optional note to display on login page (ENV: AUTH_NOTE)
+  # Use this to communicate requirements like "VPN must be enabled"
+  note: ""
 
   providers:
     gitlab:

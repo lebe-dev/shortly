@@ -13,7 +13,10 @@ docker run --name shortly -p 8080:8080 tinyops/shortly:1.0.0
 ## Features
 
 - BLAZING FAST 🌝 (Svelte+Rust)
-- Locales support: en, ru, es, fr, de, jp, ge
+- **Custom named URLs** - create memorable short links like `/onboarding` (requires authentication)
+- **OAuth Authentication** - GitLab OAuth support with session management
+- **Rate limiting** - configurable per-user limits for custom URLs
+- Locales support: en, ru, es, fr, de, jp, ge, zh
 - Dark theme support
 - Low resource usage:
   ```bash
@@ -31,36 +34,9 @@ docker run --name shortly -p 8080:8080 tinyops/shortly:1.0.0
 
 ## RoadMap
 
-### v0.3.0
-
-- [ ] Security:
-  - [ ] URL filters support
-
-### v0.4.0
-
-- [ ] Security:
-  - [ ] Add captcha support
-
-### v1.0.0
-
-- [ ] QRCode generation
-  - [ ] Backend: QRCode generation
-  - [ ] Frontend: Show QRCode result
-
-### v1.1.0
-
-- [ ] Backend: Public API
-
-### v1.2.0
-
-- [ ] Custom-named links
-
-### v1.3.0
-
-- [ ] Account management
-  - [ ] Account limits
-  
-### v1.4.0
-
-- [ ] Chrome extension
-  - [ ] Click: create short URL from current page
+- Security: URL filters support
+- Security: Add captcha support
+- QRCode generation
+- Backend: Public API
+- Account management: Account limits
+- Chrome extension: click: create short URL from current page

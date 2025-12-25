@@ -49,6 +49,7 @@
 		"vitest": "^4.0.10"
 	},
 	"dependencies": {
+		"date-fns": "^4.1.0",
 		"mode-watcher": "^1.1.0",
 		"svelte-copy": "^2.0.0"
 	}

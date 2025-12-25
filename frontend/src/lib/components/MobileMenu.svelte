@@ -5,6 +5,7 @@
 	import LogIn from 'lucide-svelte/icons/log-in';
 	import LogOut from 'lucide-svelte/icons/log-out';
 	import Globe from 'lucide-svelte/icons/globe';
+	import Link2 from 'lucide-svelte/icons/link-2';
 	import { Button } from '$lib/components/ui/button';
 	import {
 		DropdownMenu,
@@ -64,6 +65,15 @@
 				{/if}
 				<span class="text-sm font-medium">{$authStore.user.username}</span>
 			</DropdownMenuLabel>
+			<DropdownMenuSeparator />
+
+			<!-- My Links -->
+			<DropdownMenuItem>
+				<a href="/links" class="flex w-full items-center gap-2">
+					<Link2 class="h-4 w-4" />
+					<span class="text-sm">{$t('layout.myLinks')}</span>
+				</a>
+			</DropdownMenuItem>
 			<DropdownMenuSeparator />
 		{/if}
 

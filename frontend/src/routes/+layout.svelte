@@ -127,7 +127,7 @@
 		<div
 			class="flex items-center justify-center bg-gray-50 p-2 text-center text-xs text-gray-500 dark:bg-gray-900 dark:text-gray-400"
 		>
-			<span>v1.0.0</span>
+			<span>v1.1.0</span>
 		</div>
 	</div>
 {/await}

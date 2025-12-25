@@ -1,23 +1,33 @@
 <script lang="ts">
 	import { getUserUrls, deleteUrl, type UserUrlResponse } from '$lib/api/url';
+	import { fetchConfig } from '$lib/api/config';
 	import { authStore, authLoading } from '$lib/stores/auth';
 	import { t } from 'svelte-intl-precompile';
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
+	import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/card';
+	import ConsumptionDisplay from '$lib/components/ConsumptionDisplay.svelte';
+	import type { AppConfig } from '$lib/domain/config';
 	import Trash2 from 'lucide-svelte/icons/trash-2';
 	import Link2 from 'lucide-svelte/icons/link-2';
 	import Copy from 'lucide-svelte/icons/copy';
+	import CornerDownRight from 'lucide-svelte/icons/corner-down-right';
+	import { formatRemainingTime, formatCreatedDate, formatExpiryDate } from '$lib/date';
 
-	let urls: UserUrlResponse[] = [];
-	let loading = true;
+	let urls: UserUrlResponse[] = $state([]);
+	let loading = $state(true);
+	let config: AppConfig | null = $state(null);
 
-	$: if (!$authLoading) {
-		if (!$authStore.authenticated) {
-			window.location.href = '/login';
-		} else if (loading && urls.length === 0) {
-			loadUrls();
+	$effect(() => {
+		if (!$authLoading) {
+			if (!$authStore.authenticated) {
+				window.location.href = '/login';
+			} else if (loading && urls.length === 0) {
+				loadUrls();
+				loadConfig();
+			}
 		}
-	}
+	});
 
 	async function loadUrls() {
 		loading = true;
@@ -31,6 +41,14 @@
 		}
 	}
 
+	async function loadConfig() {
+		try {
+			config = await fetchConfig();
+		} catch (e) {
+			console.error('Failed to load config:', e);
+		}
+	}
+
 	async function handleDelete(urlId: string) {
 		const confirmed = confirm($t('linksPage.deleteConfirm'));
 		if (!confirmed) return;
@@ -39,6 +57,7 @@
 			await deleteUrl(urlId);
 			toast.success($t('linksPage.deleteSuccess'));
 			await loadUrls();
+			await loadConfig();
 		} catch (e) {
 			console.error('Failed to delete URL:', e);
 			toast.error($t('linksPage.errors.deleteFailed'));
@@ -55,39 +74,13 @@
 		}
 	}
 
-	function formatTimeRemaining(created: number, ttl: number): string {
-		const expiresAt = created + ttl;
-		const now = Math.floor(Date.now() / 1000);
-		const remaining = expiresAt - now;
-
-		if (remaining <= 0) {
-			return $t('linksPage.expired');
-		}
-
-		const days = Math.floor(remaining / 86400);
-		const hours = Math.floor((remaining % 86400) / 3600);
-		const minutes = Math.floor((remaining % 3600) / 60);
-
-		const parts = [];
-		if (days > 0) parts.push(`${days}d`);
-		if (hours > 0) parts.push(`${hours}h`);
-		if (minutes > 0 || parts.length === 0) parts.push(`${minutes}m`);
-
-		return parts.join(' ');
-	}
-
-	function formatExpiryDate(created: number, ttl: number): string {
-		const expiresAt = (created + ttl) * 1000;
-		return new Date(expiresAt).toLocaleString();
-	}
-
-	function formatCreatedDate(created: number): string {
-		return new Date(created * 1000).toLocaleString();
-	}
-
 	function truncateUrl(url: string, maxLength: number = 50): string {
 		if (url.length <= maxLength) return url;
 		return url.substring(0, maxLength - 3) + '...';
+	}
+
+	function getShortUrlDisplay(url: UserUrlResponse): string {
+		return url.custom_name || url.id;
 	}
 </script>
 
@@ -96,11 +89,19 @@
 	<meta name="description" content={$t('linksPage.description')} />
 </svelte:head>
 
-<div class="w-full max-w-[1300px] rounded bg-white px-6 py-8 shadow md:px-24 dark:bg-gray-900">
+<div
+	class="w-full max-w-[1300px] rounded bg-white px-3 pt-8 pb-18 shadow md:px-14 dark:bg-gray-900"
+>
 	<div class="mb-6 flex items-center gap-2">
 		<Link2 class="h-5 w-5" />
 		<h1 class="text-xl font-bold">{$t('linksPage.header')}</h1>
 	</div>
+
+	{#if config}
+		<div class="mb-6">
+			<ConsumptionDisplay config={config.features.createUrl} variant="default" showHint={true} />
+		</div>
+	{/if}
 
 	{#if loading}
 		<div class="py-12 text-center">
@@ -114,85 +115,101 @@
 			</a>
 		</div>
 	{:else}
-		<div class="overflow-x-auto">
-			<table class="w-full border-collapse">
-				<thead>
-					<tr class="border-b border-gray-200 dark:border-gray-700">
-						<th class="px-4 py-3 text-left font-semibold">{$t('linksPage.table.shortUrl')}</th>
-						<th class="px-4 py-3 text-left font-semibold">{$t('linksPage.table.originalUrl')}</th>
-						<th class="px-4 py-3 text-left font-semibold">{$t('linksPage.table.created')}</th>
-						<th class="px-4 py-3 text-left font-semibold">{$t('linksPage.table.expires')}</th>
-						<th class="px-4 py-3 text-left font-semibold">{$t('linksPage.table.actions')}</th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each urls as url}
-						<tr
-							class="border-b border-gray-200 text-sm hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-						>
-							<td class="px-4 py-3">
+		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+			{#each urls as url}
+				<Card>
+					<CardHeader>
+						<CardTitle>
+							<div class="flex items-center justify-between gap-2">
 								<div class="flex items-center gap-2">
 									<a
 										href={url.url}
 										class="text-blue-600 hover:underline dark:text-blue-400"
 										target="_blank"
 										rel="noopener noreferrer"
+										title={url.url}
 									>
-										{url.url}
+										{getShortUrlDisplay(url)}
 									</a>
 									<Button
 										variant="ghost"
 										size="sm"
-										class="h-6 w-6 p-0 hover:cursor-pointer"
+										class="h-6 w-6 p-0 text-gray-400 hover:cursor-pointer"
+										title={$t('common.buttons.copy')}
 										onclick={() => copyToClipboard(url.url)}
 									>
 										<Copy class="h-2 w-2" />
 									</Button>
 								</div>
-							</td>
-							<td class="px-4 py-3" title={url.original_url}>
-								<div class="flex items-center gap-2">
-									<a
-										href={url.original_url}
-										class="text-blue-600 hover:underline dark:text-blue-400"
-										target="_blank"
-										rel="noopener noreferrer"
-									>
-										{truncateUrl(url.original_url)}
-									</a>
-									<Button
-										variant="ghost"
-										size="sm"
-										class="h-6 w-6 p-0 hover:cursor-pointer"
-										onclick={() => copyToClipboard(url.original_url)}
-									>
-										<Copy class="h-2 w-2" />
-									</Button>
-								</div>
-							</td>
-							<td class="text-muted-foreground px-4 py-3 text-sm">
-								{formatCreatedDate(url.created)}
-							</td>
-							<td
-								class="text-muted-foreground px-4 py-3 text-sm"
-								title={formatExpiryDate(url.created, url.ttl)}
-							>
-								{formatTimeRemaining(url.created, url.ttl)}
-							</td>
-							<td class="px-3 py-2 text-center">
 								<Button
-									variant="destructive"
-									class="hover:cursor-pointer"
+									variant="ghost"
+									class="h-6 w-6 text-gray-400  hover:cursor-pointer hover:bg-red-100 hover:text-red-600 dark:text-gray-500 dark:hover:bg-red-900/20 dark:hover:text-red-400"
 									size="sm"
 									onclick={() => handleDelete(url.id)}
 								>
 									<Trash2 class="h-3 w-3" />
 								</Button>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
+							</div>
+						</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<div class="space-y-3">
+							<!-- Original URL -->
+							<div class="space-y-1">
+								<div class="text-muted-foreground text-xs font-medium">
+									{$t('linksPage.table.originalUrl')}
+								</div>
+								<div class="flex items-center gap-1">
+									<CornerDownRight class="text-muted-foreground h-3 w-3 shrink-0" />
+									<a
+										href={url.original_url}
+										class="truncate text-xs text-blue-600 hover:underline dark:text-blue-400"
+										target="_blank"
+										rel="noopener noreferrer"
+										title={url.original_url}
+									>
+										{url.original_url}
+									</a>
+									<Button
+										variant="ghost"
+										size="sm"
+										class="h-6 w-6 shrink-0 p-0 text-gray-400 hover:cursor-pointer"
+										title={$t('common.buttons.copy')}
+										onclick={() => copyToClipboard(url.original_url)}
+									>
+										<Copy class="h-2 w-2" />
+									</Button>
+								</div>
+							</div>
+
+							<!-- Created date and Expires -->
+							<div
+								class="flex items-start justify-between border-t border-gray-200 pt-3 dark:border-gray-700"
+							>
+								<div class="space-y-1">
+									<div class="text-muted-foreground text-xs font-medium">
+										{$t('linksPage.table.created')}
+									</div>
+									<div class="text-muted-foreground text-sm">
+										{formatCreatedDate(url.created)}
+									</div>
+								</div>
+								<div class="space-y-1 text-right">
+									<div class="text-muted-foreground text-xs font-medium">
+										{$t('linksPage.table.expires')}
+									</div>
+									<div
+										class="text-muted-foreground text-sm"
+										title={url.ttl === 0 ? '—' : formatExpiryDate(url.created, url.ttl)}
+									>
+										{url.ttl === 0 ? '—' : formatRemainingTime(url.ttl, url.created, $t, 'short')}
+									</div>
+								</div>
+							</div>
+						</div>
+					</CardContent>
+				</Card>
+			{/each}
 		</div>
 	{/if}
 </div>

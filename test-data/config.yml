@@ -11,10 +11,22 @@ features:
   create-url:
     enabled: true
     auth-only: true
+    max-per-user: 100
+    max-per-day: 10
+  named-urls:
+    enabled: true
+    min-length: 3
+    max-length: 20
+    # Reserved names that cannot be used
+    # Note: The following names are ALWAYS reserved (hardcoded in application):
+    #   links, api, login, logout, assets, static, health, metrics, auth, admin
+    # You can add additional custom reserved names below:
+    reserved-names: []
 
 auth:
   enabled: true
   type: gitlab
+  note: ""
   providers:
     gitlab:
       base-url: https://gitlab.com

@@ -6,7 +6,33 @@
 			"generate": "GENERAR"
 		},
 		"loading": "Cargando...",
-		"loadingEllipsis": "..."
+		"loadingEllipsis": "...",
+		"backToHome": "Volver a inicio",
+		"consumption": {
+			"title": "Límites",
+			"totalLinks": "Enlaces totales",
+			"createdToday": "Creados hoy",
+			"total": "Total",
+			"today": "Hoy",
+			"reachedBothLimits": "Has alcanzado tanto tu límite total como el diario.",
+			"reachedTotalLimit": "Has alcanzado tu límite total de enlaces.",
+			"reachedDailyLimit": "Has alcanzado tu límite diario de enlaces.",
+			"badge": {
+				"remainingToday": "Restantes: {remaining} de {total} hoy",
+				"remainingTotal": "Restantes: {remaining} de {total} en total"
+			},
+			"hint": {
+				"limits": "Elimine los enlaces no utilizados.\n\nLos enlaces caducados se eliminan automáticamente."
+			}
+		},
+		"timeUnits": {
+			"minute": "{count, plural, one {# minuto} other {# minutos}}",
+			"hour": "{count, plural, one {# hora} other {# horas}}",
+			"day": "{count, plural, one {# día} other {# días}}",
+			"week": "{count, plural, one {# semana} other {# semanas}}",
+			"month": "{count, plural, one {# mes} other {# meses}}",
+			"lessThanMinute": "menos de un minuto"
+		}
 	},
 	"layout": {
 		"homeLink": "Ir a la página principal",
@@ -26,16 +52,46 @@
 			"placeholder": "https://mi.url-larga.com",
 			"storageInfo": "Los enlaces se almacenarán durante {ttl}"
 		},
+		"hints": {
+			"urlField": {
+				"prefix": "Presione ",
+				"suffix": " para crear enlace"
+			},
+			"customNameField": {
+				"prefix": "Presione ",
+				"suffixCreate": " para crear enlace",
+				"suffixFocusUrl": " para ir al campo URL"
+			}
+		},
+		"customName": {
+			"label": "Nombre corto personalizado (opcional)",
+			"placeholder": "ej. onboarding",
+			"hint": "Nombre corto para su enlace. Por ejemplo, 'onboarding'",
+			"tooShort": "El nombre debe tener al menos {minLength} caracteres",
+			"tooLong": "El nombre debe tener como máximo {maxLength} caracteres",
+			"reserved": "Este nombre está reservado",
+			"checking": "Comprobando disponibilidad...",
+			"available": "✓ Disponible",
+			"taken": "✗ Nombre ya tomado",
+			"noExpiration": "Los enlaces con nombre nunca expiran"
+		},
 		"result": {
 			"title": "Su URL corta:",
-			"expirationInfo": "Este enlace expirará en {ttl}"
+			"expirationInfo": "Este enlace expirará en {ttl}",
+			"expirationDate": "El enlace se almacenará hasta {date}",
+			"namedUrlInfo": "Este enlace con nombre nunca expirará",
+			"clickToCopy": "Haga clic en el enlace para copiar al portapapeles",
+			"linkCopied": "Enlace copiado"
 		},
 		"errors": {
 			"configLoadFailed": "No se pudo cargar la configuración de la aplicación",
 			"urlTooLong": "Longitud máxima de URL excedida: {maxLength}",
 			"invalidUrl": "URL inválida",
 			"authRequired": "Se requiere autenticación para crear URLs cortas",
-			"serviceTitle": "Servicio de URLs Cortas"
+			"serviceTitle": "Servicio de URLs Cortas",
+			"customNameNotAvailable": "El nombre personalizado no está disponible",
+			"generateFailed": "No se pudo generar la URL corta",
+			"limitReached": "Has alcanzado tu límite de creación de enlaces"
 		}
 	},
 	"urlPage": {
@@ -58,7 +114,6 @@
 		"buttons": {
 			"gitlab": "Iniciar sesión con GitLab"
 		},
-		"backToHome": "Volver a inicio",
 		"errors": {
 			"configLoadFailed": "No se pudo cargar la configuración de la aplicación",
 			"authDisabled": "La autenticación no está disponible"
@@ -74,12 +129,20 @@
 		"deleteConfirm": "¿Está seguro de que desea eliminar este enlace? Esta acción no se puede deshacer.",
 		"deleteSuccess": "Enlace eliminado exitosamente",
 		"copySuccess": "Enlace copiado al portapapeles",
+		"hints": {
+			"limits": "Los límites son establecidos por el administrador del servicio"
+		},
 		"table": {
 			"shortUrl": "URL Corta",
 			"originalUrl": "URL Original",
 			"created": "Creado",
 			"expires": "Expira en",
 			"actions": "Acciones"
+		},
+		"timeRemaining": {
+			"dayShort": "{count}d",
+			"hourShort": "{count}h",
+			"minuteShort": "{count}m"
 		},
 		"errors": {
 			"loadFailed": "Error al cargar sus enlaces",

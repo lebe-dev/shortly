@@ -83,8 +83,13 @@
 					</svg>
 					{$t('loginPage.buttons.gitlab')}
 				</Button>
+				{#if config.auth.note}
+					<div class="text-primary mt-2 mb-4 text-xs">
+						{config.auth.note}
+					</div>
+				{/if}
 				<a href="/" class="text-muted-foreground text-sm hover:underline">
-					{$t('loginPage.backToHome')}
+					{$t('common.backToHome')}
 				</a>
 			</div>
 		</div>

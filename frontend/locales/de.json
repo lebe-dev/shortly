@@ -6,7 +6,33 @@
 			"generate": "GENERIEREN"
 		},
 		"loading": "Laden...",
-		"loadingEllipsis": "..."
+		"loadingEllipsis": "...",
+		"backToHome": "Zurück zur Startseite",
+		"consumption": {
+			"title": "Limits",
+			"totalLinks": "Gesamt Links",
+			"createdToday": "Heute erstellt",
+			"total": "Gesamt",
+			"today": "Heute",
+			"reachedBothLimits": "Sie haben sowohl Ihr Gesamt- als auch Ihr Tageslimit erreicht.",
+			"reachedTotalLimit": "Sie haben Ihr Gesamtlimit für Links erreicht.",
+			"reachedDailyLimit": "Sie haben Ihr Tageslimit für Links erreicht.",
+			"badge": {
+				"remainingToday": "Verbleibend: {remaining} von {total} heute",
+				"remainingTotal": "Verbleibend: {remaining} von {total} gesamt"
+			},
+			"hint": {
+				"limits": "Löschen Sie ungenutzte Links.\n\nAbgelaufene Links werden automatisch gelöscht."
+			}
+		},
+		"timeUnits": {
+			"minute": "{count, plural, one {# Minute} other {# Minuten}}",
+			"hour": "{count, plural, one {# Stunde} other {# Stunden}}",
+			"day": "{count, plural, one {# Tag} other {# Tage}}",
+			"week": "{count, plural, one {# Woche} other {# Wochen}}",
+			"month": "{count, plural, one {# Monat} other {# Monate}}",
+			"lessThanMinute": "weniger als eine Minute"
+		}
 	},
 	"layout": {
 		"homeLink": "Zur Hauptseite gehen",
@@ -26,16 +52,46 @@
 			"placeholder": "https://meine.lange-url.com",
 			"storageInfo": "Links werden {ttl} gespeichert"
 		},
+		"hints": {
+			"urlField": {
+				"prefix": "Drücken Sie ",
+				"suffix": " um Link zu erstellen"
+			},
+			"customNameField": {
+				"prefix": "Drücken Sie ",
+				"suffixCreate": " um Link zu erstellen",
+				"suffixFocusUrl": " um zum URL-Feld zu wechseln"
+			}
+		},
+		"customName": {
+			"label": "Benutzerdefinierter Kurzname (optional)",
+			"placeholder": "z.B. onboarding",
+			"hint": "Kurzer Name für Ihren Link. Zum Beispiel 'onboarding'",
+			"tooShort": "Name muss mindestens {minLength} Zeichen lang sein",
+			"tooLong": "Name darf höchstens {maxLength} Zeichen lang sein",
+			"reserved": "Dieser Name ist reserviert",
+			"checking": "Verfügbarkeit wird überprüft...",
+			"available": "✓ Verfügbar",
+			"taken": "✗ Name bereits vergeben",
+			"noExpiration": "Benannte Links laufen nie ab"
+		},
 		"result": {
 			"title": "Ihre kurze URL:",
-			"expirationInfo": "Dieser Link läuft in {ttl} ab"
+			"expirationInfo": "Dieser Link läuft in {ttl} ab",
+			"expirationDate": "Link wird gespeichert bis {date}",
+			"namedUrlInfo": "Dieser benannte Link läuft nie ab",
+			"clickToCopy": "Klicken Sie auf den Link, um ihn in die Zwischenablage zu kopieren",
+			"linkCopied": "Link kopiert"
 		},
 		"errors": {
 			"configLoadFailed": "App-Konfiguration konnte nicht geladen werden",
 			"urlTooLong": "Maximale URL-Länge überschritten: {maxLength}",
 			"invalidUrl": "Ungültige URL",
 			"authRequired": "Authentifizierung ist erforderlich, um Kurz-URLs zu erstellen",
-			"serviceTitle": "Kurz-URL-Dienst"
+			"serviceTitle": "Kurz-URL-Dienst",
+			"customNameNotAvailable": "Benutzerdefinierter Name ist nicht verfügbar",
+			"generateFailed": "Kurz-URL konnte nicht erstellt werden",
+			"limitReached": "Sie haben Ihr Link-Erstellungslimit erreicht"
 		}
 	},
 	"urlPage": {
@@ -58,7 +114,6 @@
 		"buttons": {
 			"gitlab": "Mit GitLab anmelden"
 		},
-		"backToHome": "Zurück zur Startseite",
 		"errors": {
 			"configLoadFailed": "App-Konfiguration konnte nicht geladen werden",
 			"authDisabled": "Authentifizierung ist nicht verfügbar"
@@ -74,12 +129,20 @@
 		"deleteConfirm": "Sind Sie sicher, dass Sie diesen Link löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
 		"deleteSuccess": "Link erfolgreich gelöscht",
 		"copySuccess": "Link in die Zwischenablage kopiert",
+		"hints": {
+			"limits": "Limits werden vom Service-Administrator festgelegt"
+		},
 		"table": {
 			"shortUrl": "Kurz-URL",
 			"originalUrl": "Original-URL",
 			"created": "Erstellt",
 			"expires": "Läuft ab in",
 			"actions": "Aktionen"
+		},
+		"timeRemaining": {
+			"dayShort": "{count}T",
+			"hourShort": "{count}Std",
+			"minuteShort": "{count}Min"
 		},
 		"errors": {
 			"loadFailed": "Ihre Links konnten nicht geladen werden",

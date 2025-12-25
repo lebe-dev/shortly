@@ -6,7 +6,33 @@
 			"generate": "生成"
 		},
 		"loading": "加载中...",
-		"loadingEllipsis": "..."
+		"loadingEllipsis": "...",
+		"backToHome": "返回主页",
+		"consumption": {
+			"title": "限制",
+			"totalLinks": "总链接数",
+			"createdToday": "今日创建",
+			"total": "总计",
+			"today": "今日",
+			"reachedBothLimits": "您已达到总限制和每日限制。",
+			"reachedTotalLimit": "您已达到链接总限制。",
+			"reachedDailyLimit": "您已达到每日链接限制。",
+			"badge": {
+				"remainingToday": "剩余：{remaining}/{total} 今日",
+				"remainingTotal": "剩余：{remaining}/{total} 总计"
+			},
+			"hint": {
+				"limits": "删除未使用的链接。\n\n过期链接会自动删除。"
+			}
+		},
+		"timeUnits": {
+			"minute": "{count}分钟",
+			"hour": "{count}小时",
+			"day": "{count}天",
+			"week": "{count}周",
+			"month": "{count}月",
+			"lessThanMinute": "不到一分钟"
+		}
 	},
 	"layout": {
 		"homeLink": "返回主页",
@@ -26,16 +52,46 @@
 			"placeholder": "https://my.long-url.com",
 			"storageInfo": "链接将保存 {ttl}"
 		},
+		"hints": {
+			"urlField": {
+				"prefix": "按 ",
+				"suffix": " 创建链接"
+			},
+			"customNameField": {
+				"prefix": "按 ",
+				"suffixCreate": " 创建链接",
+				"suffixFocusUrl": " 聚焦到URL字段"
+			}
+		},
+		"customName": {
+			"label": "自定义短名称（可选）",
+			"placeholder": "例如：onboarding",
+			"hint": "链接的短名称。例如：'onboarding'",
+			"tooShort": "名称必须至少 {minLength} 个字符",
+			"tooLong": "名称最多 {maxLength} 个字符",
+			"reserved": "此名称已被保留",
+			"checking": "正在检查可用性...",
+			"available": "✓ 可用",
+			"taken": "✗ 名称已被占用",
+			"noExpiration": "命名链接永不过期"
+		},
 		"result": {
 			"title": "您的短链接：",
-			"expirationInfo": "此链接将在 {ttl} 后过期"
+			"expirationInfo": "此链接将在 {ttl} 后过期",
+			"expirationDate": "链接将保存至 {date}",
+			"namedUrlInfo": "此命名链接永不过期",
+			"clickToCopy": "点击链接复制到剪贴板",
+			"linkCopied": "链接已复制"
 		},
 		"errors": {
 			"configLoadFailed": "无法加载应用配置",
 			"urlTooLong": "超过最大网址长度：{maxLength}",
 			"invalidUrl": "无效的网址",
 			"authRequired": "创建短链接需要身份验证",
-			"serviceTitle": "短链接服务"
+			"serviceTitle": "短链接服务",
+			"customNameNotAvailable": "自定义名称不可用",
+			"generateFailed": "生成短链接失败",
+			"limitReached": "您已达到链接创建限制"
 		}
 	},
 	"urlPage": {
@@ -58,7 +114,6 @@
 		"buttons": {
 			"gitlab": "使用 GitLab 登录"
 		},
-		"backToHome": "返回主页",
 		"errors": {
 			"configLoadFailed": "无法加载应用配置",
 			"authDisabled": "身份验证不可用"
@@ -74,12 +129,20 @@
 		"deleteConfirm": "您确定要删除此链接吗？此操作无法撤消。",
 		"deleteSuccess": "链接删除成功",
 		"copySuccess": "链接已复制到剪贴板",
+		"hints": {
+			"limits": "限制由服务管理员设定"
+		},
 		"table": {
 			"shortUrl": "短链接",
 			"originalUrl": "原始网址",
 			"created": "创建时间",
 			"expires": "过期时间",
 			"actions": "操作"
+		},
+		"timeRemaining": {
+			"dayShort": "{count}天",
+			"hourShort": "{count}时",
+			"minuteShort": "{count}分"
 		},
 		"errors": {
 			"loadFailed": "加载链接失败",
