@@ -42,7 +42,8 @@
 		"language": "Idioma",
 		"login": "Iniciar sesión",
 		"logout": "Cerrar sesión",
-		"myLinks": "Mis Enlaces"
+		"myLinks": "Mis Enlaces",
+		"adminPanel": "Panel de Administración"
 	},
 	"homePage": {
 		"title": "Crear URL corta :: SHRTLY",
@@ -148,6 +149,122 @@
 			"loadFailed": "Error al cargar sus enlaces",
 			"deleteFailed": "Error al eliminar el enlace",
 			"copyFailed": "Error al copiar el enlace"
+		}
+	},
+	"adminPage": {
+		"title": "Panel de Administración :: SHRTLY",
+		"description": "Gestionar todos los enlaces cortos",
+		"header": "Panel de Administración",
+		"tabs": {
+			"general": "General",
+			"links": "Enlaces",
+			"users": "Usuarios",
+			"audit": "Auditoría"
+		},
+		"general": {
+			"sections": {
+				"service": "Configuración del Servicio",
+				"createUrl": "Creación de URLs",
+				"namedUrls": "URLs con Nombre",
+				"auth": "Autenticación",
+				"scheduler": "Planificador"
+			},
+			"fields": {
+				"baseUrl": "URL Base",
+				"shortUrlTtl": "TTL de Enlace",
+				"maxUrlLength": "Longitud Máx. de URL",
+				"enabled": "Habilitado",
+				"authOnly": "Autenticación Requerida",
+				"maxPerUser": "Máx. por Usuario",
+				"maxPerDay": "Máx. por Día",
+				"minLength": "Longitud Mín.",
+				"maxLength": "Longitud Máx.",
+				"reservedNames": "Nombres Reservados",
+				"authType": "Proveedor",
+				"gitlabBaseUrl": "URL Base de GitLab",
+				"gitlabAppId": "ID de Aplicación",
+				"note": "Nota de Inicio de Sesión",
+				"cleanupCron": "Programación de Limpieza"
+			},
+			"values": {
+				"yes": "Sí",
+				"no": "No",
+				"none": "Ninguno",
+				"hours": "{count, plural, one {# hora} other {# horas}}",
+				"characters": "{count} caracteres",
+				"andMore": "y {count} más"
+			}
+		},
+		"empty": "No se encontraron enlaces",
+		"items": "Total",
+		"filtered": "Mostrando",
+		"search": {
+			"placeholder": "Buscar por nombre de enlace o usuario"
+		},
+		"filters": {
+			"onlyNamed": "Solo con nombre"
+		},
+		"sort": {
+			"label": "Ordenar",
+			"byCreated": "Por fecha de creación",
+			"namedFirst": "Con nombre"
+		},
+		"table": {
+			"shortUrl": "URL Corta",
+			"originalUrl": "URL Original",
+			"user": "Usuario",
+			"userId": "ID de Usuario",
+			"created": "Creado",
+			"expires": "Expira en",
+			"actions": "Acciones"
+		},
+		"deleteSuccess": "Enlace eliminado exitosamente",
+		"copySuccess": "Enlace copiado al portapapeles",
+		"errors": {
+			"notAuthorized": "No está autorizado para acceder a esta página",
+			"deleteFailed": "Error al eliminar el enlace",
+			"copyFailed": "Error al copiar el enlace"
+		},
+		"audit": {
+			"filters": {
+				"title": "Filtros",
+				"eventType": "Tipo de evento",
+				"allEventTypes": "Todos los eventos",
+				"urlName": "Nombre de URL",
+				"urlNamePlaceholder": "Buscar por nombre de URL",
+				"dateFrom": "Desde fecha",
+				"dateTo": "Hasta fecha",
+				"dateRange": "Rango de fechas",
+				"selectDateRange": "Seleccionar rango de fechas",
+				"apply": "Aplicar filtros",
+				"clear": "Limpiar filtros"
+			},
+			"table": {
+				"eventType": "Tipo de evento",
+				"user": "Usuario",
+				"urlName": "Nombre de URL",
+				"timestamp": "Marca de tiempo"
+			},
+			"eventTypes": {
+				"create_url": "URL creada",
+				"delete_url": "URL eliminada",
+				"user_login": "Inicio de sesión",
+				"user_logout": "Cierre de sesión"
+			},
+			"noEvents": "No se encontraron eventos de auditoría",
+			"showing": "Mostrando {count} de {total} eventos",
+			"errors": {
+				"loadFailed": "Error al cargar eventos de auditoría"
+			}
+		},
+		"users": {
+			"empty": "No se encontraron usuarios",
+			"userId": "ID de Usuario",
+			"created": "Creado",
+			"urlCount": "URLs Creadas",
+			"quotas": "Cuotas",
+			"maxPerUser": "Máx. por usuario",
+			"maxPerDay": "Máx. por día"
 		}
 	}
 }

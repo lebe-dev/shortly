@@ -93,6 +93,8 @@ pub struct AuthConfig {
     pub auth_type: AuthType,
     pub note: Option<String>,
     pub providers: AuthProviders,
+    #[serde(alias = "admin_users")]
+    pub admin_users: Option<String>,
 }
 
 #[derive(PartialEq, Serialize, Deserialize, Clone, Debug)]
@@ -206,8 +208,16 @@ impl fmt::Display for AuthConfig {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "AuthConfig {{ enabled: {}, type: {}, note: {:?}, providers: {} }}",
-            self.enabled, self.auth_type, self.note, self.providers
+            "AuthConfig {{ enabled: {}, type: {}, note: {:?}, providers: {}, admin_users: {} }}",
+            self.enabled,
+            self.auth_type,
+            self.note,
+            self.providers,
+            if self.admin_users.is_some() {
+                "<redacted>"
+            } else {
+                "None"
+            }
         )
     }
 }

@@ -82,6 +82,9 @@ impl AppConfigService for AppConfigServiceImpl {
         if let Ok(val) = std::env::var("AUTH_NOTE") {
             builder = builder.set_override("auth.note", val)?;
         }
+        if let Ok(val) = std::env::var("AUTH_ADMIN_USERS") {
+            builder = builder.set_override("auth.admin-users", val)?;
+        }
 
         let config = builder.build()?;
         let app_config: AppConfig = config.try_deserialize()?;

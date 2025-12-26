@@ -42,6 +42,17 @@ pub trait UserRepository: Send + Sync + Clone + 'static {
     /// Find user by internal ID
     fn find_by_id(&self, id: i64)
     -> impl Future<Output = Result<Option<User>, sqlx::Error>> + Send;
+
+    /// Find all users, ordered by username
+    fn find_all(&self) -> impl Future<Output = Result<Vec<User>, sqlx::Error>> + Send;
+
+    /// Update user quotas
+    fn update_quotas(
+        &self,
+        user_id: i64,
+        max_urls_per_user: Option<i32>,
+        max_urls_per_day: Option<i32>,
+    ) -> impl Future<Output = Result<User, sqlx::Error>> + Send;
 }
 
 pub trait SessionRepository: Send + Sync + Clone + 'static {

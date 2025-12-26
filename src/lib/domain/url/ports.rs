@@ -2,7 +2,7 @@ use std::future::Future;
 
 use crate::domain::url::model::FindUrlError;
 
-use super::audit::UrlAuditEvent;
+use super::audit::{AuditEventType, AuditEventWithUser, UrlAuditEvent};
 use super::model::{CheckCustomNameError, DeleteUrlError, ShortUrlGenerationError, Url};
 
 pub trait UrlService: Clone + Send + Sync + 'static {
@@ -38,6 +38,7 @@ pub trait UrlService: Clone + Send + Sync + 'static {
         &self,
         url_id: &str,
         user_id: i64,
+        is_admin: bool,
     ) -> impl Future<Output = Result<(), DeleteUrlError>> + Send;
 
     fn count_named_urls_by_user(
@@ -50,6 +51,26 @@ pub trait UrlService: Clone + Send + Sync + 'static {
         user_id: i64,
         since_timestamp: i64,
     ) -> impl Future<Output = Result<i64, FindUrlError>> + Send;
+
+    fn list_all_urls(&self) -> impl Future<Output = Result<Vec<Url>, FindUrlError>> + Send;
+
+    fn record_audit_event(
+        &self,
+        event: &UrlAuditEvent,
+    ) -> impl Future<Output = Result<(), Box<dyn std::error::Error>>> + Send;
+
+    fn find_audit_events(
+        &self,
+        event_type: Option<AuditEventType>,
+        actor_user_id: Option<i64>,
+        target_user_id: Option<i64>,
+        url_name: Option<String>,
+        username: Option<String>,
+        date_from: Option<i64>,
+        date_to: Option<i64>,
+        limit: i64,
+        offset: i64,
+    ) -> impl Future<Output = Result<(Vec<AuditEventWithUser>, i64), FindUrlError>> + Send;
 }
 
 pub trait UrlRepository: Send + Sync + Clone + 'static {
@@ -87,4 +108,19 @@ pub trait UrlRepository: Send + Sync + Clone + 'static {
         &self,
         event: &UrlAuditEvent,
     ) -> impl Future<Output = Result<(), sqlx::Error>> + Send;
+
+    fn find_all(&self) -> impl Future<Output = Result<Vec<Url>, sqlx::Error>> + Send;
+
+    fn find_audit_events(
+        &self,
+        event_type: Option<AuditEventType>,
+        actor_user_id: Option<i64>,
+        target_user_id: Option<i64>,
+        url_name: Option<String>,
+        username: Option<String>,
+        date_from: Option<i64>,
+        date_to: Option<i64>,
+        limit: i64,
+        offset: i64,
+    ) -> impl Future<Output = Result<(Vec<AuditEventWithUser>, i64), sqlx::Error>> + Send;
 }

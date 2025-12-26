@@ -59,7 +59,6 @@ impl UserRepository for Sqlite {
         .execute(self.get_pool())
         .await?;
 
-        // Fetch the newly created user to get default limits from migration
         let user = self
             .find_by_gitlab_id(gitlab_user.id)
             .await?
@@ -80,6 +79,52 @@ impl UserRepository for Sqlite {
         .await?;
 
         Ok(user)
+    }
+
+    async fn find_all(&self) -> Result<Vec<User>, sqlx::Error> {
+        let users = sqlx::query_as::<_, User>(
+            "SELECT id, gitlab_id, username, email, avatar_url, created_at, updated_at,
+                    max_urls_per_user, max_urls_per_day
+             FROM users
+             ORDER BY username ASC",
+        )
+        .fetch_all(self.get_pool())
+        .await?;
+
+        Ok(users)
+    }
+
+    async fn update_quotas(
+        &self,
+        user_id: i64,
+        max_urls_per_user: Option<i32>,
+        max_urls_per_day: Option<i32>,
+    ) -> Result<User, sqlx::Error> {
+        let current_time = chrono::Utc::now().timestamp();
+
+        let user = self
+            .find_by_id(user_id)
+            .await?
+            .ok_or_else(|| sqlx::Error::RowNotFound)?;
+
+        let new_max_urls_per_user = max_urls_per_user.unwrap_or(user.max_urls_per_user);
+        let new_max_urls_per_day = max_urls_per_day.unwrap_or(user.max_urls_per_day);
+
+        sqlx::query(
+            "UPDATE users
+             SET max_urls_per_user = $1, max_urls_per_day = $2, updated_at = $3
+             WHERE id = $4",
+        )
+        .bind(new_max_urls_per_user)
+        .bind(new_max_urls_per_day)
+        .bind(current_time)
+        .bind(user_id)
+        .execute(self.get_pool())
+        .await?;
+
+        self.find_by_id(user_id)
+            .await?
+            .ok_or_else(|| sqlx::Error::RowNotFound)
     }
 }
 
@@ -507,5 +552,77 @@ mod tests {
         let result = db.delete_expired(current_time).await;
 
         assert!(result.is_ok());
+    }
+
+    // UserRepository::update_quotas tests
+
+    #[tokio::test]
+    async fn test_update_quotas_both_fields() {
+        let db = get_in_memory_db().await;
+
+        let gitlab_user = GitlabUserInfo {
+            id: 30001,
+            username: "quotauser".to_string(),
+            email: None,
+            avatar_url: None,
+        };
+        let user = db.upsert(&gitlab_user).await.unwrap();
+
+        let updated_user = db.update_quotas(user.id, Some(50), Some(5)).await.unwrap();
+
+        assert_eq!(updated_user.max_urls_per_user, 50);
+        assert_eq!(updated_user.max_urls_per_day, 5);
+        assert!(updated_user.updated_at >= user.updated_at);
+    }
+
+    #[tokio::test]
+    async fn test_update_quotas_partial_per_user() {
+        let db = get_in_memory_db().await;
+
+        let gitlab_user = GitlabUserInfo {
+            id: 30002,
+            username: "partialquota".to_string(),
+            email: None,
+            avatar_url: None,
+        };
+        let user = db.upsert(&gitlab_user).await.unwrap();
+        let original_per_day = user.max_urls_per_day;
+
+        let updated_user = db.update_quotas(user.id, Some(75), None).await.unwrap();
+
+        assert_eq!(updated_user.max_urls_per_user, 75);
+        assert_eq!(updated_user.max_urls_per_day, original_per_day);
+    }
+
+    #[tokio::test]
+    async fn test_update_quotas_partial_per_day() {
+        let db = get_in_memory_db().await;
+
+        let gitlab_user = GitlabUserInfo {
+            id: 30003,
+            username: "partialdaily".to_string(),
+            email: None,
+            avatar_url: None,
+        };
+        let user = db.upsert(&gitlab_user).await.unwrap();
+        let original_per_user = user.max_urls_per_user;
+
+        let updated_user = db.update_quotas(user.id, None, Some(20)).await.unwrap();
+
+        assert_eq!(updated_user.max_urls_per_user, original_per_user);
+        assert_eq!(updated_user.max_urls_per_day, 20);
+    }
+
+    #[tokio::test]
+    async fn test_update_quotas_not_found() {
+        let db = get_in_memory_db().await;
+
+        let result = db.update_quotas(999999, Some(50), Some(5)).await;
+
+        assert!(result.is_err());
+        match result {
+            Err(sqlx::Error::RowNotFound) => (),
+            _ => panic!("Expected RowNotFound error"),
+        }
     }
 }

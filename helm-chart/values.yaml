@@ -223,6 +223,8 @@ config:
     type: "gitlab"
     # Optional note to display on login page (e.g., "VPN must be enabled")
     note: ""
+    # Comma-separated list of admin usernames (e.g., "user1,user2,user3")
+    adminUsers: ""
 
     # Authentication provider settings
     providers:

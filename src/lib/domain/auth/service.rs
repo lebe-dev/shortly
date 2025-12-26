@@ -58,7 +58,6 @@ where
         let mut rng = rand::thread_rng();
         let random_bytes: [u8; SESSION_TOKEN_BYTES] = rng.r#gen();
 
-        // Convert bytes to u128 for base62 encoding
         let mut bytes_16 = [0u8; 16];
         bytes_16.copy_from_slice(&random_bytes[0..16]);
         let random_number = u128::from_be_bytes(bytes_16);

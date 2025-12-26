@@ -45,17 +45,14 @@ pub async fn auth_middleware(
     let path = request.uri().path();
     let method = request.method();
 
-    // Exempt paths
     if path == "/api/version" || path.starts_with("/api/auth/") || !path.starts_with("/api/") {
         debug!("path '{}' '{}' exempted from authentication", method, path);
         return next.run(request).await;
     }
 
-    // Optional auth for /api/config (to include user consumption data)
     if path == "/api/config" && method == "GET" {
         debug!("Config request: attempting optional auth");
 
-        // Try to extract and validate session token
         if let Some(token) = extract_session_token(request.headers()) {
             if let Some(auth_service) = &state.auth_service {
                 match auth_service.validate_session(&token).await {
@@ -72,17 +69,13 @@ pub async fn auth_middleware(
             }
         }
 
-        // Continue without authentication
         return next.run(request).await;
     }
 
-    // Special handling for /api/url endpoints when auth-only is false
     if !state.config.features.create_url.auth_only {
-        // Allow POST /api/url (create short URL)
         if path == "/api/url" && method == "POST" {
             debug!("URL creation: auth-only=false, attempting optional auth");
 
-            // Try to extract and validate session token
             if let Some(token) = extract_session_token(request.headers()) {
                 if let Some(auth_service) = &state.auth_service {
                     match auth_service.validate_session(&token).await {
@@ -99,17 +92,14 @@ pub async fn auth_middleware(
                 debug!("No session token found, creating URL anonymously");
             }
 
-            // Continue with request (User extension present if auth succeeded)
             return next.run(request).await;
         }
-        // Allow GET /api/url/{url_id} (get URL by ID)
         if path.starts_with("/api/url/") && method == "GET" {
             debug!("URL retrieval allowed without auth (auth-only=false)");
             return next.run(request).await;
         }
     }
 
-    // If auth is not enabled, allow all requests
     if !state.config.auth.enabled {
         debug!(
             "authentication disabled globally, allowing {} {}",
@@ -137,7 +127,6 @@ pub async fn auth_middleware(
     match auth_service.validate_session(&token).await {
         Ok(user) => {
             debug!("session validated for user: {}", user.username);
-            // Add user to request extensions for downstream handlers
             request.extensions_mut().insert(user);
             next.run(request).await
         }

@@ -28,6 +28,9 @@ data:
   {{- if .Values.config.auth.note }}
   AUTH_NOTE: {{ .Values.config.auth.note | quote }}
   {{- end }}
+  {{- if .Values.config.auth.adminUsers }}
+  AUTH_ADMIN_USERS: {{ .Values.config.auth.adminUsers | quote }}
+  {{- end }}
   AUTH_PROVIDERS_GITLAB_BASE_URL: {{ .Values.config.auth.providers.gitlab.baseUrl | quote }}
 {{- if .Values.config.nginx.enabled }}
 ---

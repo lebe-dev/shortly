@@ -27,7 +27,6 @@
 				console.error('Failed to load config in layout:', e);
 			});
 
-		// Check session if auth is enabled
 		if (config?.auth.enabled) {
 			try {
 				const session = await checkSession();
@@ -107,7 +106,7 @@
 					{/if}
 					<LightSwitch />
 					{#if config?.auth.enabled}
-						<UserMenu />
+						<UserMenu {config} />
 					{/if}
 				</div>
 
@@ -127,7 +126,7 @@
 		<div
 			class="flex items-center justify-center bg-gray-50 p-2 text-center text-xs text-gray-500 dark:bg-gray-900 dark:text-gray-400"
 		>
-			<span>v1.1.0</span>
+			<span>v1.2.0</span>
 		</div>
 	</div>
 {/await}
