@@ -42,7 +42,8 @@
 		"language": "Язык",
 		"login": "Войти",
 		"logout": "Выйти",
-		"myLinks": "Мои ссылки"
+		"myLinks": "Мои ссылки",
+		"adminPanel": "Панель администратора"
 	},
 	"homePage": {
 		"title": "Создать короткую ссылку :: SHRTLY",
@@ -148,6 +149,130 @@
 			"loadFailed": "Не удалось загрузить ваши ссылки",
 			"deleteFailed": "Не удалось удалить ссылку",
 			"copyFailed": "Не удалось скопировать ссылку"
+		}
+	},
+	"adminPage": {
+		"title": "Панель администратора :: SHRTLY",
+		"description": "Управление всеми короткими ссылками",
+		"header": "Панель администрирования",
+		"tabs": {
+			"general": "Общие",
+			"links": "Ссылки",
+			"users": "Пользователи",
+			"audit": "Аудит"
+		},
+		"general": {
+			"sections": {
+				"service": "Настройки сервиса",
+				"createUrl": "Создание ссылок",
+				"namedUrls": "Именные ссылки",
+				"auth": "Аутентификация",
+				"scheduler": "Планировщик"
+			},
+			"fields": {
+				"baseUrl": "Базовый URL",
+				"shortUrlTtl": "Срок хранения",
+				"maxUrlLength": "Макс. длина URL",
+				"enabled": "Включено",
+				"authOnly": "Требуется вход",
+				"maxPerUser": "Макс. на пользователя",
+				"maxPerDay": "Макс. в день",
+				"minLength": "Мин. длина",
+				"maxLength": "Макс. длина",
+				"reservedNames": "Зарезервированные имена",
+				"authType": "Провайдер",
+				"gitlabBaseUrl": "GitLab Base URL",
+				"gitlabAppId": "Application ID",
+				"note": "Заметка на странице входа",
+				"cleanupCron": "Расписание очистки ссылок"
+			},
+			"values": {
+				"yes": "Да",
+				"no": "Нет",
+				"none": "Нет",
+				"hours": "{count, plural, one {# час} few {# часа} many {# часов} other {# часов}}",
+				"characters": "{count} символов",
+				"andMore": "и ещё {count}"
+			}
+		},
+		"empty": "Ссылки не найдены",
+		"items": "Всего",
+		"filtered": "Показано",
+		"search": {
+			"placeholder": "Поиск по имени ссылки или пользователю"
+		},
+		"filters": {
+			"onlyNamed": "Только именные"
+		},
+		"sort": {
+			"label": "Сортировка",
+			"byCreated": "По дате создания",
+			"namedFirst": "Именные"
+		},
+		"table": {
+			"shortUrl": "Короткая ссылка",
+			"originalUrl": "Оригинальный URL",
+			"user": "Пользователь",
+			"userId": "ID пользователя",
+			"created": "Создана",
+			"expires": "Истекает через",
+			"actions": "Действия"
+		},
+		"deleteSuccess": "Ссылка успешно удалена",
+		"copySuccess": "Ссылка скопирована в буфер обмена",
+		"errors": {
+			"notAuthorized": "У вас нет доступа к этой странице",
+			"deleteFailed": "Не удалось удалить ссылку",
+			"copyFailed": "Не удалось скопировать ссылку"
+		},
+		"audit": {
+			"filters": {
+				"eventType": "Тип события",
+				"allEventTypes": "Все события",
+				"urlName": "Имя URL",
+				"urlNamePlaceholder": "Поиск по имени URL",
+				"username": "Имя пользователя",
+				"usernamePlaceholder": "Поиск по имени пользователя",
+				"dateFrom": "С даты",
+				"dateTo": "До даты",
+				"dateRange": "Диапазон дат",
+				"selectDateRange": "Выберите диапазон дат",
+				"apply": "Применить",
+				"clear": "Очистить"
+			},
+			"table": {
+				"eventType": "Тип события",
+				"user": "Пользователь",
+				"urlName": "Имя URL",
+				"timestamp": "Время"
+			},
+			"eventTypes": {
+				"create_url": "Создание URL",
+				"delete_url": "Удаление URL",
+				"user_login": "Вход",
+				"user_logout": "Выход",
+				"user_quota_update": "Изменение квот"
+			},
+			"noEvents": "Событий не найдено",
+			"showing": "Показано {count} из {total}",
+			"errors": {
+				"loadFailed": "Не удалось загрузить события аудита"
+			}
+		},
+		"users": {
+			"empty": "Пользователи не найдены",
+			"userId": "ID пользователя",
+			"created": "Создан",
+			"urlCount": "Создано ссылок",
+			"quotas": "Квоты",
+			"maxPerUser": "Макс. на пользователя",
+			"maxPerDay": "Макс. в день",
+			"editQuotas": "Редактировать квоты",
+			"saveQuotas": "Сохранить",
+			"cancelEdit": "Отмена",
+			"quotasUpdated": "Квоты успешно обновлены",
+			"quotasUpdateFailed": "Не удалось обновить квоты",
+			"quotasMustBeNonNegative": "Квоты должны быть неотрицательными"
 		}
 	}
 }

@@ -42,7 +42,8 @@
 		"language": "Language",
 		"login": "Login",
 		"logout": "Logout",
-		"myLinks": "My Links"
+		"myLinks": "My Links",
+		"adminPanel": "Admin Panel"
 	},
 	"homePage": {
 		"title": "Create short url :: SHRTLY",
@@ -148,6 +149,130 @@
 			"loadFailed": "Failed to load your links",
 			"deleteFailed": "Failed to delete link",
 			"copyFailed": "Failed to copy link"
+		}
+	},
+	"adminPage": {
+		"title": "Admin Panel :: SHRTLY",
+		"description": "Manage all short links",
+		"header": "Admin Panel",
+		"tabs": {
+			"general": "General",
+			"links": "Links",
+			"users": "Users",
+			"audit": "Audit"
+		},
+		"general": {
+			"sections": {
+				"service": "Service Settings",
+				"createUrl": "URL Creation",
+				"namedUrls": "Named URLs",
+				"auth": "Authentication",
+				"scheduler": "Scheduler"
+			},
+			"fields": {
+				"baseUrl": "Base URL",
+				"shortUrlTtl": "Link TTL",
+				"maxUrlLength": "Max URL Length",
+				"enabled": "Enabled",
+				"authOnly": "Auth Required",
+				"maxPerUser": "Max per User",
+				"maxPerDay": "Max per Day",
+				"minLength": "Min Length",
+				"maxLength": "Max Length",
+				"reservedNames": "Reserved Names",
+				"authType": "Auth Provider",
+				"gitlabBaseUrl": "GitLab Base URL",
+				"gitlabAppId": "Application ID",
+				"note": "Login Note",
+				"cleanupCron": "Cleanup Schedule"
+			},
+			"values": {
+				"yes": "Yes",
+				"no": "No",
+				"none": "None",
+				"hours": "{count, plural, one {# hour} other {# hours}}",
+				"characters": "{count} characters",
+				"andMore": "and {count} more"
+			}
+		},
+		"empty": "No links found",
+		"items": "Total",
+		"filtered": "Showing",
+		"search": {
+			"placeholder": "Search by link name or username"
+		},
+		"filters": {
+			"onlyNamed": "Only named"
+		},
+		"sort": {
+			"label": "Sort",
+			"byCreated": "By creation date",
+			"namedFirst": "Named"
+		},
+		"table": {
+			"shortUrl": "Short URL",
+			"originalUrl": "Original URL",
+			"user": "User",
+			"userId": "User ID",
+			"created": "Created",
+			"expires": "Expires In",
+			"actions": "Actions"
+		},
+		"deleteSuccess": "Link deleted successfully",
+		"copySuccess": "Link copied to clipboard",
+		"errors": {
+			"notAuthorized": "You are not authorized to access this page",
+			"deleteFailed": "Failed to delete link",
+			"copyFailed": "Failed to copy link"
+		},
+		"audit": {
+			"filters": {
+				"eventType": "Event Type",
+				"allEventTypes": "All Events",
+				"urlName": "URL Name",
+				"urlNamePlaceholder": "Search by URL name",
+				"username": "Username",
+				"usernamePlaceholder": "Search by username",
+				"dateFrom": "From Date",
+				"dateTo": "To Date",
+				"dateRange": "Date Range",
+				"selectDateRange": "Select date range",
+				"apply": "Apply Filters",
+				"clear": "Clear Filters"
+			},
+			"table": {
+				"eventType": "Event Type",
+				"user": "User",
+				"urlName": "URL Name",
+				"timestamp": "Timestamp"
+			},
+			"eventTypes": {
+				"create_url": "URL Created",
+				"delete_url": "URL Deleted",
+				"user_login": "User Login",
+				"user_logout": "User Logout",
+				"user_quota_update": "Quota Updated"
+			},
+			"noEvents": "No audit events found",
+			"showing": "Showing {count} of {total} events",
+			"errors": {
+				"loadFailed": "Failed to load audit events"
+			}
+		},
+		"users": {
+			"empty": "No users found",
+			"userId": "User ID",
+			"created": "Created",
+			"urlCount": "URLs Created",
+			"quotas": "Quotas",
+			"maxPerUser": "Max per user",
+			"maxPerDay": "Max per day",
+			"editQuotas": "Edit quotas",
+			"saveQuotas": "Save",
+			"cancelEdit": "Cancel",
+			"quotasUpdated": "Quotas updated successfully",
+			"quotasUpdateFailed": "Failed to update quotas",
+			"quotasMustBeNonNegative": "Quotas must be non-negative"
 		}
 	}
 }

@@ -42,7 +42,8 @@
 		"language": "Sprache",
 		"login": "Anmelden",
 		"logout": "Abmelden",
-		"myLinks": "Meine Links"
+		"myLinks": "Meine Links",
+		"adminPanel": "Admin-Panel"
 	},
 	"homePage": {
 		"title": "Kurzen URL erstellen :: SHRTLY",
@@ -148,6 +149,122 @@
 			"loadFailed": "Ihre Links konnten nicht geladen werden",
 			"deleteFailed": "Link konnte nicht gelöscht werden",
 			"copyFailed": "Link konnte nicht kopiert werden"
+		}
+	},
+	"adminPage": {
+		"title": "Admin-Panel :: SHRTLY",
+		"description": "Alle Kurzlinks verwalten",
+		"header": "Admin-Panel",
+		"tabs": {
+			"general": "Allgemein",
+			"links": "Links",
+			"users": "Benutzer",
+			"audit": "Audit"
+		},
+		"general": {
+			"sections": {
+				"service": "Dienst-Einstellungen",
+				"createUrl": "URL-Erstellung",
+				"namedUrls": "Benannte URLs",
+				"auth": "Authentifizierung",
+				"scheduler": "Planer"
+			},
+			"fields": {
+				"baseUrl": "Basis-URL",
+				"shortUrlTtl": "Link-TTL",
+				"maxUrlLength": "Max. URL-Länge",
+				"enabled": "Aktiviert",
+				"authOnly": "Anmeldung erforderlich",
+				"maxPerUser": "Max. pro Benutzer",
+				"maxPerDay": "Max. pro Tag",
+				"minLength": "Min. Länge",
+				"maxLength": "Max. Länge",
+				"reservedNames": "Reservierte Namen",
+				"authType": "Anbieter",
+				"gitlabBaseUrl": "GitLab Basis-URL",
+				"gitlabAppId": "Anwendungs-ID",
+				"note": "Login-Hinweis",
+				"cleanupCron": "Bereinigungsplan"
+			},
+			"values": {
+				"yes": "Ja",
+				"no": "Nein",
+				"none": "Keine",
+				"hours": "{count, plural, one {# Stunde} other {# Stunden}}",
+				"characters": "{count} Zeichen",
+				"andMore": "und {count} weitere"
+			}
+		},
+		"empty": "Keine Links gefunden",
+		"items": "Gesamt",
+		"filtered": "Angezeigt",
+		"search": {
+			"placeholder": "Suche nach Link-Name oder Benutzername"
+		},
+		"filters": {
+			"onlyNamed": "Nur benannt"
+		},
+		"sort": {
+			"label": "Sortieren",
+			"byCreated": "Nach Erstellungsdatum",
+			"namedFirst": "Benannt"
+		},
+		"table": {
+			"shortUrl": "Kurz-URL",
+			"originalUrl": "Original-URL",
+			"user": "Benutzer",
+			"userId": "Benutzer-ID",
+			"created": "Erstellt",
+			"expires": "Läuft ab in",
+			"actions": "Aktionen"
+		},
+		"deleteSuccess": "Link erfolgreich gelöscht",
+		"copySuccess": "Link in Zwischenablage kopiert",
+		"errors": {
+			"notAuthorized": "Sie sind nicht berechtigt, auf diese Seite zuzugreifen",
+			"deleteFailed": "Link konnte nicht gelöscht werden",
+			"copyFailed": "Link konnte nicht kopiert werden"
+		},
+		"audit": {
+			"filters": {
+				"title": "Filter",
+				"eventType": "Ereignistyp",
+				"allEventTypes": "Alle Ereignisse",
+				"urlName": "URL-Name",
+				"urlNamePlaceholder": "Nach URL-Name suchen",
+				"dateFrom": "Von Datum",
+				"dateTo": "Bis Datum",
+				"dateRange": "Datumsbereich",
+				"selectDateRange": "Datumsbereich auswählen",
+				"apply": "Filter anwenden",
+				"clear": "Filter löschen"
+			},
+			"table": {
+				"eventType": "Ereignistyp",
+				"user": "Benutzer",
+				"urlName": "URL-Name",
+				"timestamp": "Zeitstempel"
+			},
+			"eventTypes": {
+				"create_url": "URL erstellt",
+				"delete_url": "URL gelöscht",
+				"user_login": "Benutzer angemeldet",
+				"user_logout": "Benutzer abgemeldet"
+			},
+			"noEvents": "Keine Audit-Ereignisse gefunden",
+			"showing": "{count} von {total} Ereignissen werden angezeigt",
+			"errors": {
+				"loadFailed": "Audit-Ereignisse konnten nicht geladen werden"
+			}
+		},
+		"users": {
+			"empty": "Keine Benutzer gefunden",
+			"userId": "Benutzer-ID",
+			"created": "Erstellt",
+			"urlCount": "Erstellte URLs",
+			"quotas": "Kontingente",
+			"maxPerUser": "Max. pro Benutzer",
+			"maxPerDay": "Max. pro Tag"
 		}
 	}
 }

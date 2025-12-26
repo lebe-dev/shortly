@@ -42,7 +42,8 @@
 		"language": "语言",
 		"login": "登录",
 		"logout": "登出",
-		"myLinks": "我的链接"
+		"myLinks": "我的链接",
+		"adminPanel": "管理面板"
 	},
 	"homePage": {
 		"title": "创建短链接 :: SHRTLY",
@@ -148,6 +149,122 @@
 			"loadFailed": "加载链接失败",
 			"deleteFailed": "删除链接失败",
 			"copyFailed": "复制链接失败"
+		}
+	},
+	"adminPage": {
+		"title": "管理面板 :: SHRTLY",
+		"description": "管理所有短链接",
+		"header": "管理面板",
+		"tabs": {
+			"general": "常规",
+			"links": "链接",
+			"users": "用户",
+			"audit": "审计"
+		},
+		"general": {
+			"sections": {
+				"service": "服务设置",
+				"createUrl": "URL创建",
+				"namedUrls": "命名URL",
+				"auth": "认证",
+				"scheduler": "调度器"
+			},
+			"fields": {
+				"baseUrl": "基础URL",
+				"shortUrlTtl": "链接TTL",
+				"maxUrlLength": "最大URL长度",
+				"enabled": "启用",
+				"authOnly": "需要认证",
+				"maxPerUser": "每用户最大",
+				"maxPerDay": "每日最大",
+				"minLength": "最小长度",
+				"maxLength": "最大长度",
+				"reservedNames": "保留名称",
+				"authType": "提供商",
+				"gitlabBaseUrl": "GitLab 基础URL",
+				"gitlabAppId": "应用程序ID",
+				"note": "登录提示",
+				"cleanupCron": "清理计划"
+			},
+			"values": {
+				"yes": "是",
+				"no": "否",
+				"none": "无",
+				"hours": "{count} 小时",
+				"characters": "{count} 字符",
+				"andMore": "还有 {count} 个"
+			}
+		},
+		"empty": "未找到链接",
+		"items": "总计",
+		"filtered": "显示",
+		"search": {
+			"placeholder": "按链接名称或用户名搜索"
+		},
+		"filters": {
+			"onlyNamed": "仅命名"
+		},
+		"sort": {
+			"label": "排序",
+			"byCreated": "按创建日期",
+			"namedFirst": "命名优先"
+		},
+		"table": {
+			"shortUrl": "短链接",
+			"originalUrl": "原始网址",
+			"user": "用户",
+			"userId": "用户ID",
+			"created": "创建时间",
+			"expires": "过期时间",
+			"actions": "操作"
+		},
+		"deleteSuccess": "链接删除成功",
+		"copySuccess": "链接已复制到剪贴板",
+		"errors": {
+			"notAuthorized": "您无权访问此页面",
+			"deleteFailed": "删除链接失败",
+			"copyFailed": "复制链接失败"
+		},
+		"audit": {
+			"filters": {
+				"title": "筛选",
+				"eventType": "事件类型",
+				"allEventTypes": "所有事件",
+				"urlName": "URL名称",
+				"urlNamePlaceholder": "按URL名称搜索",
+				"dateFrom": "开始日期",
+				"dateTo": "结束日期",
+				"dateRange": "日期范围",
+				"selectDateRange": "选择日期范围",
+				"apply": "应用筛选",
+				"clear": "清除筛选"
+			},
+			"table": {
+				"eventType": "事件类型",
+				"user": "用户",
+				"urlName": "URL名称",
+				"timestamp": "时间戳"
+			},
+			"eventTypes": {
+				"create_url": "创建URL",
+				"delete_url": "删除URL",
+				"user_login": "用户登录",
+				"user_logout": "用户登出"
+			},
+			"noEvents": "未找到审计事件",
+			"showing": "显示 {count} / {total} 个事件",
+			"errors": {
+				"loadFailed": "加载审计事件失败"
+			}
+		},
+		"users": {
+			"empty": "未找到用户",
+			"userId": "用户ID",
+			"created": "创建时间",
+			"urlCount": "创建的URL数",
+			"quotas": "配额",
+			"maxPerUser": "每用户最大",
+			"maxPerDay": "每日最大"
 		}
 	}
 }

@@ -4,13 +4,17 @@ export class AppConfig {
 		maxUrlLength: number,
 		baseUrl: string,
 		features: FeaturesConfig,
-		auth: AuthConfig
+		auth: AuthConfig,
+		scheduler: SchedulerConfig,
+		admin?: AdminDataDto
 	) {
 		this.shortUrlTtl = shortUrlTtl;
 		this.maxUrlLength = maxUrlLength;
 		this.baseUrl = baseUrl;
 		this.features = features;
 		this.auth = auth;
+		this.scheduler = scheduler;
+		this.admin = admin;
 	}
 
 	shortUrlTtl: number;
@@ -18,6 +22,8 @@ export class AppConfig {
 	baseUrl: string;
 	features: FeaturesConfig;
 	auth: AuthConfig;
+	scheduler: SchedulerConfig;
+	admin?: AdminDataDto;
 }
 
 export class NamedUrlsConfig {
@@ -72,13 +78,60 @@ export class FeaturesConfig {
 export type AuthType = 'gitlab';
 
 export class AuthConfig {
-	constructor(enabled: boolean, authType: AuthType, note?: string) {
+	constructor(enabled: boolean, authType: AuthType, note?: string, gitlab?: GitlabProvider) {
 		this.enabled = enabled;
 		this.authType = authType;
 		this.note = note;
+		this.gitlab = gitlab;
 	}
 
 	enabled: boolean;
 	authType: AuthType;
 	note?: string;
+	gitlab?: GitlabProvider;
+}
+
+export class GitlabProvider {
+	constructor(baseUrl: string, applicationId: string) {
+		this.baseUrl = baseUrl;
+		this.applicationId = applicationId;
+	}
+
+	baseUrl: string;
+	applicationId: string;
+}
+
+export class SchedulerConfig {
+	constructor(cleanupExpiredUrls: string) {
+		this.cleanupExpiredUrls = cleanupExpiredUrls;
+	}
+
+	cleanupExpiredUrls: string;
+}
+
+export interface AdminUrlDto {
+	id: string;
+	originalUrl: string;
+	created: number;
+	ttl: number;
+	userId: number | null;
+	username: string | null;
+	customName: string | null;
+}
+
+export interface AdminUserDto {
+	id: number;
+	username: string;
+	email?: string;
+	avatarUrl?: string;
+	createdAt: number;
+	urlCount: number;
+	maxUrlsPerUser: number;
+	maxUrlsPerDay: number;
+	isAdmin: boolean;
+}
+
+export interface AdminDataDto {
+	allUrls: AdminUrlDto[];
+	users: AdminUserDto[];
 }

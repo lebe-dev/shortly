@@ -4,6 +4,7 @@
 	import { Button } from './ui/button';
 	import { toast } from 'svelte-sonner';
 	import { locale, t } from 'svelte-intl-precompile';
+	import type { AppConfig } from '$lib/domain/config';
 	import {
 		DropdownMenu,
 		DropdownMenuContent,
@@ -20,6 +21,13 @@
 	import LogIn from 'lucide-svelte/icons/log-in';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import Link2 from 'lucide-svelte/icons/link-2';
+	import MonitorCog from 'lucide-svelte/icons/monitor-cog';
+
+	interface Props {
+		config?: AppConfig | null;
+	}
+
+	let { config = null }: Props = $props();
 
 	const languages = ['en', 'ru', 'de', 'es', 'fr', 'zh', 'jp', 'ge'];
 
@@ -70,6 +78,16 @@
 					<span class="text-sm">{$t('layout.myLinks')}</span>
 				</a>
 			</DropdownMenuItem>
+
+			<!-- Admin Panel (only visible for admins) -->
+			{#if config?.admin}
+				<DropdownMenuItem>
+					<a href="/admin" class="flex w-full items-center gap-2">
+						<MonitorCog class="h-4 w-4" />
+						<span class="text-sm">{$t('layout.adminPanel')}</span>
+					</a>
+				</DropdownMenuItem>
+			{/if}
 			<DropdownMenuSeparator />
 
 			<!-- Language Submenu -->

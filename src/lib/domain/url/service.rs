@@ -3,7 +3,7 @@ use rand::Rng;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::domain::url::{
-    audit::{AuditEventType, UrlAuditEvent},
+    audit::{AuditEventType, AuditEventWithUser, UrlAuditEvent},
     model::{CleanupExpiredUrlsError, FindUrlError},
     ports::{UrlRepository, UrlService},
 };
@@ -275,8 +275,9 @@ where
             let audit_event = UrlAuditEvent {
                 id: None,
                 event_type: AuditEventType::CreateUrl,
-                user_id: uid,
-                url_name: name.clone(),
+                actor_user_id: uid,
+                target_user_id: uid,
+                url_name: Some(name.clone()),
                 created_at: timestamp,
             };
             self.repo.record_audit_event(&audit_event).await?;
@@ -321,8 +322,9 @@ where
                         let audit_event = UrlAuditEvent {
                             id: None,
                             event_type: AuditEventType::CreateUrl,
-                            user_id: uid,
-                            url_name: short_id.clone(),
+                            actor_user_id: uid,
+                            target_user_id: uid,
+                            url_name: Some(short_id.clone()),
                             created_at: timestamp,
                         };
                         self.repo.record_audit_event(&audit_event).await?;
@@ -404,14 +406,42 @@ where
         &self,
         url_id: &str,
         user_id: i64,
+        is_admin: bool,
     ) -> Result<(), super::model::DeleteUrlError> {
-        info!("attempting to delete url '{}' by user {}", url_id, user_id);
+        info!(
+            "attempting to delete url '{}' by user {} (admin: {})",
+            url_id, user_id, is_admin
+        );
 
         match self.repo.find_by_id(url_id).await? {
             Some(url) => {
-                if url.user_id == Some(user_id) {
+                if is_admin || url.user_id == Some(user_id) {
+                    let url_name_for_audit =
+                        url.custom_name.clone().or_else(|| Some(url.id.clone()));
+
                     self.repo.delete_by_id(url_id).await?;
                     info!("url '{}' deleted successfully", url_id);
+
+                    let timestamp = SystemTime::now()
+                        .duration_since(UNIX_EPOCH)
+                        .map_err(|e| {
+                            super::model::DeleteUrlError::from(anyhow::anyhow!("Time error: {}", e))
+                        })?
+                        .as_secs() as i64;
+
+                    let audit_event = UrlAuditEvent {
+                        id: None,
+                        event_type: AuditEventType::DeleteUrl,
+                        actor_user_id: user_id,
+                        target_user_id: user_id,
+                        url_name: url_name_for_audit,
+                        created_at: timestamp,
+                    };
+
+                    if let Err(e) = self.repo.record_audit_event(&audit_event).await {
+                        error!("Failed to record delete audit event: {:?}", e);
+                    }
+
                     Ok(())
                 } else {
                     error!(
@@ -442,6 +472,49 @@ where
     ) -> Result<i64, FindUrlError> {
         self.repo
             .count_by_user_id_since(user_id, since_timestamp)
+            .await
+            .map_err(Into::into)
+    }
+
+    async fn list_all_urls(&self) -> Result<Vec<super::model::Url>, super::model::FindUrlError> {
+        info!("listing all urls");
+        self.repo.find_all().await.map_err(Into::into)
+    }
+
+    async fn record_audit_event(
+        &self,
+        event: &UrlAuditEvent,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        self.repo
+            .record_audit_event(event)
+            .await
+            .map_err(|e| Box::new(e) as Box<dyn std::error::Error>)
+    }
+
+    async fn find_audit_events(
+        &self,
+        event_type: Option<AuditEventType>,
+        actor_user_id: Option<i64>,
+        target_user_id: Option<i64>,
+        url_name: Option<String>,
+        username: Option<String>,
+        date_from: Option<i64>,
+        date_to: Option<i64>,
+        limit: i64,
+        offset: i64,
+    ) -> Result<(Vec<AuditEventWithUser>, i64), FindUrlError> {
+        self.repo
+            .find_audit_events(
+                event_type,
+                actor_user_id,
+                target_user_id,
+                url_name,
+                username,
+                date_from,
+                date_to,
+                limit,
+                offset,
+            )
             .await
             .map_err(Into::into)
     }

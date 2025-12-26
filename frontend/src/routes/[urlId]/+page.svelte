@@ -42,7 +42,6 @@
 				inProgress = false;
 			});
 
-		// Fetch config if user is authenticated
 		if ($authStore.authenticated) {
 			try {
 				config = await fetchConfig();

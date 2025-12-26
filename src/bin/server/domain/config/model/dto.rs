@@ -17,6 +17,11 @@ pub struct AppConfigDto {
     pub features: FeaturesConfigDto,
     /// Authentication configuration
     pub auth: AuthConfigDto,
+    /// Scheduler configuration
+    pub scheduler: SchedulerConfigDto,
+    /// Admin data (only present for admin users)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub admin: Option<AdminDataDto>,
 }
 
 #[derive(PartialEq, Serialize, Clone, Debug)]
@@ -60,15 +65,87 @@ pub struct AuthConfigDto {
     /// Optional note to display on login page
     #[serde(skip_serializing_if = "Option::is_none")]
     pub note: Option<String>,
+    /// GitLab provider configuration
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub gitlab: Option<GitlabProviderDto>,
+}
+
+#[derive(PartialEq, Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct GitlabProviderDto {
+    /// GitLab instance base URL
+    pub base_url: String,
+    /// GitLab application ID
+    pub application_id: String,
+}
+
+#[derive(PartialEq, Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct SchedulerConfigDto {
+    /// Cron expression for cleanup job
+    pub cleanup_expired_urls: String,
+}
+
+#[derive(PartialEq, Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct AdminDataDto {
+    /// All URLs in the system (for admin users only)
+    pub all_urls: Vec<AdminUrlDto>,
+    /// All users in the system (for admin users only)
+    pub users: Vec<AdminUserDto>,
+}
+
+#[derive(PartialEq, Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct AdminUrlDto {
+    /// Short URL ID
+    pub id: String,
+    /// Original long URL
+    pub original_url: String,
+    /// Creation timestamp (Unix epoch)
+    pub created: i64,
+    /// TTL in seconds (0 = no expiration)
+    pub ttl: u32,
+    /// User ID who created this URL
+    pub user_id: Option<i64>,
+    /// Username who created this URL
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub username: Option<String>,
+    /// Custom name for the URL (if any)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_name: Option<String>,
+}
+
+#[derive(PartialEq, Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct AdminUserDto {
+    /// User ID
+    pub id: i64,
+    /// Username
+    pub username: String,
+    /// Email (optional)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+    /// Avatar URL (optional)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub avatar_url: Option<String>,
+    /// Creation timestamp (Unix epoch)
+    pub created_at: i64,
+    /// Number of URLs created by this user
+    pub url_count: u32,
+    /// Maximum URLs allowed per user
+    pub max_urls_per_user: i32,
+    /// Maximum URLs allowed per day
+    pub max_urls_per_day: i32,
+    /// Whether this user is an admin
+    pub is_admin: bool,
 }
 
 impl From<AppConfig> for AppConfigDto {
     fn from(config: AppConfig) -> Self {
-        // Merge base reserved names with config reserved names
         let mut merged_reserved_names: Vec<String> =
             BASE_RESERVED_NAMES.iter().map(|s| s.to_string()).collect();
 
-        // Add config reserved names, avoiding duplicates
         for name in &config.features.named_urls.reserved_names {
             let name_lower = name.to_lowercase();
             if !merged_reserved_names
@@ -78,6 +155,15 @@ impl From<AppConfig> for AppConfigDto {
                 merged_reserved_names.push(name.clone());
             }
         }
+
+        let gitlab_dto = if config.auth.auth_type == AuthType::Gitlab {
+            Some(GitlabProviderDto {
+                base_url: config.auth.providers.gitlab.base_url.clone(),
+                application_id: config.auth.providers.gitlab.application_id.clone(),
+            })
+        } else {
+            None
+        };
 
         AppConfigDto {
             short_url_ttl: config.short_url.ttl,
@@ -103,7 +189,12 @@ impl From<AppConfig> for AppConfigDto {
                 enabled: config.auth.enabled,
                 auth_type: config.auth.auth_type,
                 note: config.auth.note,
+                gitlab: gitlab_dto,
             },
+            scheduler: SchedulerConfigDto {
+                cleanup_expired_urls: config.scheduler.cleanup_expired_urls.clone(),
+            },
+            admin: None,
         }
     }
 }
@@ -112,8 +203,13 @@ impl fmt::Display for AppConfigDto {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "AppConfigDto {{\n  short_url_ttl: {},\n  max_url_length: {},\n  base_url: {},\n  features: {},\n  auth: {}\n}}",
-            self.short_url_ttl, self.max_url_length, self.base_url, self.features, self.auth
+            "AppConfigDto {{\n  short_url_ttl: {},\n  max_url_length: {},\n  base_url: {},\n  features: {},\n  auth: {},\n  scheduler: {}\n}}",
+            self.short_url_ttl,
+            self.max_url_length,
+            self.base_url,
+            self.features,
+            self.auth,
+            self.scheduler
         )
     }
 }
@@ -152,8 +248,18 @@ impl fmt::Display for AuthConfigDto {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "AuthConfigDto {{ enabled: {}, auth_type: {}, note: {:?} }}",
-            self.enabled, self.auth_type, self.note
+            "AuthConfigDto {{ enabled: {}, auth_type: {}, note: {:?}, gitlab: {:?} }}",
+            self.enabled, self.auth_type, self.note, self.gitlab
+        )
+    }
+}
+
+impl fmt::Display for SchedulerConfigDto {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "SchedulerConfigDto {{ cleanup_expired_urls: {} }}",
+            self.cleanup_expired_urls
         )
     }
 }

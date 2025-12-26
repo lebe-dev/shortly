@@ -42,7 +42,8 @@
 		"language": "ენა",
 		"login": "შესვლა",
 		"logout": "გასვლა",
-		"myLinks": "ჩემი ბმულები"
+		"myLinks": "ჩემი ბმულები",
+		"adminPanel": "ადმინისტრატორის პანელი"
 	},
 	"homePage": {
 		"title": "მოკლე URL-ის შექმნა :: SHRTLY",
@@ -148,6 +149,122 @@
 			"loadFailed": "ბმულების ჩატვირთვა ვერ მოხერხდა",
 			"deleteFailed": "ბმულის წაშლა ვერ მოხერხდა",
 			"copyFailed": "ბმულის კოპირება ვერ მოხერხდა"
+		}
+	},
+	"adminPage": {
+		"title": "ადმინისტრატორის პანელი :: SHRTLY",
+		"description": "ყველა მოკლე ბმულის მართვა",
+		"header": "ადმინისტრატორის პანელი",
+		"tabs": {
+			"general": "ზოგადი",
+			"links": "ბმულები",
+			"users": "მომხმარებლები",
+			"audit": "აუდიტი"
+		},
+		"general": {
+			"sections": {
+				"service": "სერვისის პარამეტრები",
+				"createUrl": "URL-ის შექმნა",
+				"namedUrls": "სახელიანი URL-ები",
+				"auth": "ავთენტიფიკაცია",
+				"scheduler": "დამგეგმავი"
+			},
+			"fields": {
+				"baseUrl": "საბაზისო URL",
+				"shortUrlTtl": "ბმულის TTL",
+				"maxUrlLength": "მაქს. URL სიგრძე",
+				"enabled": "ჩართული",
+				"authOnly": "საჭიროა ავტორიზაცია",
+				"maxPerUser": "მაქს. მომხმარებელზე",
+				"maxPerDay": "მაქს. დღეში",
+				"minLength": "მინ. სიგრძე",
+				"maxLength": "მაქს. სიგრძე",
+				"reservedNames": "დაჯავშნილი სახელები",
+				"authType": "პროვაიდერი",
+				"gitlabBaseUrl": "GitLab საბაზისო URL",
+				"gitlabAppId": "აპლიკაციის ID",
+				"note": "შესვლის შენიშვნა",
+				"cleanupCron": "გასუფთავების განრიგი"
+			},
+			"values": {
+				"yes": "დიახ",
+				"no": "არა",
+				"none": "არა",
+				"hours": "{count} საათი",
+				"characters": "{count} სიმბოლო",
+				"andMore": "და კიდევ {count}"
+			}
+		},
+		"empty": "ბმულები არ მოიძებნა",
+		"items": "სულ",
+		"filtered": "ნაჩვენები",
+		"search": {
+			"placeholder": "ძებნა ბმულის სახელით ან მომხმარებლით"
+		},
+		"filters": {
+			"onlyNamed": "მხოლოდ სახელიანი"
+		},
+		"sort": {
+			"label": "დალაგება",
+			"byCreated": "შექმნის თარიღით",
+			"namedFirst": "სახელიანი პირველი"
+		},
+		"table": {
+			"shortUrl": "მოკლე URL",
+			"originalUrl": "ორიგინალური URL",
+			"user": "მომხმარებელი",
+			"userId": "მომხმარებლის ID",
+			"created": "შექმნის თარიღი",
+			"expires": "ვადის გასვლა",
+			"actions": "მოქმედებები"
+		},
+		"deleteSuccess": "ბმული წარმატებით წაიშალა",
+		"copySuccess": "ბმული დაკოპირდა",
+		"errors": {
+			"notAuthorized": "თქვენ არ გაქვთ ამ გვერდზე წვდომის უფლება",
+			"deleteFailed": "ბმულის წაშლა ვერ მოხერხდა",
+			"copyFailed": "ბმულის კოპირება ვერ მოხერხდა"
+		},
+		"audit": {
+			"filters": {
+				"title": "ფილტრები",
+				"eventType": "მოვლენის ტიპი",
+				"allEventTypes": "ყველა მოვლენა",
+				"urlName": "URL სახელი",
+				"urlNamePlaceholder": "ძებნა URL სახელით",
+				"dateFrom": "თარიღიდან",
+				"dateTo": "თარიღამდე",
+				"dateRange": "თარიღების დიაპაზონი",
+				"selectDateRange": "აირჩიეთ თარიღების დიაპაზონი",
+				"apply": "ფილტრების გამოყენება",
+				"clear": "ფილტრების გასუფთავება"
+			},
+			"table": {
+				"eventType": "მოვლენის ტიპი",
+				"user": "მომხმარებელი",
+				"urlName": "URL სახელი",
+				"timestamp": "დროის ნიშანი"
+			},
+			"eventTypes": {
+				"create_url": "URL შეიქმნა",
+				"delete_url": "URL წაიშალა",
+				"user_login": "მომხმარებლის შესვლა",
+				"user_logout": "მომხმარებლის გასვლა"
+			},
+			"noEvents": "აუდიტის მოვლენები ვერ მოიძებნა",
+			"showing": "ნაჩვენებია {count} {total}-დან მოვლენა",
+			"errors": {
+				"loadFailed": "აუდიტის მოვლენების ჩატვირთვა ვერ მოხერხდა"
+			}
+		},
+		"users": {
+			"empty": "მომხმარებლები ვერ მოიძებნა",
+			"userId": "მომხმარებლის ID",
+			"created": "შექმნის თარიღი",
+			"urlCount": "შექმნილი URL-ები",
+			"quotas": "კვოტები",
+			"maxPerUser": "მაქს. მომხმარებელზე",
+			"maxPerDay": "მაქს. დღეში"
 		}
 	}
 }

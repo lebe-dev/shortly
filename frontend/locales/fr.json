@@ -42,7 +42,8 @@
 		"language": "Langue",
 		"login": "Se connecter",
 		"logout": "Se déconnecter",
-		"myLinks": "Mes Liens"
+		"myLinks": "Mes Liens",
+		"adminPanel": "Panneau d'Administration"
 	},
 	"homePage": {
 		"title": "Créer une URL courte :: SHRTLY",
@@ -148,6 +149,122 @@
 			"loadFailed": "Échec du chargement de vos liens",
 			"deleteFailed": "Échec de la suppression du lien",
 			"copyFailed": "Échec de la copie du lien"
+		}
+	},
+	"adminPage": {
+		"title": "Panneau d'Administration :: SHRTLY",
+		"description": "Gérer tous les liens courts",
+		"header": "Panneau d'Administration",
+		"tabs": {
+			"general": "Général",
+			"links": "Liens",
+			"users": "Utilisateurs",
+			"audit": "Audit"
+		},
+		"general": {
+			"sections": {
+				"service": "Paramètres du Service",
+				"createUrl": "Création d'URL",
+				"namedUrls": "URLs Nommées",
+				"auth": "Authentification",
+				"scheduler": "Planificateur"
+			},
+			"fields": {
+				"baseUrl": "URL de Base",
+				"shortUrlTtl": "TTL du Lien",
+				"maxUrlLength": "Longueur Max. d'URL",
+				"enabled": "Activé",
+				"authOnly": "Authentification Requise",
+				"maxPerUser": "Max. par Utilisateur",
+				"maxPerDay": "Max. par Jour",
+				"minLength": "Longueur Min.",
+				"maxLength": "Longueur Max.",
+				"reservedNames": "Noms Réservés",
+				"authType": "Fournisseur",
+				"gitlabBaseUrl": "URL de Base GitLab",
+				"gitlabAppId": "ID d'Application",
+				"note": "Note de Connexion",
+				"cleanupCron": "Planification du Nettoyage"
+			},
+			"values": {
+				"yes": "Oui",
+				"no": "Non",
+				"none": "Aucun",
+				"hours": "{count, plural, one {# heure} other {# heures}}",
+				"characters": "{count} caractères",
+				"andMore": "et {count} de plus"
+			}
+		},
+		"empty": "Aucun lien trouvé",
+		"items": "Total",
+		"filtered": "Affichés",
+		"search": {
+			"placeholder": "Rechercher par nom de lien ou nom d'utilisateur"
+		},
+		"filters": {
+			"onlyNamed": "Nommés uniquement"
+		},
+		"sort": {
+			"label": "Trier",
+			"byCreated": "Par date de création",
+			"namedFirst": "Nommés"
+		},
+		"table": {
+			"shortUrl": "URL Courte",
+			"originalUrl": "URL Originale",
+			"user": "Utilisateur",
+			"userId": "ID Utilisateur",
+			"created": "Créé",
+			"expires": "Expire dans",
+			"actions": "Actions"
+		},
+		"deleteSuccess": "Lien supprimé avec succès",
+		"copySuccess": "Lien copié dans le presse-papiers",
+		"errors": {
+			"notAuthorized": "Vous n'êtes pas autorisé à accéder à cette page",
+			"deleteFailed": "Échec de la suppression du lien",
+			"copyFailed": "Échec de la copie du lien"
+		},
+		"audit": {
+			"filters": {
+				"title": "Filtres",
+				"eventType": "Type d'événement",
+				"allEventTypes": "Tous les événements",
+				"urlName": "Nom de l'URL",
+				"urlNamePlaceholder": "Rechercher par nom d'URL",
+				"dateFrom": "Date de début",
+				"dateTo": "Date de fin",
+				"dateRange": "Plage de dates",
+				"selectDateRange": "Sélectionner la plage de dates",
+				"apply": "Appliquer les filtres",
+				"clear": "Effacer les filtres"
+			},
+			"table": {
+				"eventType": "Type d'événement",
+				"user": "Utilisateur",
+				"urlName": "Nom de l'URL",
+				"timestamp": "Horodatage"
+			},
+			"eventTypes": {
+				"create_url": "URL créée",
+				"delete_url": "URL supprimée",
+				"user_login": "Connexion utilisateur",
+				"user_logout": "Déconnexion utilisateur"
+			},
+			"noEvents": "Aucun événement d'audit trouvé",
+			"showing": "Affichage de {count} sur {total} événements",
+			"errors": {
+				"loadFailed": "Échec du chargement des événements d'audit"
+			}
+		},
+		"users": {
+			"empty": "Aucun utilisateur trouvé",
+			"userId": "ID Utilisateur",
+			"created": "Créé",
+			"urlCount": "URLs Créées",
+			"quotas": "Quotas",
+			"maxPerUser": "Max. par utilisateur",
+			"maxPerDay": "Max. par jour"
 		}
 	}
 }

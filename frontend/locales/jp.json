@@ -42,7 +42,8 @@
 		"language": "言語",
 		"login": "ログイン",
 		"logout": "ログアウト",
-		"myLinks": "マイリンク"
+		"myLinks": "マイリンク",
+		"adminPanel": "管理パネル"
 	},
 	"homePage": {
 		"title": "短縮URLを作成 :: SHRTLY",
@@ -148,6 +149,122 @@
 			"loadFailed": "リンクの読み込みに失敗しました",
 			"deleteFailed": "リンクの削除に失敗しました",
 			"copyFailed": "リンクのコピーに失敗しました"
+		}
+	},
+	"adminPage": {
+		"title": "管理パネル :: SHRTLY",
+		"description": "すべての短縮URLを管理",
+		"header": "管理パネル",
+		"tabs": {
+			"general": "一般",
+			"links": "リンク",
+			"users": "ユーザー",
+			"audit": "監査"
+		},
+		"general": {
+			"sections": {
+				"service": "サービス設定",
+				"createUrl": "URL作成",
+				"namedUrls": "名前付きURL",
+				"auth": "認証",
+				"scheduler": "スケジューラー"
+			},
+			"fields": {
+				"baseUrl": "ベースURL",
+				"shortUrlTtl": "リンクTTL",
+				"maxUrlLength": "最大URL長",
+				"enabled": "有効",
+				"authOnly": "認証必須",
+				"maxPerUser": "ユーザーあたりの最大数",
+				"maxPerDay": "1日あたりの最大数",
+				"minLength": "最小長",
+				"maxLength": "最大長",
+				"reservedNames": "予約名",
+				"authType": "プロバイダー",
+				"gitlabBaseUrl": "GitLab ベースURL",
+				"gitlabAppId": "アプリケーションID",
+				"note": "ログイン注記",
+				"cleanupCron": "クリーンアップスケジュール"
+			},
+			"values": {
+				"yes": "はい",
+				"no": "いいえ",
+				"none": "なし",
+				"hours": "{count} 時間",
+				"characters": "{count} 文字",
+				"andMore": "他 {count} 件"
+			}
+		},
+		"empty": "リンクが見つかりません",
+		"items": "合計",
+		"filtered": "表示中",
+		"search": {
+			"placeholder": "リンク名またはユーザー名で検索"
+		},
+		"filters": {
+			"onlyNamed": "名前付きのみ"
+		},
+		"sort": {
+			"label": "並び替え",
+			"byCreated": "作成日順",
+			"namedFirst": "名前付き優先"
+		},
+		"table": {
+			"shortUrl": "短縮URL",
+			"originalUrl": "元のURL",
+			"user": "ユーザー",
+			"userId": "ユーザーID",
+			"created": "作成日時",
+			"expires": "有効期限",
+			"actions": "操作"
+		},
+		"deleteSuccess": "リンクを削除しました",
+		"copySuccess": "リンクをクリップボードにコピーしました",
+		"errors": {
+			"notAuthorized": "このページにアクセスする権限がありません",
+			"deleteFailed": "リンクの削除に失敗しました",
+			"copyFailed": "リンクのコピーに失敗しました"
+		},
+		"audit": {
+			"filters": {
+				"title": "フィルター",
+				"eventType": "イベントタイプ",
+				"allEventTypes": "すべてのイベント",
+				"urlName": "URL名",
+				"urlNamePlaceholder": "URL名で検索",
+				"dateFrom": "開始日",
+				"dateTo": "終了日",
+				"dateRange": "日付範囲",
+				"selectDateRange": "日付範囲を選択",
+				"apply": "フィルターを適用",
+				"clear": "フィルターをクリア"
+			},
+			"table": {
+				"eventType": "イベントタイプ",
+				"user": "ユーザー",
+				"urlName": "URL名",
+				"timestamp": "タイムスタンプ"
+			},
+			"eventTypes": {
+				"create_url": "URL作成",
+				"delete_url": "URL削除",
+				"user_login": "ユーザーログイン",
+				"user_logout": "ユーザーログアウト"
+			},
+			"noEvents": "監査イベントが見つかりません",
+			"showing": "{total}件中{count}件を表示",
+			"errors": {
+				"loadFailed": "監査イベントの読み込みに失敗しました"
+			}
+		},
+		"users": {
+			"empty": "ユーザーが見つかりません",
+			"userId": "ユーザーID",
+			"created": "作成日時",
+			"urlCount": "作成したURL数",
+			"quotas": "クォータ",
+			"maxPerUser": "ユーザーあたりの最大数",
+			"maxPerDay": "1日あたりの最大数"
 		}
 	}
 }

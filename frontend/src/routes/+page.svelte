@@ -16,6 +16,7 @@
 	import type { AppConfig } from '$lib/domain/config';
 	import { authStore, authLoading } from '$lib/stores/auth';
 	import { copy } from 'svelte-copy';
+	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
 	let inProgress = $state(true);
 
@@ -63,22 +64,18 @@
 	});
 
 	const canGenerate = $derived.by(() => {
-		// URL must not be empty
 		if (url.trim().length === 0) {
 			return false;
 		}
 
-		// URL must pass validation
 		if (validationError !== null) {
 			return false;
 		}
 
-		// If custom name is provided, it must be available
 		if (customName.length > 0 && customNameAvailable !== true) {
 			return false;
 		}
 
-		// Check if user is at limit (applies to all URL creation when authenticated)
 		if (userAtLimit) {
 			return false;
 		}
@@ -89,17 +86,14 @@
 	const validationError = $derived.by(() => {
 		const trimmedUrl = url.trim();
 
-		// Don't show error if field is empty
 		if (trimmedUrl.length === 0) {
 			return null;
 		}
 
-		// Check length
 		if (trimmedUrl.length >= maxUrlLength) {
 			return $t('homePage.errors.urlTooLong', { values: { maxLength: maxUrlLength } });
 		}
 
-		// Check if valid URL
 		if (!isUrlValid(trimmedUrl, maxUrlLength, config?.baseUrl)) {
 			return $t('homePage.errors.invalidUrl');
 		}
@@ -139,21 +133,17 @@
 	}
 
 	function handleUrlInput() {
-		// Reset validation error display when user types
 		showUrlValidationError = false;
 
-		// Clear previous timer
 		if (urlValidationTimer) {
 			clearTimeout(urlValidationTimer);
 			urlValidationTimer = null;
 		}
 
-		// Don't show validation error if field is empty
 		if (url.trim().length === 0) {
 			return;
 		}
 
-		// Set timer to show validation error after user stops typing
 		urlValidationTimer = setTimeout(() => {
 			showUrlValidationError = true;
 		}, 500);
@@ -182,7 +172,7 @@
 		await fetchConfig()
 			.then((data) => {
 				config = data;
-				console.log('Config loaded on mount:', data);
+				console.log('config:', data);
 				console.log('Named URLs consumption:', data.features.namedUrls);
 				shortUrlTtl = data.shortUrlTtl;
 				maxUrlLength = data.maxUrlLength;
@@ -201,7 +191,6 @@
 	});
 
 	async function generateUrl() {
-		// Trim URL before validation
 		const trimmedUrl = url.trim();
 
 		if (trimmedUrl.length >= maxUrlLength) {
@@ -229,14 +218,12 @@
 			shortUrl = data.url;
 			console.log('short url:', shortUrl);
 
-			// Calculate expiry date for non-named URLs
 			if (!nameToUse && shortUrlTtl > 0) {
 				const nowSeconds = Math.floor(Date.now() / 1000);
 				const ttlSeconds = shortUrlTtl * 3600; // Convert hours to seconds
 				shortUrlExpiryDate = formatExpiryDate(nowSeconds, ttlSeconds);
 			}
 
-			// Reload config to update consumption counters
 			if (nameToUse) {
 				const updatedConfig = await fetchConfig();
 				config = updatedConfig;
@@ -383,9 +370,12 @@
 			{/if}
 		</div>
 		<div class="flex items-center justify-center gap-3">
-			<Button size="lg" disabled={inProgress || !canGenerate} onclick={generateUrl}
-				>{$t('common.buttons.generate')}</Button
-			>
+			<Button size="lg" disabled={inProgress || !canGenerate} onclick={generateUrl}>
+				{#if inProgress}
+					<LoaderCircle class="mr-2 h-4 w-4 animate-spin" />
+				{/if}
+				{$t('common.buttons.generate')}
+			</Button>
 		</div>
 		{#if showCustomNameInput && config}
 			<div class="mt-4"><ConsumptionBadge config={config.features.createUrl} /></div>

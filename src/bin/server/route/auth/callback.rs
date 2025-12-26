@@ -6,6 +6,8 @@ use axum::{
 use axum_extra::extract::cookie::{Cookie, SameSite};
 use serde::Deserialize;
 use server_lib::domain::auth::ports::AuthService;
+use server_lib::domain::url::audit::{AuditEventType, UrlAuditEvent};
+use server_lib::domain::url::ports::UrlService;
 use std::sync::Arc;
 use time::Duration;
 
@@ -22,7 +24,7 @@ pub async fn callback_route(
     Query(query): Query<CallbackQuery>,
 ) -> impl IntoResponse {
     if !state.config.auth.enabled {
-        return (StatusCode::NOT_FOUND, "Authentication not enabled").into_response();
+        return (StatusCode::BAD_REQUEST, "Authentication not enabled").into_response();
     }
 
     let auth_service = match &state.auth_service {
@@ -31,7 +33,25 @@ pub async fn callback_route(
     };
 
     match auth_service.complete_oauth(&query.code, &query.state).await {
-        Ok((_user, session)) => {
+        Ok((user, session)) => {
+            let timestamp = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_secs() as i64;
+
+            let audit_event = UrlAuditEvent {
+                id: None,
+                event_type: AuditEventType::UserLogin,
+                actor_user_id: user.id,
+                target_user_id: user.id,
+                url_name: None,
+                created_at: timestamp,
+            };
+
+            if let Err(e) = state.url_service.record_audit_event(&audit_event).await {
+                log::error!("Failed to record login audit event: {:?}", e);
+            }
+
             let cookie = Cookie::build(("session_token", session.token))
                 .path("/")
                 .max_age(Duration::days(30))

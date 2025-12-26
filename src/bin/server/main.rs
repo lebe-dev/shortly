@@ -38,6 +38,7 @@ use server_lib::{
 use tokio_cron_scheduler::{Job, JobScheduler};
 
 use crate::route::{
+    admin::{audit::list_audit_events_route, quotas::update_user_quotas_route},
     url::{
         check::check_custom_name_route, delete::delete_url_route,
         generate::generate_short_url_route, get::get_short_url_by_id_route,
@@ -58,6 +59,7 @@ pub struct AppState {
     config: AppConfig,
     url_service: UrlServiceImplType<Sqlite>,
     auth_service: Option<AuthServiceImpl<Sqlite, Sqlite, GitlabOAuthClient>>,
+    user_repository: Sqlite,
 }
 
 #[tokio::main]
@@ -131,6 +133,7 @@ async fn main() -> anyhow::Result<()> {
                         config: app_config.clone(),
                         url_service: url_service.clone(),
                         auth_service: auth_service.clone(),
+                        user_repository: db_pool.clone(),
                     };
 
                     // SCHEDULER - START
@@ -193,6 +196,8 @@ async fn main() -> anyhow::Result<()> {
                         .route("/api/url", post(generate_short_url_route))
                         .route("/api/url/check", get(check_custom_name_route))
                         .route("/api/user/urls", get(list_user_urls_route))
+                        .route("/api/user/{user_id}/quotas", post(update_user_quotas_route))
+                        .route("/api/admin/audit", get(list_audit_events_route))
                         .fallback(static_handler)
                         .layer(from_fn_with_state(app_state_arc.clone(), auth_middleware))
                         .with_state(app_state_arc);
