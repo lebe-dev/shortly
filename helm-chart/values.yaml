@@ -366,3 +366,73 @@ secrets:
         #applicationId: "vault:secret_v2/data/infra/shortly#APPLICATION_ID"
         secret: ""
         #secret: "vault:secret_v2/data/infra/shortly#SECRET"
+
+# Kubernetes probes configuration
+probes:
+  # Shortly application container probes
+  shortly:
+    livenessProbe:
+      enabled: true
+      httpGet:
+        path: /api/health
+        port: backend  # 8081 with nginx, 8080 without
+      initialDelaySeconds: 10
+      periodSeconds: 30
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+
+    readinessProbe:
+      enabled: true
+      httpGet:
+        path: /api/health
+        port: backend
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+
+    startupProbe:
+      enabled: true
+      httpGet:
+        path: /api/health
+        port: backend
+      initialDelaySeconds: 0
+      periodSeconds: 2
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 15  # 30 seconds total (15 * 2s)
+
+  # Nginx container probes (when enabled)
+  nginx:
+    livenessProbe:
+      enabled: true
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 30
+      timeoutSeconds: 3
+      successThreshold: 1
+      failureThreshold: 3
+
+    readinessProbe:
+      enabled: true
+      httpGet:
+        path: /api/health
+        port: 8080
+      initialDelaySeconds: 2
+      periodSeconds: 10
+      timeoutSeconds: 3
+      successThreshold: 1
+      failureThreshold: 3
+
+    startupProbe:
+      enabled: true
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 0
+      periodSeconds: 1
+      timeoutSeconds: 3
+      successThreshold: 1
+      failureThreshold: 10  # 10 seconds total
