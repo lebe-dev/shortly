@@ -232,6 +232,16 @@ config:
         # GitLab instance base URL
         baseUrl: "https://gitlab.com"
 
+  # Metrics configuration
+  metrics:
+    # Enable/disable Prometheus metrics endpoint at /api/metrics
+    # When enabled:
+    # - Creates internal service (shortly-internal:8081) for Prometheus scraping
+    # - External access is blocked by nginx sidecar (deny all)
+    # - Internal access available via shortly-internal service (bypasses nginx)
+    # Default: false (metrics disabled)
+    enabled: false
+
   # Nginx reverse proxy configuration
   nginx:
     # Enable/disable nginx sidecar (default: true)
@@ -337,6 +347,16 @@ config:
                   add_header Cache-Control "public";
               }
 
+              # Security: Block external access to operational endpoints
+              # Internal access available via shortly-internal service (port 8081)
+              location = /api/health {
+                  deny all;
+              }
+
+              location = /api/metrics {
+                  deny all;
+              }
+
               # Default proxy for all other requests
               location / {
                   proxy_pass http://backend;
@@ -349,6 +369,19 @@ config:
               }
           }
       }
+
+# Prometheus monitoring configuration (optional)
+monitoring:
+  serviceMonitor:
+    # Create ServiceMonitor resource for Prometheus Operator
+    enabled: false
+    # Additional labels for ServiceMonitor (e.g., for Prometheus selector)
+    labels: {}
+      # prometheus: kube-prometheus
+    # Scrape interval
+    interval: "30s"
+    # Scrape timeout
+    scrapeTimeout: "10s"
 
 secrets:
   annotations: {}
