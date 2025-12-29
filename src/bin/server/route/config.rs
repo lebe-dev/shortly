@@ -173,7 +173,7 @@ pub fn is_user_admin(
             admins
                 .split(',')
                 .map(|s| s.trim())
-                .any(|admin| admin == username)
+                .any(|admin| admin.eq_ignore_ascii_case(username))
         })
         .unwrap_or(false)
 }
