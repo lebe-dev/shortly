@@ -68,6 +68,8 @@ auth:
   # Use this to communicate requirements like "VPN must be enabled"
   note: ""
 
+  admin-users: "admin-user1,admin-user2"
+
   providers:
     gitlab:
       # GitLab instance base URL (ENV: AUTH_PROVIDERS_GITLAB_BASE_URL)

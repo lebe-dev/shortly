@@ -40,6 +40,8 @@ auth:
 
   note: ""
 
+  admin-users: "admin-user1,admin-user2"
+
   providers:
     gitlab:
       base-url: https://gitlab.com
