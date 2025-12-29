@@ -30,6 +30,7 @@ docker run --name shortly -p 8080:8080 tinyops/shortly:1.3.0
   - [Docker](docs/install/docker.md)
 - [Configuration](docs/configuration/configuration.md)
   - [Add locale](docs/locale.md)
+- [Monitoring](docs/monitoring.md)
 - [Development](DEV.md)
 
 ## RoadMap
