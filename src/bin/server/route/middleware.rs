@@ -45,7 +45,11 @@ pub async fn auth_middleware(
     let path = request.uri().path();
     let method = request.method();
 
-    if path == "/api/version" || path.starts_with("/api/auth/") || !path.starts_with("/api/") {
+    if path == "/api/version"
+        || path == "/api/health"
+        || path.starts_with("/api/auth/")
+        || !path.starts_with("/api/")
+    {
         debug!("path '{}' '{}' exempted from authentication", method, path);
         return next.run(request).await;
     }
@@ -57,13 +61,12 @@ pub async fn auth_middleware(
             if let Some(auth_service) = &state.auth_service {
                 match auth_service.validate_session(&token).await {
                     Ok(user) => {
-                        debug!("Optional auth successful for user: {}", user.username);
+                        debug!("optional auth successful for user: {}", user.username);
                         request.extensions_mut().insert(user);
                         return next.run(request).await;
                     }
                     Err(e) => {
-                        debug!("Session validation failed: {:?}", e);
-                        // Continue without user context
+                        debug!("session validation failed: {:?}", e);
                     }
                 }
             }
@@ -84,12 +87,12 @@ pub async fn auth_middleware(
                             request.extensions_mut().insert(user);
                         }
                         Err(e) => {
-                            debug!("Optional auth failed, continuing anonymously: {:?}", e);
+                            debug!("optional auth failed, continuing anonymously: {:?}", e);
                         }
                     }
                 }
             } else {
-                debug!("No session token found, creating URL anonymously");
+                debug!("no session token found, creating URL anonymously");
             }
 
             return next.run(request).await;

@@ -19,6 +19,7 @@ use route::{
         callback::callback_route, login::login_route, logout::logout_route, session::session_route,
     },
     config::get_app_config_route,
+    health::health_route,
     middleware::auth_middleware,
     version::get_version_route,
 };
@@ -186,6 +187,7 @@ async fn main() -> anyhow::Result<()> {
 
                     let app = Router::new()
                         .route("/api/version", get(get_version_route))
+                        .route("/api/health", get(health_route))
                         .route("/api/config", get(get_app_config_route))
                         .route("/api/auth/login", get(login_route))
                         .route("/api/auth/callback", get(callback_route))
