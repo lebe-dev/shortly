@@ -122,6 +122,110 @@ startupProbe:
 
 See [Helm Chart Configuration](../helm-chart/README.md#probe-configuration) for complete probe settings.
 
+## Security: Restricted External Access
+
+The `/api/health` and `/api/metrics` endpoints are blocked from external access for security:
+
+- **External Access (via Ingress):** Blocked by nginx sidecar (returns 403 Forbidden)
+- **Internal Access:** Available via `shortly-internal` service on port 8081
+- **Health Probes:** Work normally (connect directly to pod IP, bypassing nginx)
+
+### Internal Service for Metrics
+
+When `config.metrics.enabled: true` in Helm chart, a separate internal service is created:
+
+**Service Details:**
+- **Name:** `{release-name}-shortly-internal` (e.g., `shortly-internal`)
+- **Port:** 8081
+- **Endpoint:** `/api/metrics` (also `/api/health` available)
+- **Access:** Internal cluster only (not exposed via ingress)
+
+**Traffic Flow:**
+```
+External → Ingress → Service (80) → Nginx (8080) → BLOCKED (403)
+Prometheus → Internal Service (8081) → App (8081) → ALLOWED (200)
+K8s Probes → Pod IP (8081) → App → ALLOWED (200)
+```
+
+### Prometheus Configuration for Internal Access
+
+#### Manual Prometheus Configuration
+
+```yaml
+scrape_configs:
+  - job_name: 'shortly'
+    kubernetes_sd_configs:
+      - role: service
+        namespaces:
+          names:
+            - shortly
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_service_name]
+        regex: .*-internal
+        action: keep
+      - source_labels: [__meta_kubernetes_service_name]
+        target_label: service
+    metrics_path: /api/metrics
+    scrape_interval: 30s
+    scrape_timeout: 10s
+```
+
+#### Using ServiceMonitor (Prometheus Operator)
+
+Enable in Helm chart values.yaml:
+
+```yaml
+config:
+  metrics:
+    enabled: true
+
+monitoring:
+  serviceMonitor:
+    enabled: true
+    labels:
+      prometheus: kube-prometheus  # Match your Prometheus selector
+    interval: "30s"
+    scrapeTimeout: "10s"
+```
+
+The ServiceMonitor automatically targets the internal service and scrapes `/api/metrics`.
+
+### Testing Internal Access
+
+```bash
+# From within the cluster
+kubectl run -it --rm debug --image=curlimages/curl --restart=Never -- \
+  curl http://shortly-internal.shortly.svc.cluster.local:8081/api/metrics
+
+# Expected: 200 OK with Prometheus metrics
+
+# Test external access (should be blocked)
+curl https://shortly.example.com/api/metrics
+# Expected: 403 Forbidden
+```
+
+### Direct Pod Access
+
+You can also access metrics directly via pod IP (bypasses both service and nginx):
+
+```bash
+# Get pod IP
+kubectl get pods -n shortly -o wide
+
+# Access directly
+curl http://<POD_IP>:8081/api/metrics
+```
+
+### Architecture Note
+
+The blocking strategy relies on nginx sidecar configuration:
+
+- **Nginx sidecar enabled (default in production):** External requests flow through Ingress → Service (80) → Nginx (8080) → App (8081). Nginx blocks `/api/health` and `/api/metrics` with `deny all`.
+- **Internal access:** Requests via `shortly-internal` service go directly to App (8081), bypassing nginx sidecar.
+- **Health probes:** Kubernetes probes connect directly to pod IP:8081, bypassing both service and nginx.
+
+**Important:** If `config.nginx.enabled: false`, the blocking will not be active. Ensure nginx sidecar is enabled in production for security.
+
 ## Monitoring Best Practices
 
 ### Response Time Monitoring
