@@ -7,7 +7,7 @@ URL shortener service.
 ## Quick start
 
 ```bash
-docker run --name shortly -p 8080:8080 tinyops/shortly:1.0.0 
+docker run --name shortly -p 8080:8080 tinyops/shortly:1.2.1 
 ```
 
 ## Features
@@ -16,7 +16,7 @@ docker run --name shortly -p 8080:8080 tinyops/shortly:1.0.0
 - **Custom named URLs** - create memorable short links like `/onboarding` (requires authentication)
 - **OAuth Authentication** - GitLab OAuth support with session management
 - **Rate limiting** - configurable per-user limits for custom URLs
-- Locales support: en, ru, es, fr, de, jp, ge, zh
+- Locales support: en, ru, es, fr, de, jp, ge, zh, he
 - Dark theme support
 - Low resource usage:
   ```bash
@@ -38,5 +38,4 @@ docker run --name shortly -p 8080:8080 tinyops/shortly:1.0.0
 - Security: Add captcha support
 - QRCode generation
 - Backend: Public API
-- Account management: Account limits
 - Chrome extension: click: create short URL from current page

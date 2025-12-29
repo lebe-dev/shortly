@@ -81,24 +81,7 @@ After setup, your installation should look like this:
 
 ### 1. Application Configuration
 
-Edit `config.yml` and update the `base-url` to match your domain:
-
-```yaml
-bind: '0.0.0.0:8080'
-log-level: info
-log-target: file
-db-cnn: "sqlite://./data/app.db?mode=rwc"
-base-url: 'https://shortly.example.com'  # Change this!
-short-url:
-  ttl: 168  # 7 days
-scheduler:
-  cleanup-expired-urls: '0 0 * * *'
-```
-
-**Key parameters:**
-- `base-url`: Your public domain (used in generated short URLs)
-- `short-url.ttl`: URL expiration time in hours (default: 7 days)
-- `log-level`: `debug`, `info`, `warn`, or `error`
+Edit `config.yml` and update the `base-url` to match your domain.
 
 #### Environment Variables (Alternative Configuration Method)
 
