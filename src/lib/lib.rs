@@ -4,4 +4,4 @@ pub mod outbound;
 #[cfg(test)]
 pub mod tests;
 
-pub const VERSION: &str = "1.2.2";
+pub const VERSION: &str = "1.3.0";
