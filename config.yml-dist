@@ -89,3 +89,6 @@ scheduler:
   # Cron expression for cleanup job (ENV: SCHEDULER_CLEANUP_EXPIRED_URLS)
   # Format: "sec min hour day-of-month month day-of-week"
   cleanup-expired-urls: "0 0 0 * * *" # Every day at midnight
+
+metrics:
+  enabled: true

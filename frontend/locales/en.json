@@ -167,7 +167,8 @@
 				"createUrl": "URL Creation",
 				"namedUrls": "Named URLs",
 				"auth": "Authentication",
-				"scheduler": "Scheduler"
+				"scheduler": "Scheduler",
+				"metrics": "Metrics"
 			},
 			"fields": {
 				"baseUrl": "Base URL",
@@ -184,7 +185,8 @@
 				"gitlabBaseUrl": "GitLab Base URL",
 				"gitlabAppId": "Application ID",
 				"note": "Login Note",
-				"cleanupCron": "Cleanup Schedule"
+				"cleanupCron": "Cleanup Schedule",
+				"metricsEndpoint": "Endpoint"
 			},
 			"values": {
 				"yes": "Yes",

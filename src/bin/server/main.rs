@@ -20,6 +20,7 @@ use route::{
     },
     config::get_app_config_route,
     health::health_route,
+    metrics::metrics_route,
     middleware::auth_middleware,
     version::get_version_route,
 };
@@ -61,6 +62,7 @@ pub struct AppState {
     url_service: UrlServiceImplType<Sqlite>,
     auth_service: Option<AuthServiceImpl<Sqlite, Sqlite, GitlabOAuthClient>>,
     user_repository: Sqlite,
+    start_time: i64,
 }
 
 #[tokio::main]
@@ -135,6 +137,7 @@ async fn main() -> anyhow::Result<()> {
                         url_service: url_service.clone(),
                         auth_service: auth_service.clone(),
                         user_repository: db_pool.clone(),
+                        start_time: chrono::Utc::now().timestamp(),
                     };
 
                     // SCHEDULER - START
@@ -188,6 +191,7 @@ async fn main() -> anyhow::Result<()> {
                     let app = Router::new()
                         .route("/api/version", get(get_version_route))
                         .route("/api/health", get(health_route))
+                        .route("/api/metrics", get(metrics_route))
                         .route("/api/config", get(get_app_config_route))
                         .route("/api/auth/login", get(login_route))
                         .route("/api/auth/callback", get(callback_route))

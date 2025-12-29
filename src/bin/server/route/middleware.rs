@@ -47,6 +47,7 @@ pub async fn auth_middleware(
 
     if path == "/api/version"
         || path == "/api/health"
+        || path == "/api/metrics"
         || path.starts_with("/api/auth/")
         || !path.starts_with("/api/")
     {
