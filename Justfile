@@ -17,8 +17,9 @@ test-all:
 build-release-image: test-all
   docker build --progress=plain --platform=linux/amd64 -t tinyops/shortly:{{version}} .
 
+build-chart:
+  helm package helm-chart/
+
 release: build-release-image
   docker push tinyops/shortly:{{version}}
-
-build-chart:
   helm package helm-chart/
