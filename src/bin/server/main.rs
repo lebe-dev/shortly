@@ -214,9 +214,20 @@ async fn main() -> anyhow::Result<()> {
                         .await
                         .expect("unable to bind tcp socket");
 
-                    println!("SHORTLY v{}", VERSION);
-                    println!("Bind: http://{bind}");
-                    println!("URL: {}", app_config.base_url);
+                    println!(
+                        r#"
+                        ______ _____  __________  __
+                       / __/ // / _ \/_  __/ /\ \/ /
+                      _\ \/ _  / , _/ / / / /__\  /
+                     /___/_//_/_/|_| /_/ /____//_/
+
+                                 v{}
+                        "#,
+                        VERSION
+                    );
+
+                    println!("- Bind: http://{bind}");
+                    println!("- URL: {}", app_config.base_url);
 
                     axum::serve(listener, app)
                         .await
