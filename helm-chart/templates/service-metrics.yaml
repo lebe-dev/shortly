@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "helm-chart.fullname" . }}-internal
+  name: {{ include "helm-chart.fullname" . }}-metrics
   labels:
     {{- include "helm-chart.labels" . | nindent 4 }}
   annotations:
-    # Internal service for Prometheus metrics scraping
+    # Metrics service for Prometheus scraping
     # Bypasses nginx sidecar, connects directly to Shortly app
 spec:
   type: ClusterIP

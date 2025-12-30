@@ -277,8 +277,7 @@ Control Kubernetes liveness, readiness, and startup probes for both containers.
 | `probes.nginx.livenessProbe.timeoutSeconds` | Timeout for probe response | `3` |
 | `probes.nginx.livenessProbe.failureThreshold` | Failures before restart | `3` |
 | `probes.nginx.readinessProbe.enabled` | Enable readiness probe for nginx container | `true` |
-| `probes.nginx.readinessProbe.httpGet.path` | Health check path (proxied to backend) | `/api/health` |
-| `probes.nginx.readinessProbe.httpGet.port` | Port for HTTP check | `8080` |
+| `probes.nginx.readinessProbe.tcpSocket.port` | Port for TCP socket check | `8080` |
 | `probes.nginx.readinessProbe.initialDelaySeconds` | Initial delay before readiness probe starts | `2` |
 | `probes.nginx.readinessProbe.periodSeconds` | How often to perform the probe | `10` |
 | `probes.nginx.readinessProbe.timeoutSeconds` | Timeout for probe response | `3` |
@@ -297,7 +296,7 @@ Control Kubernetes liveness, readiness, and startup probes for both containers.
 
 **Shortly Container**: All probes use HTTP GET to `/api/health`, which verifies database connectivity.
 
-**Nginx Container**: Liveness uses TCP socket check (lightweight), readiness uses HTTP GET to `/api/health` (verifies backend health through proxy).
+**Nginx Container**: Both liveness and readiness probes use TCP socket check on port 8080 (lightweight connection verification). HTTP health checks are not used for nginx probes due to security restrictions that block external access to `/api/health`.
 
 ## Example Configurations
 

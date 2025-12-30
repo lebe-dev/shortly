@@ -236,9 +236,9 @@ config:
   metrics:
     # Enable/disable Prometheus metrics endpoint at /api/metrics
     # When enabled:
-    # - Creates internal service (shortly-internal:8081) for Prometheus scraping
+    # - Creates metrics service (shortly-metrics:8081) for Prometheus scraping
     # - External access is blocked by nginx sidecar (deny all)
-    # - Internal access available via shortly-internal service (bypasses nginx)
+    # - Internal access available via shortly-metrics service (bypasses nginx)
     # Default: false (metrics disabled)
     enabled: false
 
@@ -348,7 +348,7 @@ config:
               }
 
               # Security: Block external access to operational endpoints
-              # Internal access available via shortly-internal service (port 8081)
+              # Internal access available via shortly-metrics service (port 8081)
               location = /api/health {
                   deny all;
               }
@@ -451,8 +451,7 @@ probes:
 
     readinessProbe:
       enabled: true
-      httpGet:
-        path: /api/health
+      tcpSocket:
         port: 8080
       initialDelaySeconds: 2
       periodSeconds: 10

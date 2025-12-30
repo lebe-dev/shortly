@@ -127,15 +127,15 @@ See [Helm Chart Configuration](../helm-chart/README.md#probe-configuration) for 
 The `/api/health` and `/api/metrics` endpoints are blocked from external access for security:
 
 - **External Access (via Ingress):** Blocked by nginx sidecar (returns 403 Forbidden)
-- **Internal Access:** Available via `shortly-internal` service on port 8081
+- **Internal Access:** Available via `shortly-metrics` service on port 8081
 - **Health Probes:** Work normally (connect directly to pod IP, bypassing nginx)
 
-### Internal Service for Metrics
+### Metrics Service
 
-When `config.metrics.enabled: true` in Helm chart, a separate internal service is created:
+When `config.metrics.enabled: true` in Helm chart, a separate metrics service is created:
 
 **Service Details:**
-- **Name:** `{release-name}-shortly-internal` (e.g., `shortly-internal`)
+- **Name:** `{release-name}-shortly-metrics` (e.g., `shortly-metrics`)
 - **Port:** 8081
 - **Endpoint:** `/api/metrics` (also `/api/health` available)
 - **Access:** Internal cluster only (not exposed via ingress)
@@ -195,7 +195,7 @@ The ServiceMonitor automatically targets the internal service and scrapes `/api/
 ```bash
 # From within the cluster
 kubectl run -it --rm debug --image=curlimages/curl --restart=Never -- \
-  curl http://shortly-internal.shortly.svc.cluster.local:8081/api/metrics
+  curl http://shortly-metrics.shortly.svc.cluster.local:8081/api/metrics
 
 # Expected: 200 OK with Prometheus metrics
 
@@ -221,7 +221,7 @@ curl http://<POD_IP>:8081/api/metrics
 The blocking strategy relies on nginx sidecar configuration:
 
 - **Nginx sidecar enabled (default in production):** External requests flow through Ingress → Service (80) → Nginx (8080) → App (8081). Nginx blocks `/api/health` and `/api/metrics` with `deny all`.
-- **Internal access:** Requests via `shortly-internal` service go directly to App (8081), bypassing nginx sidecar.
+- **Internal access:** Requests via `shortly-metrics` service go directly to App (8081), bypassing nginx sidecar.
 - **Health probes:** Kubernetes probes connect directly to pod IP:8081, bypassing both service and nginx.
 
 **Important:** If `config.nginx.enabled: false`, the blocking will not be active. Ensure nginx sidecar is enabled in production for security.
