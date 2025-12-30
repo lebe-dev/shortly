@@ -12,6 +12,8 @@ pub struct Url {
     pub user_id: Option<i64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_accessed: Option<i64>,
 }
 
 #[derive(Debug, Error)]

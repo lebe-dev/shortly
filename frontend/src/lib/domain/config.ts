@@ -6,6 +6,7 @@ export class AppConfig {
 		features: FeaturesConfig,
 		auth: AuthConfig,
 		scheduler: SchedulerConfig,
+		metrics: MetricsConfig,
 		admin?: AdminDataDto
 	) {
 		this.shortUrlTtl = shortUrlTtl;
@@ -14,6 +15,7 @@ export class AppConfig {
 		this.features = features;
 		this.auth = auth;
 		this.scheduler = scheduler;
+		this.metrics = metrics;
 		this.admin = admin;
 	}
 
@@ -23,6 +25,7 @@ export class AppConfig {
 	features: FeaturesConfig;
 	auth: AuthConfig;
 	scheduler: SchedulerConfig;
+	metrics: MetricsConfig;
 	admin?: AdminDataDto;
 }
 
@@ -109,6 +112,14 @@ export class SchedulerConfig {
 	cleanupExpiredUrls: string;
 }
 
+export class MetricsConfig {
+	constructor(enabled: boolean) {
+		this.enabled = enabled;
+	}
+
+	enabled: boolean;
+}
+
 export interface AdminUrlDto {
 	id: string;
 	originalUrl: string;
@@ -117,6 +128,7 @@ export interface AdminUrlDto {
 	userId: number | null;
 	username: string | null;
 	customName: string | null;
+	lastAccessed: number | null;
 }
 
 export interface AdminUserDto {

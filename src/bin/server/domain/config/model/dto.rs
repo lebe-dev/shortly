@@ -19,6 +19,8 @@ pub struct AppConfigDto {
     pub auth: AuthConfigDto,
     /// Scheduler configuration
     pub scheduler: SchedulerConfigDto,
+    /// Metrics configuration
+    pub metrics: MetricsConfigDto,
     /// Admin data (only present for admin users)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub admin: Option<AdminDataDto>,
@@ -88,6 +90,13 @@ pub struct SchedulerConfigDto {
 
 #[derive(PartialEq, Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
+pub struct MetricsConfigDto {
+    /// Whether metrics endpoint is enabled
+    pub enabled: bool,
+}
+
+#[derive(PartialEq, Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct AdminDataDto {
     /// All URLs in the system (for admin users only)
     pub all_urls: Vec<AdminUrlDto>,
@@ -114,6 +123,9 @@ pub struct AdminUrlDto {
     /// Custom name for the URL (if any)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_name: Option<String>,
+    /// Last accessed timestamp (Unix epoch)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_accessed: Option<i64>,
 }
 
 #[derive(PartialEq, Serialize, Clone, Debug)]
@@ -194,6 +206,9 @@ impl From<AppConfig> for AppConfigDto {
             scheduler: SchedulerConfigDto {
                 cleanup_expired_urls: config.scheduler.cleanup_expired_urls.clone(),
             },
+            metrics: MetricsConfigDto {
+                enabled: config.metrics.enabled,
+            },
             admin: None,
         }
     }
@@ -203,13 +218,14 @@ impl fmt::Display for AppConfigDto {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "AppConfigDto {{\n  short_url_ttl: {},\n  max_url_length: {},\n  base_url: {},\n  features: {},\n  auth: {},\n  scheduler: {}\n}}",
+            "AppConfigDto {{\n  short_url_ttl: {},\n  max_url_length: {},\n  base_url: {},\n  features: {},\n  auth: {},\n  scheduler: {},\n  metrics: {}\n}}",
             self.short_url_ttl,
             self.max_url_length,
             self.base_url,
             self.features,
             self.auth,
-            self.scheduler
+            self.scheduler,
+            self.metrics
         )
     }
 }
@@ -261,5 +277,11 @@ impl fmt::Display for SchedulerConfigDto {
             "SchedulerConfigDto {{ cleanup_expired_urls: {} }}",
             self.cleanup_expired_urls
         )
+    }
+}
+
+impl fmt::Display for MetricsConfigDto {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "MetricsConfigDto {{ enabled: {} }}", self.enabled)
     }
 }
