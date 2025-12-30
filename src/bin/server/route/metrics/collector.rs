@@ -26,9 +26,8 @@ pub async fn collect_url_metrics(pool: &SqlitePool) -> Result<UrlMetrics, sqlx::
         .fetch_one(pool)
         .await?;
 
-    // Created last 24h
-    let created_24h: (i64,) = sqlx::query_as("SELECT COUNT(*) FROM urls WHERE created >= ?")
-        .bind(yesterday)
+    // Last accessed
+    let last_accessed: (Option<i64>,) = sqlx::query_as("SELECT MAX(last_accessed) FROM urls")
         .fetch_one(pool)
         .await?;
 
@@ -42,10 +41,10 @@ pub async fn collect_url_metrics(pool: &SqlitePool) -> Result<UrlMetrics, sqlx::
 
     Ok(UrlMetrics {
         total: total.0,
-        last_created: last_created.0.unwrap_or(0),
+        last_created: last_created.0,
         custom_named: custom_named.0,
         expired: expired.0,
-        created_24h: created_24h.0,
+        last_accessed: last_accessed.0,
         deleted_24h: deleted_24h.0,
     })
 }
@@ -104,10 +103,10 @@ pub async fn collect_ttl_values(pool: &SqlitePool) -> Result<Vec<i64>, sqlx::Err
 
 pub struct UrlMetrics {
     pub total: i64,
-    pub last_created: i64,
+    pub last_created: Option<i64>,
     pub custom_named: i64,
     pub expired: i64,
-    pub created_24h: i64,
+    pub last_accessed: Option<i64>,
     pub deleted_24h: i64,
 }
 

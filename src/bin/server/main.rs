@@ -30,7 +30,10 @@ use server_lib::{
     VERSION,
     domain::{
         auth::{ports::AuthService, service::AuthServiceImpl},
-        url::{ports::UrlService, service::UrlServiceImpl as UrlServiceImplType},
+        url::{
+            ports::{UrlRepository, UrlService},
+            service::UrlServiceImpl as UrlServiceImplType,
+        },
     },
     outbound::{
         oauth::gitlab::GitlabOAuthClient,
@@ -298,6 +301,15 @@ async fn static_handler(State(state): State<Arc<SharedAppState>>, uri: Uri) -> i
             Ok(Some(url)) => {
                 info!("redirecting short URL '{}' to '{}'", path, url.original_url);
 
+                let url_id = url.id.clone();
+                let user_repo = state.user_repository.clone();
+                tokio::spawn(async move {
+                    let timestamp = chrono::Utc::now().timestamp();
+                    if let Err(e) = user_repo.update_last_accessed(&url_id, timestamp).await {
+                        warn!("Failed to update last_accessed for '{}': {}", url_id, e);
+                    }
+                });
+
                 return (
                     StatusCode::FOUND, // 302 Temporary Redirect
                     [(header::LOCATION, url.original_url)],
@@ -313,7 +325,6 @@ async fn static_handler(State(state): State<Arc<SharedAppState>>, uri: Uri) -> i
                 return index_html().await;
             }
         }
-        // If URL not found or error - continue with normal static file handling
     } else {
         if RESERVED_FRONTEND_ROUTES.contains(&path) {
             debug!(

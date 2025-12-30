@@ -296,7 +296,7 @@ Shortly exposes application metrics in Prometheus format for monitoring and obse
 | `shortly_urls_last_created_timestamp` | Gauge | Unix timestamp of the most recently created URL |
 | `shortly_urls_custom_named_total` | Gauge | Number of URLs with custom names |
 | `shortly_urls_expired_total` | Gauge | Number of expired URLs (where TTL has passed) |
-| `shortly_urls_created_last_24h` | Gauge | URLs created in the last 24 hours |
+| `shortly_urls_last_accessed_timestamp` | Gauge | Unix timestamp of the most recent URL access (redirect event) |
 | `shortly_urls_deleted_last_24h` | Gauge | URLs deleted in the last 24 hours |
 | `shortly_urls_ttl_hours` | Histogram | Distribution of URL TTL values in hours |
 
@@ -451,8 +451,8 @@ shortly_database_connection_pool_size - shortly_database_connection_pool_idle
 # Uptime in days
 shortly_uptime_seconds / 86400
 
-# URLs created in last 24h
-shortly_urls_created_last_24h
+# Last URL access time (Unix timestamp)
+shortly_urls_last_accessed_timestamp
 
 # 95th percentile TTL
 histogram_quantile(0.95, shortly_urls_ttl_hours_bucket)
@@ -485,13 +485,13 @@ groups:
           summary: "Database connection pool exhausted"
           description: "No idle database connections available"
 
-      - alert: NoRecentURLCreation
-        expr: shortly_urls_created_last_24h == 0
-        for: 24h
+      - alert: NoRecentURLAccess
+        expr: time() - shortly_urls_last_accessed_timestamp > 86400
+        for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "No URLs created in last 24 hours"
+          summary: "No URLs accessed in last 24 hours"
           description: "Service may not be receiving traffic"
 ```
 

@@ -1,5 +1,5 @@
 use lazy_static::lazy_static;
-use prometheus::{CounterVec, Gauge, GaugeVec, Histogram, HistogramOpts, Opts, Registry};
+use prometheus::{Gauge, GaugeVec, Histogram, HistogramOpts, Opts, Registry};
 
 lazy_static! {
     pub static ref REGISTRY: Registry = Registry::new();
@@ -24,9 +24,9 @@ lazy_static! {
             "Number of expired URLs"))
         .expect("metric creation");
 
-    pub static ref URLS_CREATED_24H: Gauge =
-        Gauge::with_opts(Opts::new("shortly_urls_created_last_24h",
-            "URLs created in last 24 hours"))
+    pub static ref URLS_LAST_ACCESSED: Gauge =
+        Gauge::with_opts(Opts::new("shortly_urls_last_accessed_timestamp",
+            "Unix timestamp of the most recent URL access (redirect)"))
         .expect("metric creation");
 
     pub static ref URLS_DELETED_24H: Gauge =
@@ -50,8 +50,8 @@ lazy_static! {
         .expect("metric creation");
 
     // Audit Metrics
-    pub static ref AUDIT_EVENTS_TOTAL: CounterVec =
-        CounterVec::new(
+    pub static ref AUDIT_EVENTS_TOTAL: GaugeVec =
+        GaugeVec::new(
             Opts::new("shortly_audit_events_total", "Total audit events by type"),
             &["event_type"]
         ).expect("metric creation");
@@ -109,7 +109,7 @@ pub fn register_metrics() {
         .register(Box::new(URLS_EXPIRED.clone()))
         .expect("register");
     REGISTRY
-        .register(Box::new(URLS_CREATED_24H.clone()))
+        .register(Box::new(URLS_LAST_ACCESSED.clone()))
         .expect("register");
     REGISTRY
         .register(Box::new(URLS_DELETED_24H.clone()))

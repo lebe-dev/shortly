@@ -55,10 +55,14 @@ async fn collect_all_metrics(state: &AppState) -> Result<(), Box<dyn std::error:
 
     let url_metrics = collector::collect_url_metrics(pool).await?;
     registry::URLS_TOTAL.set(url_metrics.total as f64);
-    registry::URLS_LAST_CREATED.set(url_metrics.last_created as f64);
+    if let Some(ts) = url_metrics.last_created {
+        registry::URLS_LAST_CREATED.set(ts as f64);
+    }
     registry::URLS_CUSTOM_NAMED.set(url_metrics.custom_named as f64);
     registry::URLS_EXPIRED.set(url_metrics.expired as f64);
-    registry::URLS_CREATED_24H.set(url_metrics.created_24h as f64);
+    if let Some(ts) = url_metrics.last_accessed {
+        registry::URLS_LAST_ACCESSED.set(ts as f64);
+    }
     registry::URLS_DELETED_24H.set(url_metrics.deleted_24h as f64);
 
     if state.auth_service.is_some() {
@@ -72,7 +76,7 @@ async fn collect_all_metrics(state: &AppState) -> Result<(), Box<dyn std::error:
     for metric in audit_metrics {
         registry::AUDIT_EVENTS_TOTAL
             .with_label_values(&[&metric.event_type])
-            .inc_by(metric.count as f64);
+            .set(metric.count as f64);
         registry::AUDIT_LAST_EVENT
             .with_label_values(&[&metric.event_type])
             .set(metric.last_timestamp as f64);

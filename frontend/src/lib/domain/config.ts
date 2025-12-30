@@ -128,6 +128,7 @@ export interface AdminUrlDto {
 	userId: number | null;
 	username: string | null;
 	customName: string | null;
+	lastAccessed: number | null;
 }
 
 export interface AdminUserDto {

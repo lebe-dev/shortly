@@ -138,6 +138,7 @@
 			"originalUrl": "Original URL",
 			"created": "Created",
 			"expires": "Expires In",
+			"lastAccessed": "Last Accessed",
 			"actions": "Actions"
 		},
 		"timeRemaining": {

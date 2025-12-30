@@ -107,6 +107,7 @@ pub async fn get_app_config_route(
                             user_id: url.user_id,
                             username,
                             custom_name: url.custom_name,
+                            last_accessed: url.last_accessed,
                         });
                     }
 

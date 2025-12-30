@@ -8,10 +8,10 @@ Helm chart for deploying Shortly - a URL shortener service.
 helm repo add tinyops https://tinyops.ru/helm-charts/
 helm repo update
 
-helm upgrade --install -n shortly --create-namespace shortly tinyops/shortly --version 0.1.2
+helm upgrade --install -n shortly --create-namespace shortly tinyops/shortly --version 1.1.0
 
 # with custom values
-helm upgrade --install -n shortly --create-namespace shortly tinyops/shortly --version 0.1.2 -f values.yml
+helm upgrade --install -n shortly --create-namespace shortly tinyops/shortly --version 1.1.0 -f values.yml
 ```
 
 ## Uninstalling the Chart

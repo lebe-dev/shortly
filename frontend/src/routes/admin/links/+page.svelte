@@ -190,6 +190,7 @@
 					customName={url.customName}
 					username={url.username}
 					userId={url.userId}
+					lastAccessed={url.lastAccessed}
 					onDelete={handleDelete}
 					onCopy={copyToClipboard}
 					showUserInfo={true}

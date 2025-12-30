@@ -123,6 +123,9 @@ pub struct AdminUrlDto {
     /// Custom name for the URL (if any)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_name: Option<String>,
+    /// Last accessed timestamp (Unix epoch)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_accessed: Option<i64>,
 }
 
 #[derive(PartialEq, Serialize, Clone, Debug)]
