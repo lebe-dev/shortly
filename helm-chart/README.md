@@ -8,10 +8,10 @@ Helm chart for deploying Shortly - a URL shortener service.
 helm repo add tinyops https://tinyops.ru/helm-charts/
 helm repo update
 
-helm upgrade --install -n shortly --create-namespace shortly tinyops/shortly --version 1.1.0
+helm upgrade --install -n shortly --create-namespace shortly tinyops/shortly --version 0.1.2
 
 # with custom values
-helm upgrade --install -n shortly --create-namespace shortly tinyops/shortly --version 1.1.0 -f values.yml
+helm upgrade --install -n shortly --create-namespace shortly tinyops/shortly --version 0.1.2 -f values.yml
 ```
 
 ## Uninstalling the Chart
@@ -245,58 +245,6 @@ config:
 |-----------|-------------|---------|
 | `volumes` | Additional volumes | `[]` |
 | `volumeMounts` | Additional volume mounts | `[]` |
-
-### Probe Configuration
-
-Control Kubernetes liveness, readiness, and startup probes for both containers.
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `probes.shortly.livenessProbe.enabled` | Enable liveness probe for shortly container | `true` |
-| `probes.shortly.livenessProbe.httpGet.path` | Health check path | `/api/health` |
-| `probes.shortly.livenessProbe.initialDelaySeconds` | Initial delay before liveness probe starts | `10` |
-| `probes.shortly.livenessProbe.periodSeconds` | How often to perform the probe | `30` |
-| `probes.shortly.livenessProbe.timeoutSeconds` | Timeout for probe response | `5` |
-| `probes.shortly.livenessProbe.failureThreshold` | Failures before restart | `3` |
-| `probes.shortly.readinessProbe.enabled` | Enable readiness probe for shortly container | `true` |
-| `probes.shortly.readinessProbe.httpGet.path` | Health check path | `/api/health` |
-| `probes.shortly.readinessProbe.initialDelaySeconds` | Initial delay before readiness probe starts | `5` |
-| `probes.shortly.readinessProbe.periodSeconds` | How often to perform the probe | `10` |
-| `probes.shortly.readinessProbe.timeoutSeconds` | Timeout for probe response | `5` |
-| `probes.shortly.readinessProbe.failureThreshold` | Failures before marking unready | `3` |
-| `probes.shortly.startupProbe.enabled` | Enable startup probe for shortly container | `true` |
-| `probes.shortly.startupProbe.httpGet.path` | Health check path | `/api/health` |
-| `probes.shortly.startupProbe.initialDelaySeconds` | Initial delay before startup probe starts | `0` |
-| `probes.shortly.startupProbe.periodSeconds` | How often to perform the probe | `2` |
-| `probes.shortly.startupProbe.timeoutSeconds` | Timeout for probe response | `5` |
-| `probes.shortly.startupProbe.failureThreshold` | Failures before container fails to start | `15` |
-| `probes.nginx.livenessProbe.enabled` | Enable liveness probe for nginx container | `true` |
-| `probes.nginx.livenessProbe.tcpSocket.port` | Port for TCP check | `8080` |
-| `probes.nginx.livenessProbe.initialDelaySeconds` | Initial delay before liveness probe starts | `5` |
-| `probes.nginx.livenessProbe.periodSeconds` | How often to perform the probe | `30` |
-| `probes.nginx.livenessProbe.timeoutSeconds` | Timeout for probe response | `3` |
-| `probes.nginx.livenessProbe.failureThreshold` | Failures before restart | `3` |
-| `probes.nginx.readinessProbe.enabled` | Enable readiness probe for nginx container | `true` |
-| `probes.nginx.readinessProbe.tcpSocket.port` | Port for TCP socket check | `8080` |
-| `probes.nginx.readinessProbe.initialDelaySeconds` | Initial delay before readiness probe starts | `2` |
-| `probes.nginx.readinessProbe.periodSeconds` | How often to perform the probe | `10` |
-| `probes.nginx.readinessProbe.timeoutSeconds` | Timeout for probe response | `3` |
-| `probes.nginx.readinessProbe.failureThreshold` | Failures before marking unready | `3` |
-| `probes.nginx.startupProbe.enabled` | Enable startup probe for nginx container | `true` |
-| `probes.nginx.startupProbe.tcpSocket.port` | Port for TCP check | `8080` |
-| `probes.nginx.startupProbe.initialDelaySeconds` | Initial delay before startup probe starts | `0` |
-| `probes.nginx.startupProbe.periodSeconds` | How often to perform the probe | `1` |
-| `probes.nginx.startupProbe.timeoutSeconds` | Timeout for probe response | `3` |
-| `probes.nginx.startupProbe.failureThreshold` | Failures before container fails to start | `10` |
-
-**Probe Behavior:**
-- **Startup Probe**: Gives the application time to initialize. Other probes don't run until startup succeeds.
-- **Liveness Probe**: Restarts the container if it fails. Used to detect deadlocks or hung processes.
-- **Readiness Probe**: Removes the pod from service if it fails. Used to temporarily stop traffic during high load or temporary issues.
-
-**Shortly Container**: All probes use HTTP GET to `/api/health`, which verifies database connectivity.
-
-**Nginx Container**: Both liveness and readiness probes use TCP socket check on port 8080 (lightweight connection verification). HTTP health checks are not used for nginx probes due to security restrictions that block external access to `/api/health`.
 
 ## Example Configurations
 

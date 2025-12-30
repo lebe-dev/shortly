@@ -86,10 +86,6 @@ impl AppConfigService for AppConfigServiceImpl {
             builder = builder.set_override("auth.admin-users", val)?;
         }
 
-        if let Ok(val) = std::env::var("METRICS_ENABLED") {
-            builder = builder.set_override("metrics.enabled", val)?;
-        }
-
         let config = builder.build()?;
         let app_config: AppConfig = config.try_deserialize()?;
         Ok(app_config)
@@ -119,7 +115,6 @@ mod tests {
             std::env::remove_var("AUTH_PROVIDERS_GITLAB_BASE_URL");
             std::env::remove_var("AUTH_PROVIDERS_GITLAB_APPLICATION_ID");
             std::env::remove_var("AUTH_PROVIDERS_GITLAB_SECRET");
-            std::env::remove_var("METRICS_ENABLED");
         }
 
         let service = AppConfigServiceImpl;

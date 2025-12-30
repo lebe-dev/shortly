@@ -32,7 +32,6 @@ data:
   AUTH_ADMIN_USERS: {{ .Values.config.auth.adminUsers | quote }}
   {{- end }}
   AUTH_PROVIDERS_GITLAB_BASE_URL: {{ .Values.config.auth.providers.gitlab.baseUrl | quote }}
-  METRICS_ENABLED: {{ .Values.config.metrics.enabled | quote }}
 {{- if .Values.config.nginx.enabled }}
 ---
 apiVersion: v1

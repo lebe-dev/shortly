@@ -268,7 +268,6 @@ where
                 created: timestamp,
                 user_id: Some(uid),
                 custom_name: Some(name.clone()),
-                last_accessed: Some(timestamp),
             };
 
             self.repo.save(&new_url).await?;
@@ -315,7 +314,6 @@ where
                         created: timestamp,
                         user_id,
                         custom_name: None,
-                        last_accessed: Some(timestamp),
                     };
 
                     self.repo.save(&new_url).await?;

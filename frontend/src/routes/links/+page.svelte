@@ -111,7 +111,6 @@
 					created={url.created}
 					ttl={url.ttl}
 					customName={url.custom_name}
-					lastAccessed={url.last_accessed}
 					onDelete={handleDelete}
 					onCopy={copyToClipboard}
 					showUserInfo={false}

@@ -138,7 +138,6 @@
 			"originalUrl": "Original URL",
 			"created": "Created",
 			"expires": "Expires In",
-			"lastAccessed": "Last Accessed",
 			"actions": "Actions"
 		},
 		"timeRemaining": {
@@ -168,8 +167,7 @@
 				"createUrl": "URL Creation",
 				"namedUrls": "Named URLs",
 				"auth": "Authentication",
-				"scheduler": "Scheduler",
-				"metrics": "Metrics"
+				"scheduler": "Scheduler"
 			},
 			"fields": {
 				"baseUrl": "Base URL",
@@ -186,8 +184,7 @@
 				"gitlabBaseUrl": "GitLab Base URL",
 				"gitlabAppId": "Application ID",
 				"note": "Login Note",
-				"cleanupCron": "Cleanup Schedule",
-				"metricsEndpoint": "Endpoint"
+				"cleanupCron": "Cleanup Schedule"
 			},
 			"values": {
 				"yes": "Yes",

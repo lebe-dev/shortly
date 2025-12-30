@@ -16,7 +16,6 @@
 		customName?: string | null;
 		username?: string | null;
 		userId?: number | null;
-		lastAccessed?: number | null;
 		onDelete: (id: string) => Promise<void>;
 		onCopy: (url: string) => Promise<void>;
 		showUserInfo?: boolean;
@@ -31,7 +30,6 @@
 		customName = null,
 		username = null,
 		userId = null,
-		lastAccessed = null,
 		onDelete,
 		onCopy,
 		showUserInfo = false
@@ -181,18 +179,6 @@
 					</div>
 				</div>
 			</div>
-
-			<!-- Last Accessed -->
-			{#if lastAccessed}
-				<div class="space-y-1 border-t border-gray-200 pt-3 dark:border-gray-700">
-					<div class="text-muted-foreground text-xs font-medium">
-						{$t('linksPage.table.lastAccessed')}
-					</div>
-					<div class="text-muted-foreground text-sm">
-						{formatCreatedDate(lastAccessed)}
-					</div>
-				</div>
-			{/if}
 		</div>
 	</CardContent>
 </Card>

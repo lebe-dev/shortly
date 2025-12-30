@@ -126,11 +126,7 @@
 		<div
 			class="flex items-center justify-center bg-gray-50 p-2 text-center text-xs text-gray-500 dark:bg-gray-900 dark:text-gray-400"
 		>
-<<<<<<< HEAD
 			<span>v1.2.1</span>
-=======
-			<span>v1.3.0</span>
->>>>>>> b2d8094685c27bdd710732ea2de916f6b47403fa
 		</div>
 	</div>
 {/await}

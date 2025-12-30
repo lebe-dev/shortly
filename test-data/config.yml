@@ -39,6 +39,3 @@ short-url:
 
 scheduler:
   cleanup-expired-urls: "0 0 * * *"
-
-metrics:
-  enabled: true

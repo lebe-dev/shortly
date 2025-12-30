@@ -21,9 +21,8 @@ impl UrlRepository for Sqlite {
                 ttl,
                 created,
                 user_id,
-                custom_name,
-                last_accessed
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7);
+                custom_name
+            ) VALUES ($1, $2, $3, $4, $5, $6);
             "#,
         )
         .bind(&url.id)
@@ -32,7 +31,6 @@ impl UrlRepository for Sqlite {
         .bind(&url.created)
         .bind(&url.user_id)
         .bind(&url.custom_name)
-        .bind(&url.last_accessed)
         .execute(self.get_pool())
         .await?;
 
@@ -52,7 +50,6 @@ impl UrlRepository for Sqlite {
                 created: row.get("created"),
                 user_id: row.get("user_id"),
                 custom_name: row.get("custom_name"),
-                last_accessed: row.get("last_accessed"),
             })
             .fetch_optional(self.get_pool())
             .await?;
@@ -72,7 +69,6 @@ impl UrlRepository for Sqlite {
                 created: row.get("created"),
                 user_id: row.get("user_id"),
                 custom_name: row.get("custom_name"),
-                last_accessed: row.get("last_accessed"),
             })
             .fetch_optional(self.get_pool())
             .await?;
@@ -101,7 +97,6 @@ impl UrlRepository for Sqlite {
                 created: row.get("created"),
                 user_id: row.get("user_id"),
                 custom_name: row.get("custom_name"),
-                last_accessed: row.get("last_accessed"),
             })
             .fetch_all(self.get_pool())
             .await?;
@@ -179,7 +174,6 @@ impl UrlRepository for Sqlite {
                 created: row.get("created"),
                 user_id: row.get("user_id"),
                 custom_name: row.get("custom_name"),
-                last_accessed: row.get("last_accessed"),
             })
             .fetch_all(self.get_pool())
             .await?;
@@ -199,6 +193,7 @@ impl UrlRepository for Sqlite {
         limit: i64,
         offset: i64,
     ) -> Result<(Vec<AuditEventWithUser>, i64), sqlx::Error> {
+        // Build WHERE clauses dynamically
         let mut where_clauses = Vec::new();
 
         if event_type.is_some() {
@@ -229,6 +224,7 @@ impl UrlRepository for Sqlite {
             String::new()
         };
 
+        // Count query
         let count_query = format!(
             "SELECT COUNT(*) FROM url_audit ua \
              INNER JOIN users actor ON ua.actor_user_id = actor.id \
@@ -236,6 +232,7 @@ impl UrlRepository for Sqlite {
             where_clause
         );
 
+        // Main query
         let main_query = format!(
             "SELECT ua.id, ua.event_type, ua.actor_user_id, actor.username as actor_username, \
              ua.target_user_id, target.username as target_username, ua.url_name, ua.created_at \
@@ -247,6 +244,7 @@ impl UrlRepository for Sqlite {
             where_clause
         );
 
+        // Execute count query
         let mut count_q = sqlx::query_scalar(&count_query);
         if let Some(ref et) = event_type {
             count_q = count_q.bind(et.to_string());
@@ -272,6 +270,7 @@ impl UrlRepository for Sqlite {
         }
         let total_count: i64 = count_q.fetch_one(self.get_pool()).await?;
 
+        // Execute main query
         let mut main_q = sqlx::query(&main_query);
         if let Some(ref et) = event_type {
             main_q = main_q.bind(et.to_string());
@@ -325,16 +324,6 @@ impl UrlRepository for Sqlite {
 
         Ok((events, total_count))
     }
-
-    async fn update_last_accessed(&self, url_id: &str, timestamp: i64) -> Result<(), sqlx::Error> {
-        sqlx::query("UPDATE urls SET last_accessed = $1 WHERE id = $2")
-            .bind(timestamp)
-            .bind(url_id)
-            .execute(self.get_pool())
-            .await?;
-
-        Ok(())
-    }
 }
 
 #[cfg(test)]
@@ -363,7 +352,6 @@ mod tests {
             created: Utc::now().timestamp() - 7200, // 2 hours ago
             user_id: None,
             custom_name: None,
-            last_accessed: Some(Utc::now().timestamp() - 7200),
         };
 
         db.save(&expired_url).await.unwrap();
@@ -393,7 +381,6 @@ mod tests {
             created: Utc::now().timestamp() - 7200, // 2 hours ago
             user_id: None,
             custom_name: None,
-            last_accessed: Some(Utc::now().timestamp() - 7200),
         };
 
         // Create a valid URL (created now with 1 week TTL)
@@ -404,7 +391,6 @@ mod tests {
             created: Utc::now().timestamp(),
             user_id: None,
             custom_name: None,
-            last_accessed: Some(Utc::now().timestamp()),
         };
 
         db.save(&expired_url).await.unwrap();
@@ -436,7 +422,6 @@ mod tests {
             created: Utc::now().timestamp() - 7200, // 2 hours ago
             user_id: Some(1),
             custom_name: None,
-            last_accessed: Some(Utc::now().timestamp() - 7200),
         };
 
         // Create a named URL with ttl=0 (should never expire)
@@ -447,7 +432,6 @@ mod tests {
             created: Utc::now().timestamp() - 86400 * 365, // 1 year ago
             user_id: Some(1),
             custom_name: Some("my-link".to_string()),
-            last_accessed: Some(Utc::now().timestamp() - 86400 * 365),
         };
 
         db.save(&expired_url).await.unwrap();

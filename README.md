@@ -7,11 +7,7 @@ URL shortener service.
 ## Quick start
 
 ```bash
-<<<<<<< HEAD
 docker run --name shortly -p 8080:8080 tinyops/shortly:1.2.1 
-=======
-docker run --name shortly -p 8080:8080 tinyops/shortly:1.3.0 
->>>>>>> b2d8094685c27bdd710732ea2de916f6b47403fa
 ```
 
 ## Features
@@ -34,19 +30,12 @@ docker run --name shortly -p 8080:8080 tinyops/shortly:1.3.0
   - [Docker](docs/install/docker.md)
 - [Configuration](docs/configuration/configuration.md)
   - [Add locale](docs/locale.md)
-- [Monitoring](docs/monitoring.md)
 - [Development](DEV.md)
 
 ## RoadMap
 
-- PostgreSQL support
-- Backend: Public API
-- Chrome extension: click: create short URL from current page
 - Security: URL filters support
 - Security: Add captcha support
 - QRCode generation
-<<<<<<< HEAD
 - Backend: Public API
 - Chrome extension: click: create short URL from current page
-=======
->>>>>>> b2d8094685c27bdd710732ea2de916f6b47403fa

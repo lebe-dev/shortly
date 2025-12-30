@@ -196,7 +196,7 @@ Expected output:
 ```
 NAME              IMAGE                    STATUS        PORTS
 shortly-nginx     nginx:alpine            Up 10 seconds  0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp
-shortly-app       tinyops/shortly:1.3.0   Up 12 seconds  8080/tcp
+shortly-app       tinyops/shortly:0.1.0   Up 12 seconds  8080/tcp
 ```
 
 ### Stopping Services

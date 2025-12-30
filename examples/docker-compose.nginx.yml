@@ -1,0 +1,37 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: shortly-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # nginx configuration files
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+
+      # SSL certificates (place your certs here)
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+
+      # nginx logs
+      - ./logs/nginx:/var/log/nginx
+
+      # Optional: custom error pages
+      # - ./nginx/html:/usr/share/nginx/html:ro
+
+  app:
+    image: tinyops/shortly:0.1.0
+    container_name: shortly-app
+    restart: always
+    volumes:
+      # Application data (SQLite database)
+      - ./data:/app/data
+
+      # Application logs
+      - ./logs/app:/app/logs
+
+      # Application configuration
+      - ./config.yml:/app/config.yml:ro
+    expose:
+      - "8080"

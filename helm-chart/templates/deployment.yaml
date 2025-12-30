@@ -59,51 +59,6 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if .Values.probes.nginx.startupProbe.enabled }}
-          startupProbe:
-            {{- if .Values.probes.nginx.startupProbe.httpGet }}
-            httpGet:
-              {{- toYaml .Values.probes.nginx.startupProbe.httpGet | nindent 14 }}
-            {{- else if .Values.probes.nginx.startupProbe.tcpSocket }}
-            tcpSocket:
-              {{- toYaml .Values.probes.nginx.startupProbe.tcpSocket | nindent 14 }}
-            {{- end }}
-            initialDelaySeconds: {{ .Values.probes.nginx.startupProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.probes.nginx.startupProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.probes.nginx.startupProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.probes.nginx.startupProbe.successThreshold }}
-            failureThreshold: {{ .Values.probes.nginx.startupProbe.failureThreshold }}
-          {{- end }}
-          {{- if .Values.probes.nginx.livenessProbe.enabled }}
-          livenessProbe:
-            {{- if .Values.probes.nginx.livenessProbe.httpGet }}
-            httpGet:
-              {{- toYaml .Values.probes.nginx.livenessProbe.httpGet | nindent 14 }}
-            {{- else if .Values.probes.nginx.livenessProbe.tcpSocket }}
-            tcpSocket:
-              {{- toYaml .Values.probes.nginx.livenessProbe.tcpSocket | nindent 14 }}
-            {{- end }}
-            initialDelaySeconds: {{ .Values.probes.nginx.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.probes.nginx.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.probes.nginx.livenessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.probes.nginx.livenessProbe.successThreshold }}
-            failureThreshold: {{ .Values.probes.nginx.livenessProbe.failureThreshold }}
-          {{- end }}
-          {{- if .Values.probes.nginx.readinessProbe.enabled }}
-          readinessProbe:
-            {{- if .Values.probes.nginx.readinessProbe.httpGet }}
-            httpGet:
-              {{- toYaml .Values.probes.nginx.readinessProbe.httpGet | nindent 14 }}
-            {{- else if .Values.probes.nginx.readinessProbe.tcpSocket }}
-            tcpSocket:
-              {{- toYaml .Values.probes.nginx.readinessProbe.tcpSocket | nindent 14 }}
-            {{- end }}
-            initialDelaySeconds: {{ .Values.probes.nginx.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.probes.nginx.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.probes.nginx.readinessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.probes.nginx.readinessProbe.successThreshold }}
-            failureThreshold: {{ .Values.probes.nginx.readinessProbe.failureThreshold }}
-          {{- end }}
         {{- end }}
         - name: {{ .Chart.Name }}
           {{- with .Values.securityContext }}
@@ -127,51 +82,7 @@ spec:
               name: {{ include "helm-chart.fullname" . }}
           - secretRef:
               name: {{ include "helm-chart.fullname" . }}
-          {{- if .Values.probes.shortly.startupProbe.enabled }}
-          startupProbe:
-            httpGet:
-              path: {{ .Values.probes.shortly.startupProbe.httpGet.path }}
-              {{- if .Values.config.nginx.enabled }}
-              port: backend
-              {{- else }}
-              port: http
-              {{- end }}
-            initialDelaySeconds: {{ .Values.probes.shortly.startupProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.probes.shortly.startupProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.probes.shortly.startupProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.probes.shortly.startupProbe.successThreshold }}
-            failureThreshold: {{ .Values.probes.shortly.startupProbe.failureThreshold }}
-          {{- end }}
-          {{- if .Values.probes.shortly.livenessProbe.enabled }}
-          livenessProbe:
-            httpGet:
-              path: {{ .Values.probes.shortly.livenessProbe.httpGet.path }}
-              {{- if .Values.config.nginx.enabled }}
-              port: backend
-              {{- else }}
-              port: http
-              {{- end }}
-            initialDelaySeconds: {{ .Values.probes.shortly.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.probes.shortly.livenessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.probes.shortly.livenessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.probes.shortly.livenessProbe.successThreshold }}
-            failureThreshold: {{ .Values.probes.shortly.livenessProbe.failureThreshold }}
-          {{- end }}
-          {{- if .Values.probes.shortly.readinessProbe.enabled }}
-          readinessProbe:
-            httpGet:
-              path: {{ .Values.probes.shortly.readinessProbe.httpGet.path }}
-              {{- if .Values.config.nginx.enabled }}
-              port: backend
-              {{- else }}
-              port: http
-              {{- end }}
-            initialDelaySeconds: {{ .Values.probes.shortly.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.probes.shortly.readinessProbe.periodSeconds }}
-            timeoutSeconds: {{ .Values.probes.shortly.readinessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.probes.shortly.readinessProbe.successThreshold }}
-            failureThreshold: {{ .Values.probes.shortly.readinessProbe.failureThreshold }}
-          {{- end }}
+
           {{- with .Values.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
