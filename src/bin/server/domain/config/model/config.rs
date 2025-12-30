@@ -28,6 +28,8 @@ pub struct AppConfig {
     pub features: FeaturesConfig,
 
     pub auth: AuthConfig,
+
+    pub metrics: MetricsConfig,
 }
 
 #[derive(PartialEq, Deserialize, Clone, Debug)]
@@ -119,6 +121,12 @@ pub struct GitlabAuthProvider {
     pub secret: String,
 }
 
+#[derive(PartialEq, Deserialize, Clone, Debug)]
+#[serde(rename_all = "kebab-case")]
+pub struct MetricsConfig {
+    pub enabled: bool,
+}
+
 #[derive(Debug, Error)]
 pub enum LoadAppConfigError {
     #[error(transparent)]
@@ -131,7 +139,7 @@ impl fmt::Display for AppConfig {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "AppConfig {{\n  bind: {},\n  log_level: {},\n  log_target: {},\n  db_cnn: <redacted>,\n  base_url: {},\n  short_url: {},\n  scheduler: {},\n  features: {},\n  auth: {}\n}}",
+            "AppConfig {{\n  bind: {},\n  log_level: {},\n  log_target: {},\n  db_cnn: <redacted>,\n  base_url: {},\n  short_url: {},\n  scheduler: {},\n  features: {},\n  auth: {},\n  metrics: {}\n}}",
             self.bind,
             self.log_level,
             self.log_target,
@@ -139,7 +147,8 @@ impl fmt::Display for AppConfig {
             self.short_url,
             self.scheduler,
             self.features,
-            self.auth
+            self.auth,
+            self.metrics
         )
     }
 }
@@ -243,5 +252,11 @@ impl fmt::Display for GitlabAuthProvider {
             "GitlabAuthProvider {{ base_url: {}, application_id: {}, secret: <redacted> }}",
             self.base_url, self.application_id
         )
+    }
+}
+
+impl fmt::Display for MetricsConfig {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "MetricsConfig {{ enabled: {} }}", self.enabled)
     }
 }

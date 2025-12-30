@@ -123,4 +123,10 @@ pub trait UrlRepository: Send + Sync + Clone + 'static {
         limit: i64,
         offset: i64,
     ) -> impl Future<Output = Result<(Vec<AuditEventWithUser>, i64), sqlx::Error>> + Send;
+
+    fn update_last_accessed(
+        &self,
+        url_id: &str,
+        timestamp: i64,
+    ) -> impl Future<Output = Result<(), sqlx::Error>> + Send;
 }

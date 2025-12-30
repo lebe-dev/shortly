@@ -19,6 +19,8 @@ use route::{
         callback::callback_route, login::login_route, logout::logout_route, session::session_route,
     },
     config::get_app_config_route,
+    health::health_route,
+    metrics::metrics_route,
     middleware::auth_middleware,
     version::get_version_route,
 };
@@ -28,7 +30,10 @@ use server_lib::{
     VERSION,
     domain::{
         auth::{ports::AuthService, service::AuthServiceImpl},
-        url::{ports::UrlService, service::UrlServiceImpl as UrlServiceImplType},
+        url::{
+            ports::{UrlRepository, UrlService},
+            service::UrlServiceImpl as UrlServiceImplType,
+        },
     },
     outbound::{
         oauth::gitlab::GitlabOAuthClient,
@@ -60,6 +65,7 @@ pub struct AppState {
     url_service: UrlServiceImplType<Sqlite>,
     auth_service: Option<AuthServiceImpl<Sqlite, Sqlite, GitlabOAuthClient>>,
     user_repository: Sqlite,
+    start_time: i64,
 }
 
 #[tokio::main]
@@ -134,6 +140,7 @@ async fn main() -> anyhow::Result<()> {
                         url_service: url_service.clone(),
                         auth_service: auth_service.clone(),
                         user_repository: db_pool.clone(),
+                        start_time: chrono::Utc::now().timestamp(),
                     };
 
                     // SCHEDULER - START
@@ -186,6 +193,8 @@ async fn main() -> anyhow::Result<()> {
 
                     let app = Router::new()
                         .route("/api/version", get(get_version_route))
+                        .route("/api/health", get(health_route))
+                        .route("/api/metrics", get(metrics_route))
                         .route("/api/config", get(get_app_config_route))
                         .route("/api/auth/login", get(login_route))
                         .route("/api/auth/callback", get(callback_route))
@@ -208,9 +217,20 @@ async fn main() -> anyhow::Result<()> {
                         .await
                         .expect("unable to bind tcp socket");
 
-                    println!("SHORTLY v{}", VERSION);
-                    println!("Bind: http://{bind}");
-                    println!("URL: {}", app_config.base_url);
+                    println!(
+                        r#"
+                        ______ _____  __________  __
+                       / __/ // / _ \/_  __/ /\ \/ /
+                      _\ \/ _  / , _/ / / / /__\  /
+                     /___/_//_/_/|_| /_/ /____//_/
+
+                                 v{}
+                        "#,
+                        VERSION
+                    );
+
+                    println!("- Bind: http://{bind}");
+                    println!("- URL: {}", app_config.base_url);
 
                     axum::serve(listener, app)
                         .await
@@ -281,6 +301,15 @@ async fn static_handler(State(state): State<Arc<SharedAppState>>, uri: Uri) -> i
             Ok(Some(url)) => {
                 info!("redirecting short URL '{}' to '{}'", path, url.original_url);
 
+                let url_id = url.id.clone();
+                let user_repo = state.user_repository.clone();
+                tokio::spawn(async move {
+                    let timestamp = chrono::Utc::now().timestamp();
+                    if let Err(e) = user_repo.update_last_accessed(&url_id, timestamp).await {
+                        warn!("Failed to update last_accessed for '{}': {}", url_id, e);
+                    }
+                });
+
                 return (
                     StatusCode::FOUND, // 302 Temporary Redirect
                     [(header::LOCATION, url.original_url)],
@@ -296,7 +325,6 @@ async fn static_handler(State(state): State<Arc<SharedAppState>>, uri: Uri) -> i
                 return index_html().await;
             }
         }
-        // If URL not found or error - continue with normal static file handling
     } else {
         if RESERVED_FRONTEND_ROUTES.contains(&path) {
             debug!(

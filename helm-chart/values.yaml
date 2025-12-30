@@ -232,6 +232,16 @@ config:
         # GitLab instance base URL
         baseUrl: "https://gitlab.com"
 
+  # Metrics configuration
+  metrics:
+    # Enable/disable Prometheus metrics endpoint at /api/metrics
+    # When enabled:
+    # - Creates metrics service (shortly-metrics:8081) for Prometheus scraping
+    # - External access is blocked by nginx sidecar (deny all)
+    # - Internal access available via shortly-metrics service (bypasses nginx)
+    # Default: false (metrics disabled)
+    enabled: false
+
   # Nginx reverse proxy configuration
   nginx:
     # Enable/disable nginx sidecar (default: true)
@@ -337,6 +347,16 @@ config:
                   add_header Cache-Control "public";
               }
 
+              # Security: Block external access to operational endpoints
+              # Internal access available via shortly-metrics service (port 8081)
+              location = /api/health {
+                  deny all;
+              }
+
+              location = /api/metrics {
+                  deny all;
+              }
+
               # Default proxy for all other requests
               location / {
                   proxy_pass http://backend;
@@ -349,6 +369,19 @@ config:
               }
           }
       }
+
+# Prometheus monitoring configuration (optional)
+monitoring:
+  serviceMonitor:
+    # Create ServiceMonitor resource for Prometheus Operator
+    enabled: false
+    # Additional labels for ServiceMonitor (e.g., for Prometheus selector)
+    labels: {}
+      # prometheus: kube-prometheus
+    # Scrape interval
+    interval: "30s"
+    # Scrape timeout
+    scrapeTimeout: "10s"
 
 secrets:
   annotations: {}
@@ -366,3 +399,72 @@ secrets:
         #applicationId: "vault:secret_v2/data/infra/shortly#APPLICATION_ID"
         secret: ""
         #secret: "vault:secret_v2/data/infra/shortly#SECRET"
+
+# Kubernetes probes configuration
+probes:
+  # Shortly application container probes
+  shortly:
+    livenessProbe:
+      enabled: true
+      httpGet:
+        path: /api/health
+        port: backend  # 8081 with nginx, 8080 without
+      initialDelaySeconds: 10
+      periodSeconds: 30
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+
+    readinessProbe:
+      enabled: true
+      httpGet:
+        path: /api/health
+        port: backend
+      initialDelaySeconds: 5
+      periodSeconds: 10
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 3
+
+    startupProbe:
+      enabled: true
+      httpGet:
+        path: /api/health
+        port: backend
+      initialDelaySeconds: 0
+      periodSeconds: 2
+      timeoutSeconds: 5
+      successThreshold: 1
+      failureThreshold: 15  # 30 seconds total (15 * 2s)
+
+  # Nginx container probes (when enabled)
+  nginx:
+    livenessProbe:
+      enabled: true
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 30
+      timeoutSeconds: 3
+      successThreshold: 1
+      failureThreshold: 3
+
+    readinessProbe:
+      enabled: true
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 2
+      periodSeconds: 10
+      timeoutSeconds: 3
+      successThreshold: 1
+      failureThreshold: 3
+
+    startupProbe:
+      enabled: true
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 0
+      periodSeconds: 1
+      timeoutSeconds: 3
+      successThreshold: 1
+      failureThreshold: 10  # 10 seconds total
