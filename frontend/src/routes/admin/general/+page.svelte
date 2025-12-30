@@ -8,6 +8,7 @@
 	import FileText from 'lucide-svelte/icons/file-text';
 	import ShieldCheck from 'lucide-svelte/icons/shield-check';
 	import Calendar from 'lucide-svelte/icons/calendar';
+	import BarChart from 'lucide-svelte/icons/bar-chart';
 
 	let config: AppConfig | null = $state(null);
 	let loading = $state(true);
@@ -278,6 +279,50 @@
 						>
 						<span class="font-mono text-sm font-medium">{config.scheduler.cleanupExpiredUrls}</span>
 					</div>
+				</div>
+			</CardContent>
+		</Card>
+
+		<!-- Metrics Card -->
+		<Card>
+			<CardHeader>
+				<div class="flex items-center gap-2">
+					<BarChart class="h-5 w-5" />
+					<CardTitle>{$t('adminPage.general.sections.metrics')}</CardTitle>
+				</div>
+			</CardHeader>
+			<CardContent>
+				<div class="space-y-3">
+					<div class="flex items-start justify-between">
+						<span class="text-muted-foreground text-sm"
+							>{$t('adminPage.general.fields.enabled')}:</span
+						>
+						<span
+							class="text-sm font-medium"
+							class:text-green-600={config.metrics.enabled}
+							class:dark:text-green-400={config.metrics.enabled}
+							class:text-red-600={!config.metrics.enabled}
+							class:dark:text-red-400={!config.metrics.enabled}
+						>
+							{config.metrics.enabled
+								? $t('adminPage.general.values.yes')
+								: $t('adminPage.general.values.no')}
+						</span>
+					</div>
+					{#if config.metrics.enabled}
+						<div class="flex items-start justify-between">
+							<span class="text-muted-foreground text-sm"
+								>{$t('adminPage.general.fields.metricsEndpoint')}:</span
+							>
+							<a
+								href="/api/metrics"
+								target="_blank"
+								class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+							>
+								/api/metrics
+							</a>
+						</div>
+					{/if}
 				</div>
 			</CardContent>
 		</Card>

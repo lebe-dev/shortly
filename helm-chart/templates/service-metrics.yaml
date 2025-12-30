@@ -1,0 +1,20 @@
+{{- if .Values.config.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "helm-chart.fullname" . }}-metrics
+  labels:
+    {{- include "helm-chart.labels" . | nindent 4 }}
+  annotations:
+    # Metrics service for Prometheus scraping
+    # Bypasses nginx sidecar, connects directly to Shortly app
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8081
+      targetPort: backend
+      protocol: TCP
+      name: metrics
+  selector:
+    {{- include "helm-chart.selectorLabels" . | nindent 4 }}
+{{- end }}

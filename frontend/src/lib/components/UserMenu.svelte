@@ -29,7 +29,7 @@
 
 	let { config = null }: Props = $props();
 
-	const languages = ['en', 'ru', 'de', 'es', 'fr', 'zh', 'jp', 'ge'];
+	const languages = ['en', 'ru', 'de', 'es', 'fr', 'zh', 'jp', 'ge', 'he'];
 
 	function changeLanguage(lang: string) {
 		locale.set(lang);

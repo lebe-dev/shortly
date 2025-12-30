@@ -1,0 +1,278 @@
+{
+	"id": "he",
+	"common": {
+		"buttons": {
+			"copy": "העתק",
+			"generate": "צור"
+		},
+		"loading": "טוען...",
+		"loadingEllipsis": "...",
+		"backToHome": "חזרה לדף הבית",
+		"consumption": {
+			"title": "מגבלות",
+			"totalLinks": "סך הכל קישורים",
+			"createdToday": "נוצרו היום",
+			"total": "סה״כ",
+			"today": "היום",
+			"reachedBothLimits": "הגעת למגבלה היומית והכללית.",
+			"reachedTotalLimit": "הגעת למגבלת הקישורים הכוללת.",
+			"reachedDailyLimit": "הגעת למגבלת הקישורים היומית.",
+			"badge": {
+				"remainingToday": "נותרו: {remaining} מתוך {total} היום",
+				"remainingTotal": "נותרו: {remaining} מתוך {total} סה״כ"
+			},
+			"hint": {
+				"limits": "מחק קישורים לא בשימוש כדי לפנות מקום.\n\nקישורים שפג תוקפם נמחקים אוטומטית."
+			}
+		},
+		"timeUnits": {
+			"minute": "{count, plural, one {דקה אחת} other {# דקות}}",
+			"hour": "{count, plural, one {שעה אחת} other {# שעות}}",
+			"day": "{count, plural, one {יום אחד} other {# ימים}}",
+			"week": "{count, plural, one {שבוע אחד} other {# שבועות}}",
+			"month": "{count, plural, one {חודש אחד} other {# חודשים}}",
+			"lessThanMinute": "פחות מדקה"
+		}
+	},
+	"layout": {
+		"homeLink": "עבור לדף הראשי",
+		"toggleTheme": "החלף ערכת נושא",
+		"darkTheme": "ערכת נושא כהה",
+		"lightTheme": "ערכת נושא בהירה",
+		"language": "שפה",
+		"login": "התחבר",
+		"logout": "התנתק",
+		"myLinks": "הקישורים שלי",
+		"adminPanel": "פאנל ניהול"
+	},
+	"homePage": {
+		"title": "צור קישור קצר :: SHRTLY",
+		"description": "צור קישור קצר ונוח מקישור ארוך",
+		"form": {
+			"label": "הדבק כאן את הכתובת הארוכה",
+			"placeholder": "https://my.long-url.com",
+			"storageInfo": "הקישורים יישמרו למשך {ttl}"
+		},
+		"hints": {
+			"urlField": {
+				"prefix": "לחץ ",
+				"suffix": " כדי ליצור קישור"
+			},
+			"customNameField": {
+				"prefix": "לחץ ",
+				"suffixCreate": " כדי ליצור קישור",
+				"suffixFocusUrl": " כדי להתמקד בשדה הכתובת"
+			}
+		},
+		"customName": {
+			"label": "שם קצר מותאם אישית (אופציונלי)",
+			"placeholder": "לדוגמה, onboarding",
+			"hint": "שם קצר לקישור שלך. לדוגמה, 'onboarding'",
+			"tooShort": "השם חייב להיות לפחות {minLength} תווים",
+			"tooLong": "השם יכול להיות עד {maxLength} תווים",
+			"reserved": "שם זה שמור",
+			"checking": "בודק זמינות...",
+			"available": "✓ זמין",
+			"taken": "✗ השם כבר תפוס",
+			"noExpiration": "קישורים עם שם לא פגים לעולם"
+		},
+		"result": {
+			"title": "הקישור הקצר שלך:",
+			"expirationInfo": "קישור זה יפוג בעוד {ttl}",
+			"expirationDate": "הקישור יישמר עד {date}",
+			"namedUrlInfo": "קישור זה עם שם לא יפוג לעולם",
+			"clickToCopy": "לחץ על הקישור כדי להעתיק ללוח",
+			"linkCopied": "הקישור הועתק"
+		},
+		"errors": {
+			"configLoadFailed": "לא ניתן לטעון את הגדרות האפליקציה",
+			"urlTooLong": "אורך הכתובת מקסימלי חרג: {maxLength}",
+			"invalidUrl": "כתובת לא תקינה",
+			"authRequired": "נדרשת הזדהות כדי ליצור קישורים קצרים",
+			"serviceTitle": "שירות קיצור כתובות",
+			"customNameNotAvailable": "השם המותאם אישית אינו זמין",
+			"generateFailed": "יצירת הקישור הקצר נכשלה",
+			"limitReached": "הגעת למגבלת יצירת הקישורים שלך"
+		}
+	},
+	"urlPage": {
+		"title": "עמוד כתובת",
+		"description": "עמוד עם הכתובת המקורית",
+		"notFound": {
+			"title": "הקישור לא נמצא",
+			"wrongUrl": "הקישור הקצר שהזנת שגוי או אינו קיים",
+			"expired": "ייתכן שהקישור פג או נמחק"
+		},
+		"display": {
+			"fullUrlLabel": "כתובת מלאה:",
+			"expired": "פג תוקף הקישור",
+			"expirationInfo": "קישור זה יפוג בעוד {remainingTime}"
+		}
+	},
+	"loginPage": {
+		"title": "התחברות :: SHRTLY",
+		"description": "התחבר לשירות Shortly",
+		"buttons": {
+			"gitlab": "התחבר עם GitLab"
+		},
+		"errors": {
+			"configLoadFailed": "לא ניתן לטעון את הגדרות האפליקציה",
+			"authDisabled": "ההזדהות אינה זמינה"
+		}
+	},
+	"linksPage": {
+		"title": "הקישורים שלי :: SHRTLY",
+		"description": "נהל את הקישורים הקצרים שלך",
+		"header": "הקישורים שלי",
+		"empty": "עדיין לא יצרת קישורים קצרים",
+		"createFirst": "צור את הקישור הראשון שלך",
+		"expired": "פג תוקף",
+		"deleteConfirm": "האם אתה בטוח שברצונך למחוק קישור זה? פעולה זו אינה ניתנת לביטול.",
+		"deleteSuccess": "הקישור נמחק בהצלחה",
+		"copySuccess": "הקישור הועתק ללוח",
+		"hints": {
+			"limits": "המגבלות נקבעות על ידי מנהל השירות"
+		},
+		"table": {
+			"shortUrl": "כתובת קצרה",
+			"originalUrl": "כתובת מקורית",
+			"created": "נוצר",
+			"expires": "פג בעוד",
+			"actions": "פעולות"
+		},
+		"timeRemaining": {
+			"dayShort": "{count}י",
+			"hourShort": "{count}ש",
+			"minuteShort": "{count}ד"
+		},
+		"errors": {
+			"loadFailed": "טעינת הקישורים שלך נכשלה",
+			"deleteFailed": "מחיקת הקישור נכשלה",
+			"copyFailed": "העתקת הקישור נכשלה"
+		}
+	},
+	"adminPage": {
+		"title": "פאנל ניהול :: SHRTLY",
+		"description": "נהל את כל הקישורים הקצרים",
+		"header": "פאנל ניהול",
+		"tabs": {
+			"general": "כללי",
+			"links": "קישורים",
+			"users": "משתמשים",
+			"audit": "ביקורת"
+		},
+		"general": {
+			"sections": {
+				"service": "הגדרות שירות",
+				"createUrl": "יצירת כתובת",
+				"namedUrls": "כתובות עם שם",
+				"auth": "הזדהות",
+				"scheduler": "מתזמן"
+			},
+			"fields": {
+				"baseUrl": "כתובת בסיס",
+				"shortUrlTtl": "משך חיי קישור",
+				"maxUrlLength": "אורך כתובת מקסימלי",
+				"enabled": "מופעל",
+				"authOnly": "נדרשת הזדהות",
+				"maxPerUser": "מקסימום למשתמש",
+				"maxPerDay": "מקסימום ליום",
+				"minLength": "אורך מינימום",
+				"maxLength": "אורך מקסימום",
+				"reservedNames": "שמות שמורים",
+				"authType": "ספק הזדהות",
+				"gitlabBaseUrl": "כתובת GitLab בסיס",
+				"gitlabAppId": "מזהה אפליקציה",
+				"note": "הערת התחברות",
+				"cleanupCron": "לוח זמנים לניקוי"
+			},
+			"values": {
+				"yes": "כן",
+				"no": "לא",
+				"none": "אין",
+				"hours": "{count, plural, one {שעה אחת} other {# שעות}}",
+				"characters": "{count} תווים",
+				"andMore": "ועוד {count}"
+			}
+		},
+		"empty": "לא נמצאו קישורים",
+		"items": "סה״כ",
+		"filtered": "מוצג",
+		"search": {
+			"placeholder": "חפש לפי שם קישור או שם משתמש"
+		},
+		"filters": {
+			"onlyNamed": "רק עם שם"
+		},
+		"sort": {
+			"label": "מיון",
+			"byCreated": "לפי תאריך יצירה",
+			"namedFirst": "עם שם"
+		},
+		"table": {
+			"shortUrl": "כתובת קצרה",
+			"originalUrl": "כתובת מקורית",
+			"user": "משתמש",
+			"userId": "מזהה משתמש",
+			"created": "נוצר",
+			"expires": "פג בעוד",
+			"actions": "פעולות"
+		},
+		"deleteSuccess": "הקישור נמחק בהצלחה",
+		"copySuccess": "הקישור הועתק ללוח",
+		"errors": {
+			"notAuthorized": "אין לך הרשאה לגשת לעמוד זה",
+			"deleteFailed": "מחיקת הקישור נכשלה",
+			"copyFailed": "העתקת הקישור נכשלה"
+		},
+		"audit": {
+			"filters": {
+				"eventType": "סוג אירוע",
+				"allEventTypes": "כל האירועים",
+				"urlName": "שם כתובת",
+				"urlNamePlaceholder": "חפש לפי שם כתובת",
+				"username": "שם משתמש",
+				"usernamePlaceholder": "חפש לפי שם משתמש",
+				"dateFrom": "מתאריך",
+				"dateTo": "עד תאריך",
+				"dateRange": "טווח תאריכים",
+				"selectDateRange": "בחר טווח תאריכים",
+				"apply": "החל סינונים",
+				"clear": "נקה סינונים"
+			},
+			"table": {
+				"eventType": "סוג אירוע",
+				"user": "משתמש",
+				"urlName": "שם כתובת",
+				"timestamp": "חותמת זמן"
+			},
+			"eventTypes": {
+				"create_url": "כתובת נוצרה",
+				"delete_url": "כתובת נמחקה",
+				"user_login": "משתמש התחבר",
+				"user_logout": "משתמש התנתק",
+				"user_quota_update": "מכסה עודכנה"
+			},
+			"noEvents": "לא נמצאו אירועי ביקורת",
+			"showing": "מוצג {count} מתוך {total} אירועים",
+			"errors": {
+				"loadFailed": "טעינת אירועי ביקורת נכשלה"
+			}
+		},
+		"users": {
+			"empty": "לא נמצאו משתמשים",
+			"userId": "מזהה משתמש",
+			"created": "נוצר",
+			"urlCount": "כתובות שנוצרו",
+			"quotas": "מכסות",
+			"maxPerUser": "מקסימום למשתמש",
+			"maxPerDay": "מקסימום ליום",
+			"editQuotas": "ערוך מכסות",
+			"saveQuotas": "שמור",
+			"cancelEdit": "בטל",
+			"quotasUpdated": "המכסות עודכנו בהצלחה",
+			"quotasUpdateFailed": "עדכון המכסות נכשל",
+			"quotasMustBeNonNegative": "המכסות חייבות להיות לא שליליות"
+		}
+	}
+}

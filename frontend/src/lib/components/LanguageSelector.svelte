@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { locale } from 'svelte-intl-precompile';
 
-	const languages = ['en', 'ru', 'de', 'es', 'fr', 'zh', 'jp', 'ge'];
+	const languages = ['en', 'ru', 'de', 'es', 'fr', 'zh', 'jp', 'ge', 'he'];
 
 	let isOpen = $state(false);
 

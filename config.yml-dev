@@ -40,6 +40,8 @@ auth:
 
   note: ""
 
+  admin-users: "admin-user1,admin-user2"
+
   providers:
     gitlab:
       base-url: https://gitlab.com
@@ -55,3 +57,6 @@ short-url:
 scheduler:
   # Cleanup expired URLs every day at midnight
   cleanup-expired-urls: "0 0 0 * * *"
+
+metrics:
+  enabled: true
