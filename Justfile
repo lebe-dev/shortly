@@ -20,6 +20,9 @@ build-release-image: test-all
 build-chart:
   helm package helm-chart/
 
+trivy:
+  trivy image --severity HIGH,CRITICAL tinyops/shortly:{{version}}
+
 release: build-release-image
   docker push tinyops/shortly:{{version}}
   helm package helm-chart/
