@@ -102,6 +102,7 @@ export class UserUrlResponse {
 	created: number;
 	ttl: number;
 	custom_name?: string;
+	last_accessed?: number | null;
 
 	constructor(
 		id: string,
@@ -109,7 +110,8 @@ export class UserUrlResponse {
 		original_url: string,
 		created: number,
 		ttl: number,
-		custom_name?: string
+		custom_name?: string,
+		last_accessed?: number | null
 	) {
 		this.id = id;
 		this.url = url;
@@ -117,6 +119,7 @@ export class UserUrlResponse {
 		this.created = created;
 		this.ttl = ttl;
 		this.custom_name = custom_name;
+		this.last_accessed = last_accessed;
 	}
 }
 

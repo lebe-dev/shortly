@@ -3,7 +3,7 @@ import { registerAll } from '$locales';
 
 registerAll();
 
-const SUPPORTED_LOCALES = ['en', 'ru', 'de', 'es', 'fr', 'zh', 'jp', 'ge'];
+const SUPPORTED_LOCALES = ['en', 'ru', 'de', 'es', 'fr', 'zh', 'jp', 'ge', 'he'];
 
 const LOCALE_STORAGE_KEY = 'app-locale';
 

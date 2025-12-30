@@ -17,6 +17,8 @@ pub struct UserUrlResponse {
     pub ttl: u32,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_accessed: Option<i64>,
 }
 
 pub async fn list_user_urls_route(
@@ -36,6 +38,7 @@ pub async fn list_user_urls_route(
                         created: url.created,
                         ttl: url.ttl,
                         custom_name: url.custom_name,
+                        last_accessed: url.last_accessed,
                     }
                 })
                 .collect();

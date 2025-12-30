@@ -12,6 +12,7 @@ use server_lib::domain::url::model::DeleteUrlError;
 use server_lib::domain::url::ports::UrlService;
 
 use crate::SharedAppState;
+use crate::route::config::is_user_admin;
 
 pub async fn delete_url_route(
     State(state): State<Arc<SharedAppState>>,
@@ -41,18 +42,4 @@ pub async fn delete_url_route(
             }
         },
     }
-}
-
-fn is_user_admin(username: &str, config: &crate::domain::config::model::config::AppConfig) -> bool {
-    config
-        .auth
-        .admin_users
-        .as_ref()
-        .map(|admins| {
-            admins
-                .split(',')
-                .map(|s| s.trim())
-                .any(|admin| admin == username)
-        })
-        .unwrap_or(false)
 }
