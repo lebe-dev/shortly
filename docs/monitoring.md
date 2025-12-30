@@ -468,7 +468,7 @@ groups:
     interval: 30s
     rules:
       - alert: HighExpiredURLs
-        expr: shortly_urls_expired_total > 1000
+        expr: shortly_urls_expired_total{job="example-job-name"} > 1000
         for: 5m
         labels:
           severity: warning
@@ -477,7 +477,7 @@ groups:
           description: "{{ $value }} URLs have expired"
 
       - alert: DatabasePoolExhausted
-        expr: shortly_database_connection_pool_idle == 0
+        expr: shortly_database_connection_pool_idle{job="example-job-name"} == 0
         for: 2m
         labels:
           severity: critical
@@ -486,13 +486,40 @@ groups:
           description: "No idle database connections available"
 
       - alert: NoRecentURLAccess
-        expr: time() - shortly_urls_last_accessed_timestamp > 86400
+        expr: time() - shortly_urls_last_accessed_timestamp{job="example-job-name"} > 86400
         for: 5m
         labels:
           severity: warning
         annotations:
           summary: "No URLs accessed in last 24 hours"
           description: "Service may not be receiving traffic"
+
+      - alert: HighURLDeletionRate
+        expr: shortly_urls_deleted_last_24h{job="example-job-name"} > 500
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High URL deletion rate"
+          description: "{{ $value }} URLs deleted in last 24 hours"
+
+      - alert: DatabasePoolUtilizationHigh
+        expr: (shortly_database_connection_pool_size{job="example-job-name"} - shortly_database_connection_pool_idle{job="example-job-name"}) / shortly_database_connection_pool_size{job="example-job-name"} > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Database connection pool utilization is high"
+          description: "Pool utilization is {{ $value | humanizePercentage }}"
+
+      - alert: ServiceDown
+        expr: up{job="example-job-name"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Shortly service is down"
+          description: "Shortly service has been down for more than 1 minute"
 ```
 
 ## Metrics Implementation Details
