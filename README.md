@@ -35,8 +35,9 @@ docker run --name shortly -p 8080:8080 tinyops/shortly:1.3.0
 
 ## RoadMap
 
+- PostgreSQL support
+- Backend: Public API
+- Chrome extension: click: create short URL from current page
 - Security: URL filters support
 - Security: Add captcha support
 - QRCode generation
-- Backend: Public API
-- Chrome extension: click: create short URL from current page
