@@ -53,7 +53,7 @@ pub async fn metrics_route(
 async fn collect_all_metrics(state: &AppState) -> Result<(), Box<dyn std::error::Error>> {
     let pool = state.user_repository.get_pool();
 
-    let url_metrics = collector::collect_url_metrics(pool).await?;
+    let url_metrics = collector::collect_url_metrics(&pool).await?;
     registry::URLS_TOTAL.set(url_metrics.total as f64);
     if let Some(ts) = url_metrics.last_created {
         registry::URLS_LAST_CREATED.set(ts as f64);
@@ -66,13 +66,13 @@ async fn collect_all_metrics(state: &AppState) -> Result<(), Box<dyn std::error:
     registry::URLS_DELETED_24H.set(url_metrics.deleted_24h as f64);
 
     if state.auth_service.is_some() {
-        let user_metrics = collector::collect_user_metrics(pool).await?;
+        let user_metrics = collector::collect_user_metrics(&pool).await?;
         registry::USERS_TOTAL.set(user_metrics.total as f64);
         registry::USERS_ACTIVE_SESSIONS.set(user_metrics.active_sessions as f64);
         registry::USERS_LAST_LOGIN.set(user_metrics.last_login as f64);
     }
 
-    let audit_metrics = collector::collect_audit_metrics(pool).await?;
+    let audit_metrics = collector::collect_audit_metrics(&pool).await?;
     for metric in audit_metrics {
         registry::AUDIT_EVENTS_TOTAL
             .with_label_values(&[&metric.event_type])
@@ -82,8 +82,16 @@ async fn collect_all_metrics(state: &AppState) -> Result<(), Box<dyn std::error:
             .set(metric.last_timestamp as f64);
     }
 
-    registry::DB_POOL_SIZE.set(pool.size() as f64);
-    registry::DB_POOL_IDLE.set(pool.num_idle() as f64);
+    let (pool_size, pool_idle) = match &pool {
+        server_lib::outbound::database::DatabasePool::Sqlite(p) => {
+            (p.size() as f64, p.num_idle() as f64)
+        }
+        server_lib::outbound::database::DatabasePool::Postgres(p) => {
+            (p.size() as f64, p.num_idle() as f64)
+        }
+    };
+    registry::DB_POOL_SIZE.set(pool_size);
+    registry::DB_POOL_IDLE.set(pool_idle);
 
     let now = chrono::Utc::now().timestamp();
     let uptime = now - state.start_time;
@@ -92,7 +100,7 @@ async fn collect_all_metrics(state: &AppState) -> Result<(), Box<dyn std::error:
         .with_label_values(&[VERSION])
         .set(1.0);
 
-    let ttl_values = collector::collect_ttl_values(pool).await?;
+    let ttl_values = collector::collect_ttl_values(&pool).await?;
     for ttl in ttl_values {
         let hours_remaining = (ttl - now) as f64 / 3600.0;
         if hours_remaining > 0.0 {

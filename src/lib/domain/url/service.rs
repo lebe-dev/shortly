@@ -3,7 +3,7 @@ use rand::Rng;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::domain::url::{
-    audit::{AuditEventType, AuditEventWithUser, UrlAuditEvent},
+    audit::{AuditEventType, AuditEventWithUser, AuditQueryParams, UrlAuditEvent},
     model::{CleanupExpiredUrlsError, FindUrlError},
     ports::{UrlRepository, UrlService},
 };
@@ -14,6 +14,20 @@ const MAX_RETRIES: usize = 100;
 pub const BASE_RESERVED_NAMES: &[&str] = &[
     "links", "api", "login", "logout", "assets", "static", "health", "metrics", "auth", "admin",
 ];
+
+/// Configuration for URL service
+#[derive(Debug, Clone)]
+pub struct UrlServiceConfig {
+    pub base_url: String,
+    pub ttl_hours: u32,
+    pub max_url_length: usize,
+    pub named_urls_enabled: bool,
+    pub named_url_min_length: usize,
+    pub named_url_max_length: usize,
+    pub reserved_names: Vec<String>,
+    pub max_urls_per_user: u32,
+    pub max_urls_per_day: u32,
+}
 
 #[derive(Debug, Clone)]
 pub struct UrlServiceImpl<R>
@@ -43,34 +57,13 @@ where
     /// Creates a new UrlServiceImpl
     ///
     /// # Arguments
-    /// * `base_url` - Base URL for generating short URLs
-    /// * `ttl_hours` - TTL in hours (will be converted to seconds)
-    /// * `max_url_length` - Maximum URL length in characters
+    /// * `config` - Service configuration
     /// * `repo` - URL repository implementation
-    /// * `named_urls_enabled` - Whether named URLs feature is enabled
-    /// * `named_url_min_length` - Minimum length for custom names
-    /// * `named_url_max_length` - Maximum length for custom names
-    /// * `reserved_names` - Additional reserved names from configuration (will be merged with BASE_RESERVED_NAMES)
-    /// * `max_urls_per_user` - Maximum total URLs per user
-    /// * `max_urls_per_day` - Maximum URLs per user per day
-    pub fn new(
-        base_url: &str,
-        ttl_hours: u32,
-        max_url_length: usize,
-        repo: R,
-        named_urls_enabled: bool,
-        named_url_min_length: usize,
-        named_url_max_length: usize,
-        reserved_names: Vec<String>,
-        max_urls_per_user: u32,
-        max_urls_per_day: u32,
-    ) -> Self {
-        // Merge base reserved names with config reserved names
+    pub fn new(config: UrlServiceConfig, repo: R) -> Self {
         let mut merged_reserved_names: Vec<String> =
             BASE_RESERVED_NAMES.iter().map(|s| s.to_string()).collect();
 
-        // Add config reserved names, avoiding duplicates
-        for name in reserved_names {
+        for name in config.reserved_names {
             let name_lower = name.to_lowercase();
             if !merged_reserved_names
                 .iter()
@@ -81,16 +74,16 @@ where
         }
 
         Self {
-            base_url: base_url.to_string(),
-            ttl: ttl_hours * 3600, // Convert hours to seconds
-            max_url_length,
+            base_url: config.base_url,
+            ttl: config.ttl_hours * 3600, // Convert hours to seconds
+            max_url_length: config.max_url_length,
             repo,
-            named_urls_enabled,
-            named_url_min_length,
-            named_url_max_length,
+            named_urls_enabled: config.named_urls_enabled,
+            named_url_min_length: config.named_url_min_length,
+            named_url_max_length: config.named_url_max_length,
             reserved_names: merged_reserved_names,
-            max_urls_per_user,
-            max_urls_per_day,
+            max_urls_per_user: config.max_urls_per_user,
+            max_urls_per_day: config.max_urls_per_day,
         }
     }
 
@@ -150,13 +143,11 @@ where
         &self,
         user_id: i64,
     ) -> Result<(), super::model::ShortUrlGenerationError> {
-        // Total count
         let total_count = self.repo.count_by_user_id(user_id).await?;
         if total_count >= self.max_urls_per_user as i64 {
             return Err(super::model::ShortUrlGenerationError::UserLimitExceeded);
         }
 
-        // Daily limit
         let timestamp = SystemTime::now()
             .duration_since(UNIX_EPOCH)
             .map_err(|e| {
@@ -180,7 +171,6 @@ where
     R: UrlRepository,
 {
     async fn is_url_valid(&self, url: &str) -> bool {
-        // Trim whitespace before validation
         let url = url.trim();
 
         if url.is_empty() {
@@ -191,7 +181,7 @@ where
             return false;
         }
 
-        if !url::Url::parse(url).is_ok() {
+        if url::Url::parse(url).is_err() {
             return false;
         }
 
@@ -372,7 +362,7 @@ where
         &self,
         name: &str,
     ) -> Result<bool, super::model::CheckCustomNameError> {
-        if let Err(_) = self.validate_custom_name(name) {
+        if self.validate_custom_name(name).is_err() {
             return Ok(false); // Invalid = not available
         }
 
@@ -495,28 +485,10 @@ where
 
     async fn find_audit_events(
         &self,
-        event_type: Option<AuditEventType>,
-        actor_user_id: Option<i64>,
-        target_user_id: Option<i64>,
-        url_name: Option<String>,
-        username: Option<String>,
-        date_from: Option<i64>,
-        date_to: Option<i64>,
-        limit: i64,
-        offset: i64,
+        params: AuditQueryParams,
     ) -> Result<(Vec<AuditEventWithUser>, i64), FindUrlError> {
         self.repo
-            .find_audit_events(
-                event_type,
-                actor_user_id,
-                target_user_id,
-                url_name,
-                username,
-                date_from,
-                date_to,
-                limit,
-                offset,
-            )
+            .find_audit_events(&params)
             .await
             .map_err(Into::into)
     }
@@ -527,6 +499,21 @@ mod tests {
     use super::*;
     use crate::domain::url::model::ShortUrlGenerationError;
     use crate::tests::database::get_in_memory_db;
+
+    // Helper function to create default test config
+    fn get_test_config() -> UrlServiceConfig {
+        UrlServiceConfig {
+            base_url: "http://localhost:8080".to_string(),
+            ttl_hours: 1,
+            max_url_length: 2048,
+            named_urls_enabled: false,
+            named_url_min_length: 3,
+            named_url_max_length: 20,
+            reserved_names: vec![],
+            max_urls_per_user: 100,
+            max_urls_per_day: 10,
+        }
+    }
 
     // Helper function to create a test user in the database
     async fn create_test_user(db: &crate::outbound::sqlite::init::Sqlite, user_id: i64) {
@@ -553,18 +540,7 @@ mod tests {
     #[tokio::test]
     async fn test_register_url_success() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db);
 
         let result = service
             .register_url("https://example.com", None, None)
@@ -580,18 +556,7 @@ mod tests {
     #[tokio::test]
     async fn test_register_url_generates_unique_id() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         let url1 = service
             .register_url("https://example.com", None, None)
@@ -608,18 +573,7 @@ mod tests {
     #[tokio::test]
     async fn test_find_by_id_existing_url() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         let registered_url = service
             .register_url("https://example.com", None, None)
@@ -637,18 +591,7 @@ mod tests {
     #[tokio::test]
     async fn test_find_by_id_non_existing_url() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         let result = service.find_by_id("nonexistent").await;
 
@@ -659,18 +602,7 @@ mod tests {
     #[tokio::test]
     async fn test_generate_short_url() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         let registered_url = service
             .register_url("https://example.com", None, None)
@@ -690,18 +622,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_with_http() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         assert!(service.is_url_valid("http://example.com").await);
         assert!(service.is_url_valid("http://example.com/path").await);
@@ -715,18 +636,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_with_https() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         assert!(service.is_url_valid("https://example.com").await);
         assert!(
@@ -744,18 +654,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_with_various_schemes() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         // FTP
         assert!(service.is_url_valid("ftp://ftp.example.com/file.txt").await);
@@ -781,18 +680,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_empty_string() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         assert!(!service.is_url_valid("").await);
     }
@@ -800,18 +688,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_whitespace_only() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         assert!(!service.is_url_valid("   ").await);
         assert!(!service.is_url_valid("\t").await);
@@ -821,18 +698,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_missing_scheme() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         assert!(!service.is_url_valid("example.com").await);
         assert!(!service.is_url_valid("www.example.com").await);
@@ -842,18 +708,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_relative_paths() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         assert!(!service.is_url_valid("/path/to/resource").await);
         assert!(!service.is_url_valid("../relative/path").await);
@@ -863,18 +718,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_invalid_format() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         assert!(!service.is_url_valid("not a url at all").await);
         assert!(!service.is_url_valid("http://").await);
@@ -885,18 +729,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_with_special_characters() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         // Valid URLs with encoded characters
         assert!(
@@ -922,18 +755,7 @@ mod tests {
     #[tokio::test]
     async fn test_is_url_valid_with_ip_addresses() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         assert!(service.is_url_valid("http://192.168.1.1").await);
         assert!(service.is_url_valid("http://127.0.0.1:8080/path").await);
@@ -944,18 +766,7 @@ mod tests {
     #[tokio::test]
     async fn test_register_url_generates_six_character_id() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        ); // 1 hour
+        let service = UrlServiceImpl::new(get_test_config(), db); // 1 hour
 
         // Generate multiple URLs to test consistency
         for i in 0..50 {
@@ -979,16 +790,18 @@ mod tests {
     async fn test_is_url_valid_rejects_self_referencing() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "https://short.ly",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "https://short.ly".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: false,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
         );
 
         assert!(!service.is_url_valid("https://short.ly").await);
@@ -1002,16 +815,18 @@ mod tests {
     async fn test_is_url_valid_case_insensitive_self_referencing() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "https://short.ly",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "https://short.ly".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: false,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
         );
 
         assert!(!service.is_url_valid("HTTPS://SHORT.LY/abc").await);
@@ -1022,16 +837,18 @@ mod tests {
     async fn test_is_url_valid_handles_trailing_slash_in_base_url() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "https://short.ly/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "https://short.ly/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: false,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
         );
 
         assert!(!service.is_url_valid("https://short.ly/abc").await);
@@ -1042,16 +859,18 @@ mod tests {
     async fn test_is_url_valid_allows_different_domains() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "https://short.ly",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "https://short.ly".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: false,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
         );
 
         assert!(service.is_url_valid("https://example.com").await);
@@ -1064,16 +883,18 @@ mod tests {
     async fn test_is_url_valid_trims_whitespace() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "https://short.ly",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "https://short.ly".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: false,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
         );
 
         assert!(service.is_url_valid("  https://example.com  ").await);
@@ -1087,16 +908,18 @@ mod tests {
     async fn test_is_url_valid_rejects_self_referencing_with_whitespace() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "https://short.ly",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "https://short.ly".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: false,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
         );
 
         assert!(!service.is_url_valid("  https://short.ly  ").await);
@@ -1107,18 +930,7 @@ mod tests {
     #[tokio::test]
     async fn test_register_url_trims_whitespace() {
         let db = get_in_memory_db().await;
-        let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
-            db,
-            false,
-            3,
-            20,
-            vec![],
-            100,
-            10,
-        );
+        let service = UrlServiceImpl::new(get_test_config(), db);
 
         let result = service
             .register_url("  https://example.com  ", None, None)
@@ -1138,16 +950,18 @@ mod tests {
     async fn test_validate_custom_name_hardcoded_reserved_names() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            true, // Named URLs enabled
-            3,
-            20,
-            vec![], // No additional reserved names
-            100,
-            10,
         );
 
         // Test all hardcoded reserved names
@@ -1172,16 +986,18 @@ mod tests {
     async fn test_validate_custom_name_hardcoded_reserved_names_case_insensitive() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            true, // Named URLs enabled
-            3,
-            20,
-            vec![],
-            100,
-            10,
         );
 
         // Test case variations of hardcoded reserved names
@@ -1198,16 +1014,18 @@ mod tests {
     async fn test_validate_custom_name_config_reserved_names() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec!["custom".to_string(), "reserved".to_string()],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            true, // Named URLs enabled
-            3,
-            20,
-            vec!["custom".to_string(), "reserved".to_string()],
-            100,
-            10,
         );
 
         // Test config reserved names
@@ -1221,16 +1039,18 @@ mod tests {
     async fn test_validate_custom_name_min_length() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            true, // Named URLs enabled
-            3,    // Min length
-            20,
-            vec![],
-            100,
-            10,
         );
 
         // Too short
@@ -1248,16 +1068,18 @@ mod tests {
     async fn test_validate_custom_name_max_length() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 10,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            true, // Named URLs enabled
-            3,
-            10, // Max length
-            vec![],
-            100,
-            10,
         );
 
         // Too long
@@ -1279,16 +1101,18 @@ mod tests {
     async fn test_validate_custom_name_valid_characters() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            true, // Named URLs enabled
-            3,
-            20,
-            vec![],
-            100,
-            10,
         );
 
         // Valid characters: a-z, A-Z, 0-9, -, _
@@ -1302,16 +1126,18 @@ mod tests {
     async fn test_validate_custom_name_invalid_characters() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            true, // Named URLs enabled
-            3,
-            20,
-            vec![],
-            100,
-            10,
         );
 
         // Invalid characters
@@ -1327,16 +1153,18 @@ mod tests {
     async fn test_validate_custom_name_feature_disabled() {
         let db = get_in_memory_db().await;
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: false,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            false, // Named URLs DISABLED
-            3,
-            20,
-            vec![],
-            100,
-            10,
         );
 
         // Should reject any name when feature is disabled
@@ -1352,16 +1180,18 @@ mod tests {
         let db = get_in_memory_db().await;
         // Config contains a name that's already in BASE_RESERVED_NAMES
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec!["api".to_string(), "custom".to_string()],
+                max_urls_per_user: 100,
+                max_urls_per_day: 10,
+            },
             db,
-            true,
-            3,
-            20,
-            vec!["api".to_string(), "custom".to_string()], // "api" is already in BASE_RESERVED_NAMES
-            100,
-            10,
         );
 
         // Both should be reserved
@@ -1388,16 +1218,18 @@ mod tests {
         create_test_user(&db, user_id).await;
 
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 3,
+                max_urls_per_day: 10,
+            },
             db,
-            true, // Named URLs enabled
-            3,
-            20,
-            vec![],
-            3,  // max_urls_per_user = 3
-            10, // max_urls_per_day = 10
         );
 
         // Create 3 URLs - should all succeed
@@ -1442,16 +1274,18 @@ mod tests {
         create_test_user(&db, user_id).await;
 
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 100,
+                max_urls_per_day: 2,
+            },
             db,
-            true, // Named URLs enabled
-            3,
-            20,
-            vec![],
-            100, // max_urls_per_user = 100 (high enough to not interfere)
-            2,   // max_urls_per_day = 2
         );
 
         // Create 2 URLs - should both succeed
@@ -1493,16 +1327,18 @@ mod tests {
         create_test_user(&db, user_id).await;
 
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 5,
+                max_urls_per_day: 3,
+            },
             db,
-            true, // Named URLs enabled
-            3,
-            20,
-            vec![],
-            5, // max_urls_per_user = 5
-            3, // max_urls_per_day = 3
         );
 
         // Create 2 URLs - both should succeed (under both limits)
@@ -1533,16 +1369,18 @@ mod tests {
         create_test_user(&db, user_id).await;
 
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 2,
+                max_urls_per_day: 1,
+            },
             db,
-            true, // Named URLs enabled
-            3,
-            20,
-            vec![],
-            2, // max_urls_per_user = 2 (very low)
-            1, // max_urls_per_day = 1 (very low)
         );
 
         // Create one named URL
@@ -1592,16 +1430,18 @@ mod tests {
         create_test_user(&db, 2).await;
 
         let service = UrlServiceImpl::new(
-            "http://localhost:8080/",
-            1,
-            2048,
+            UrlServiceConfig {
+                base_url: "http://localhost:8080/".to_string(),
+                ttl_hours: 1,
+                max_url_length: 2048,
+                named_urls_enabled: true,
+                named_url_min_length: 3,
+                named_url_max_length: 20,
+                reserved_names: vec![],
+                max_urls_per_user: 2,
+                max_urls_per_day: 2,
+            },
             db,
-            true, // Named URLs enabled
-            3,
-            20,
-            vec![],
-            2, // max_urls_per_user = 2
-            2, // max_urls_per_day = 2
         );
 
         // User 1 creates 2 URLs (hits limit)

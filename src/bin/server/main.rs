@@ -32,12 +32,13 @@ use server_lib::{
         auth::{ports::AuthService, service::AuthServiceImpl},
         url::{
             ports::{UrlRepository, UrlService},
-            service::UrlServiceImpl as UrlServiceImplType,
+            service::{UrlServiceConfig, UrlServiceImpl as UrlServiceImplType},
         },
     },
     outbound::{
-        oauth::gitlab::GitlabOAuthClient,
-        sqlite::{init::Sqlite, migration::MigrationManager},
+        database::Database, oauth::gitlab::GitlabOAuthClient,
+        postgres::migration::PostgresMigrationManager,
+        sqlite::migration::MigrationManager as SqliteMigrationManager,
     },
 };
 use tokio_cron_scheduler::{Job, JobScheduler};
@@ -62,9 +63,9 @@ pub type SharedAppState = AppState;
 #[derive(Clone)]
 pub struct AppState {
     config: AppConfig,
-    url_service: UrlServiceImplType<Sqlite>,
-    auth_service: Option<AuthServiceImpl<Sqlite, Sqlite, GitlabOAuthClient>>,
-    user_repository: Sqlite,
+    url_service: UrlServiceImplType<Database>,
+    auth_service: Option<AuthServiceImpl<Database, Database, GitlabOAuthClient>>,
+    user_repository: Database,
     start_time: i64,
 }
 
@@ -74,175 +75,192 @@ async fn main() -> anyhow::Result<()> {
 
     let config_file = Path::new("config.yml");
 
-    match config_service.load_from_file(&config_file) {
+    match config_service.load_from_file(config_file) {
         Ok(app_config) => {
             let logging_config = get_logging_config(&app_config.log_level, &app_config.log_target);
             log4rs::init_config(logging_config).expect("unable to init logging configuration");
 
             info!("config: {}", app_config);
 
-            match Sqlite::new(&app_config.db_cnn).await {
-                Ok(db_pool) => {
-                    let migrations = assets::load_migrations_from_assets()
-                        .expect("failed to load migrations from assets");
+            let db = Database::from_connection_string(&app_config.db_cnn)
+                .await
+                .map_err(|e| {
+                    eprintln!("database error: {}", e);
+                    anyhow!("database error")
+                })?;
 
-                    let migration_manager =
-                        MigrationManager::new(db_pool.get_pool().clone(), migrations);
-                    if let Err(e) = migration_manager.initialize().await {
+            info!("connected to {} database", db.db_type());
+
+            let migrations = assets::load_migrations_for_database(db.db_type())
+                .expect("failed to load migrations");
+
+            match &db {
+                Database::Sqlite(sqlite) => {
+                    let manager =
+                        SqliteMigrationManager::new(sqlite.get_pool().clone(), migrations);
+                    if let Err(e) = manager.initialize().await {
                         eprintln!("failed to initialize migration system: {}", e);
                         return Err(anyhow!("migration initialization error"));
                     }
-                    if let Err(e) = migration_manager.run_migrations().await {
+                    if let Err(e) = manager.run_migrations().await {
                         eprintln!("failed to run migrations: {}", e);
                         return Err(anyhow!("migration error"));
                     }
-
-                    let url_service = UrlServiceImplType::new(
-                        &app_config.base_url,
-                        app_config.short_url.ttl,
-                        app_config.short_url.max_length,
-                        db_pool.clone(),
-                        app_config.features.named_urls.enabled,
-                        app_config.features.named_urls.min_length,
-                        app_config.features.named_urls.max_length,
-                        app_config.features.named_urls.reserved_names.clone(),
-                        app_config.features.create_url.max_per_user,
-                        app_config.features.create_url.max_per_day,
-                    );
-
-                    let auth_service = if app_config.auth.enabled {
-                        let redirect_uri = format!("{}/api/auth/callback", app_config.base_url);
-
-                        let oauth_client = GitlabOAuthClient::new(
-                            app_config.auth.providers.gitlab.base_url.clone(),
-                            app_config.auth.providers.gitlab.application_id.clone(),
-                            app_config.auth.providers.gitlab.secret.clone(),
-                            redirect_uri.clone(),
-                        );
-
-                        let auth_service = AuthServiceImpl::new(
-                            db_pool.clone(),
-                            db_pool.clone(),
-                            oauth_client,
-                            app_config.auth.providers.gitlab.base_url.clone(),
-                            app_config.auth.providers.gitlab.application_id.clone(),
-                            redirect_uri,
-                            Some(30), // 30 day session TTL
-                        );
-
-                        Some(auth_service)
-                    } else {
-                        None
-                    };
-
-                    let app_state = AppState {
-                        config: app_config.clone(),
-                        url_service: url_service.clone(),
-                        auth_service: auth_service.clone(),
-                        user_repository: db_pool.clone(),
-                        start_time: chrono::Utc::now().timestamp(),
-                    };
-
-                    // SCHEDULER - START
-
-                    let sched = JobScheduler::new()
-                        .await
-                        .expect("scheduler initialization error");
-
-                    let service = url_service.clone();
-
-                    sched
-                        .add(
-                            Job::new_async(
-                                app_config.scheduler.cleanup_expired_urls.clone().as_str(),
-                                move |_, _| {
-                                    let service = service.clone();
-
-                                    Box::pin(async move {
-                                        let _ = service.cleanup_expired_urls().await;
-                                    })
-                                },
-                            )
-                            .expect("unable to create cronjob for cleanup expired urls"),
-                        )
-                        .await
-                        .expect("unable to add cleanup expired urls cronjob to scheduler");
-
-                    if let Some(ref auth_svc) = auth_service {
-                        let auth_svc_clone = auth_svc.clone();
-                        sched
-                            .add(
-                                Job::new_async("0 0 * * * *", move |_, _| {
-                                    // Every hour
-                                    let service = auth_svc_clone.clone();
-                                    Box::pin(async move {
-                                        let _ = service.cleanup_expired_sessions().await;
-                                    })
-                                })
-                                .expect("unable to create cronjob for cleanup expired sessions"),
-                            )
-                            .await
-                            .expect("unable to add cleanup expired sessions cronjob to scheduler");
-                    }
-
-                    sched.start().await?;
-
-                    // SCHEDULER - END
-
-                    let app_state_arc = Arc::new(app_state);
-
-                    let app = Router::new()
-                        .route("/api/version", get(get_version_route))
-                        .route("/api/health", get(health_route))
-                        .route("/api/metrics", get(metrics_route))
-                        .route("/api/config", get(get_app_config_route))
-                        .route("/api/auth/login", get(login_route))
-                        .route("/api/auth/callback", get(callback_route))
-                        .route("/api/auth/session", get(session_route))
-                        .route("/api/auth/logout", post(logout_route))
-                        .route("/api/url/{url_id}", get(get_short_url_by_id_route))
-                        .route("/api/url/{url_id}", axum::routing::delete(delete_url_route))
-                        .route("/api/url", post(generate_short_url_route))
-                        .route("/api/url/check", get(check_custom_name_route))
-                        .route("/api/user/urls", get(list_user_urls_route))
-                        .route("/api/user/{user_id}/quotas", post(update_user_quotas_route))
-                        .route("/api/admin/audit", get(list_audit_events_route))
-                        .fallback(static_handler)
-                        .layer(from_fn_with_state(app_state_arc.clone(), auth_middleware))
-                        .with_state(app_state_arc);
-
-                    let bind = format!("{}", &app_config.bind);
-
-                    let listener = tokio::net::TcpListener::bind(&bind)
-                        .await
-                        .expect("unable to bind tcp socket");
-
-                    println!(
-                        r#"
-                        ______ _____  __________  __
-                       / __/ // / _ \/_  __/ /\ \/ /
-                      _\ \/ _  / , _/ / / / /__\  /
-                     /___/_//_/_/|_| /_/ /____//_/
-
-                                 v{}
-                        "#,
-                        VERSION
-                    );
-
-                    println!("- Bind: http://{bind}");
-                    println!("- URL: {}", app_config.base_url);
-
-                    axum::serve(listener, app)
-                        .await
-                        .expect("unable to start web server");
-
-                    Ok(())
                 }
-                Err(e) => {
-                    eprintln!("database error: {}", e);
-                    Err(anyhow!("database error"))
+                Database::Postgres(postgres) => {
+                    let manager =
+                        PostgresMigrationManager::new(postgres.get_pool().clone(), migrations);
+                    if let Err(e) = manager.initialize().await {
+                        eprintln!("failed to initialize migration system: {}", e);
+                        return Err(anyhow!("migration initialization error"));
+                    }
+                    if let Err(e) = manager.run_migrations().await {
+                        eprintln!("failed to run migrations: {}", e);
+                        return Err(anyhow!("migration error"));
+                    }
                 }
             }
+
+            let url_service_config = UrlServiceConfig {
+                base_url: app_config.base_url.clone(),
+                ttl_hours: app_config.short_url.ttl,
+                max_url_length: app_config.short_url.max_length,
+                named_urls_enabled: app_config.features.named_urls.enabled,
+                named_url_min_length: app_config.features.named_urls.min_length,
+                named_url_max_length: app_config.features.named_urls.max_length,
+                reserved_names: app_config.features.named_urls.reserved_names.clone(),
+                max_urls_per_user: app_config.features.create_url.max_per_user,
+                max_urls_per_day: app_config.features.create_url.max_per_day,
+            };
+            let url_service = UrlServiceImplType::new(url_service_config, db.clone());
+
+            let auth_service = if app_config.auth.enabled {
+                let redirect_uri = format!("{}/api/auth/callback", app_config.base_url);
+
+                let oauth_client = GitlabOAuthClient::new(
+                    app_config.auth.providers.gitlab.base_url.clone(),
+                    app_config.auth.providers.gitlab.application_id.clone(),
+                    app_config.auth.providers.gitlab.secret.clone(),
+                    redirect_uri.clone(),
+                );
+
+                let auth_service = AuthServiceImpl::new(
+                    db.clone(),
+                    db.clone(),
+                    oauth_client,
+                    app_config.auth.providers.gitlab.base_url.clone(),
+                    app_config.auth.providers.gitlab.application_id.clone(),
+                    redirect_uri,
+                    Some(30), // 30 day session TTL
+                );
+
+                Some(auth_service)
+            } else {
+                None
+            };
+
+            let app_state = AppState {
+                config: app_config.clone(),
+                url_service: url_service.clone(),
+                auth_service: auth_service.clone(),
+                user_repository: db.clone(),
+                start_time: chrono::Utc::now().timestamp(),
+            };
+
+            // SCHEDULER - START
+
+            let sched = JobScheduler::new()
+                .await
+                .expect("scheduler initialization error");
+
+            let service = url_service.clone();
+
+            sched
+                .add(
+                    Job::new_async(
+                        app_config.scheduler.cleanup_expired_urls.clone().as_str(),
+                        move |_, _| {
+                            let service = service.clone();
+
+                            Box::pin(async move {
+                                let _ = service.cleanup_expired_urls().await;
+                            })
+                        },
+                    )
+                    .expect("unable to create cronjob for cleanup expired urls"),
+                )
+                .await
+                .expect("unable to add cleanup expired urls cronjob to scheduler");
+
+            if let Some(ref auth_svc) = auth_service {
+                let auth_svc_clone = auth_svc.clone();
+                sched
+                    .add(
+                        Job::new_async("0 0 * * * *", move |_, _| {
+                            // Every hour
+                            let service = auth_svc_clone.clone();
+                            Box::pin(async move {
+                                let _ = service.cleanup_expired_sessions().await;
+                            })
+                        })
+                        .expect("unable to create cronjob for cleanup expired sessions"),
+                    )
+                    .await
+                    .expect("unable to add cleanup expired sessions cronjob to scheduler");
+            }
+
+            sched.start().await?;
+
+            // SCHEDULER - END
+
+            let app_state_arc = Arc::new(app_state);
+
+            let app = Router::new()
+                .route("/api/version", get(get_version_route))
+                .route("/api/health", get(health_route))
+                .route("/api/metrics", get(metrics_route))
+                .route("/api/config", get(get_app_config_route))
+                .route("/api/auth/login", get(login_route))
+                .route("/api/auth/callback", get(callback_route))
+                .route("/api/auth/session", get(session_route))
+                .route("/api/auth/logout", post(logout_route))
+                .route("/api/url/{url_id}", get(get_short_url_by_id_route))
+                .route("/api/url/{url_id}", axum::routing::delete(delete_url_route))
+                .route("/api/url", post(generate_short_url_route))
+                .route("/api/url/check", get(check_custom_name_route))
+                .route("/api/user/urls", get(list_user_urls_route))
+                .route("/api/user/{user_id}/quotas", post(update_user_quotas_route))
+                .route("/api/admin/audit", get(list_audit_events_route))
+                .fallback(static_handler)
+                .layer(from_fn_with_state(app_state_arc.clone(), auth_middleware))
+                .with_state(app_state_arc);
+
+            let bind = app_config.bind.to_string();
+
+            let listener = tokio::net::TcpListener::bind(&bind)
+                .await
+                .expect("unable to bind tcp socket");
+
+            println!(
+                r#"
+                ______ _____  __________  __
+               / __/ // / _ \/_  __/ /\ \/ /
+              _\ \/ _  / , _/ / / / /__\  /
+             /___/_//_/_/|_| /_/ /____//_/
+
+                         v{}
+                "#,
+                VERSION
+            );
+
+            println!("- Bind: http://{bind}");
+            println!("- URL: {}", app_config.base_url);
+
+            axum::serve(listener, app)
+                .await
+                .expect("unable to start web server");
+
+            Ok(())
         }
         Err(e) => {
             eprintln!("failed to load configuration: {}", e);
@@ -325,15 +343,13 @@ async fn static_handler(State(state): State<Arc<SharedAppState>>, uri: Uri) -> i
                 return index_html().await;
             }
         }
+    } else if RESERVED_FRONTEND_ROUTES.contains(&path) {
+        debug!(
+            "path '{}' is a reserved frontend route, skipping short URL lookup",
+            path
+        );
     } else {
-        if RESERVED_FRONTEND_ROUTES.contains(&path) {
-            debug!(
-                "path '{}' is a reserved frontend route, skipping short URL lookup",
-                path
-            );
-        } else {
-            debug!("path '{}' doesn't match short URL criteria", path);
-        }
+        debug!("path '{}' doesn't match short URL criteria", path);
     }
 
     if path.is_empty() || path == INDEX_HTML {

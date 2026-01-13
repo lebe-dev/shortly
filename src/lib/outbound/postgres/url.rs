@@ -1,7 +1,7 @@
 use chrono::Utc;
 use log::info;
-use sqlx::Row;
-use sqlx::sqlite::SqliteRow;
+use sqlx::postgres::PgRow;
+use sqlx::{Postgres as SqlxPostgres, Row};
 
 use crate::domain::url::{
     audit::{AuditEventType, AuditEventWithUser, AuditQueryParams, UrlAuditEvent},
@@ -9,11 +9,11 @@ use crate::domain::url::{
     ports::UrlRepository,
 };
 
-use super::init::Sqlite;
+use super::init::Postgres;
 
-impl UrlRepository for Sqlite {
+impl UrlRepository for Postgres {
     async fn save(&self, url: &Url) -> Result<(), sqlx::Error> {
-        sqlx::query(
+        sqlx::query::<SqlxPostgres>(
             r#"
             INSERT INTO urls (
                 id,
@@ -28,7 +28,7 @@ impl UrlRepository for Sqlite {
         )
         .bind(&url.id)
         .bind(&url.original_url)
-        .bind(url.ttl)
+        .bind(url.ttl as i32)
         .bind(url.created)
         .bind(url.user_id)
         .bind(&url.custom_name)
@@ -42,13 +42,13 @@ impl UrlRepository for Sqlite {
     }
 
     async fn find_by_id(&self, id: &str) -> Result<Option<Url>, sqlx::Error> {
-        let select_query = sqlx::query("SELECT * FROM urls WHERE id=$1").bind(id);
+        let select_query = sqlx::query::<SqlxPostgres>("SELECT * FROM urls WHERE id=$1").bind(id);
 
         let url = select_query
-            .map(|row: SqliteRow| Url {
+            .map(|row: PgRow| Url {
                 id: row.get("id"),
                 original_url: row.get("original_url"),
-                ttl: row.get("ttl"),
+                ttl: row.get::<i32, _>("ttl") as u32,
                 created: row.get("created"),
                 user_id: row.get("user_id"),
                 custom_name: row.get("custom_name"),
@@ -61,14 +61,15 @@ impl UrlRepository for Sqlite {
     }
 
     async fn find_by_custom_name(&self, custom_name: &str) -> Result<Option<Url>, sqlx::Error> {
-        let select_query = sqlx::query("SELECT * FROM urls WHERE custom_name = $1 COLLATE NOCASE")
-            .bind(custom_name);
+        let select_query =
+            sqlx::query::<SqlxPostgres>("SELECT * FROM urls WHERE LOWER(custom_name) = LOWER($1)")
+                .bind(custom_name);
 
         let url = select_query
-            .map(|row: SqliteRow| Url {
+            .map(|row: PgRow| Url {
                 id: row.get("id"),
                 original_url: row.get("original_url"),
-                ttl: row.get("ttl"),
+                ttl: row.get::<i32, _>("ttl") as u32,
                 created: row.get("created"),
                 user_id: row.get("user_id"),
                 custom_name: row.get("custom_name"),
@@ -81,8 +82,9 @@ impl UrlRepository for Sqlite {
     }
 
     async fn delete_expired(&self) -> Result<(), sqlx::Error> {
-        let query = sqlx::query("DELETE FROM urls WHERE ttl > 0 AND created + ttl < $1")
-            .bind(Utc::now().timestamp());
+        let query =
+            sqlx::query::<SqlxPostgres>("DELETE FROM urls WHERE ttl > 0 AND created + ttl < $1")
+                .bind(Utc::now().timestamp());
 
         query.execute(self.get_pool()).await?;
 
@@ -90,14 +92,16 @@ impl UrlRepository for Sqlite {
     }
 
     async fn find_by_user_id(&self, user_id: i64) -> Result<Vec<Url>, sqlx::Error> {
-        let query = sqlx::query("SELECT * FROM urls WHERE user_id = $1 ORDER BY created DESC")
-            .bind(user_id);
+        let query = sqlx::query::<SqlxPostgres>(
+            "SELECT * FROM urls WHERE user_id = $1 ORDER BY created DESC",
+        )
+        .bind(user_id);
 
         let urls = query
-            .map(|row: SqliteRow| Url {
+            .map(|row: PgRow| Url {
                 id: row.get("id"),
                 original_url: row.get("original_url"),
-                ttl: row.get("ttl"),
+                ttl: row.get::<i32, _>("ttl") as u32,
                 created: row.get("created"),
                 user_id: row.get("user_id"),
                 custom_name: row.get("custom_name"),
@@ -110,7 +114,7 @@ impl UrlRepository for Sqlite {
     }
 
     async fn delete_by_id(&self, id: &str) -> Result<(), sqlx::Error> {
-        sqlx::query("DELETE FROM urls WHERE id = $1")
+        sqlx::query::<SqlxPostgres>("DELETE FROM urls WHERE id = $1")
             .bind(id)
             .execute(self.get_pool())
             .await?;
@@ -169,13 +173,13 @@ impl UrlRepository for Sqlite {
     }
 
     async fn find_all(&self) -> Result<Vec<Url>, sqlx::Error> {
-        let query = sqlx::query("SELECT * FROM urls ORDER BY created DESC");
+        let query = sqlx::query::<SqlxPostgres>("SELECT * FROM urls ORDER BY created DESC");
 
         let urls = query
-            .map(|row: SqliteRow| Url {
+            .map(|row: PgRow| Url {
                 id: row.get("id"),
                 original_url: row.get("original_url"),
-                ttl: row.get("ttl"),
+                ttl: row.get::<i32, _>("ttl") as u32,
                 created: row.get("created"),
                 user_id: row.get("user_id"),
                 custom_name: row.get("custom_name"),
@@ -192,27 +196,39 @@ impl UrlRepository for Sqlite {
         params: &AuditQueryParams,
     ) -> Result<(Vec<AuditEventWithUser>, i64), sqlx::Error> {
         let mut where_clauses = Vec::new();
+        let mut param_idx = 1usize;
 
         if params.event_type.is_some() {
-            where_clauses.push("ua.event_type = ?");
+            where_clauses.push(format!("ua.event_type = ${}", param_idx));
+            param_idx += 1;
         }
         if params.actor_user_id.is_some() {
-            where_clauses.push("ua.actor_user_id = ?");
+            where_clauses.push(format!("ua.actor_user_id = ${}", param_idx));
+            param_idx += 1;
         }
         if params.target_user_id.is_some() {
-            where_clauses.push("ua.target_user_id = ?");
+            where_clauses.push(format!("ua.target_user_id = ${}", param_idx));
+            param_idx += 1;
         }
         if params.url_name.is_some() {
-            where_clauses.push("ua.url_name LIKE ?");
+            where_clauses.push(format!("ua.url_name LIKE ${}", param_idx));
+            param_idx += 1;
         }
         if params.username.is_some() {
-            where_clauses.push("(actor.username LIKE ? OR target.username LIKE ?)");
+            where_clauses.push(format!(
+                "(actor.username LIKE ${} OR target.username LIKE ${})",
+                param_idx,
+                param_idx + 1
+            ));
+            param_idx += 2;
         }
         if params.date_from.is_some() {
-            where_clauses.push("ua.created_at >= ?");
+            where_clauses.push(format!("ua.created_at >= ${}", param_idx));
+            param_idx += 1;
         }
         if params.date_to.is_some() {
-            where_clauses.push("ua.created_at <= ?");
+            where_clauses.push(format!("ua.created_at <= ${}", param_idx));
+            param_idx += 1;
         }
 
         let where_clause = if !where_clauses.is_empty() {
@@ -228,6 +244,10 @@ impl UrlRepository for Sqlite {
             where_clause
         );
 
+        let limit_placeholder = format!("${}", param_idx);
+        param_idx += 1;
+        let offset_placeholder = format!("${}", param_idx);
+
         let main_query = format!(
             "SELECT ua.id, ua.event_type, ua.actor_user_id, actor.username as actor_username, \
              ua.target_user_id, target.username as target_username, ua.url_name, ua.created_at \
@@ -235,8 +255,8 @@ impl UrlRepository for Sqlite {
              INNER JOIN users actor ON ua.actor_user_id = actor.id \
              INNER JOIN users target ON ua.target_user_id = target.id{} \
              ORDER BY ua.created_at DESC \
-             LIMIT ? OFFSET ?",
-            where_clause
+             LIMIT {} OFFSET {}",
+            where_clause, limit_placeholder, offset_placeholder
         );
 
         let mut count_q = sqlx::query_scalar(&count_query);
@@ -290,7 +310,7 @@ impl UrlRepository for Sqlite {
         main_q = main_q.bind(params.limit).bind(params.offset);
 
         let events = main_q
-            .map(|row: SqliteRow| {
+            .map(|row: PgRow| {
                 let event_type_str: String = row.get("event_type");
                 let event_type = match event_type_str.as_str() {
                     "create_url" => AuditEventType::CreateUrl,
@@ -319,144 +339,12 @@ impl UrlRepository for Sqlite {
     }
 
     async fn update_last_accessed(&self, url_id: &str, timestamp: i64) -> Result<(), sqlx::Error> {
-        sqlx::query("UPDATE urls SET last_accessed = $1 WHERE id = $2")
+        sqlx::query::<SqlxPostgres>("UPDATE urls SET last_accessed = $1 WHERE id = $2")
             .bind(timestamp)
             .bind(url_id)
             .execute(self.get_pool())
             .await?;
 
         Ok(())
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::tests::database::get_in_memory_db;
-
-    #[tokio::test]
-    async fn test_delete_expired_empty() {
-        let db = get_in_memory_db().await;
-
-        let result = db.delete_expired().await;
-
-        assert!(result.is_ok());
-    }
-
-    #[tokio::test]
-    async fn test_delete_expired_removes_expired_urls() {
-        let db = get_in_memory_db().await;
-
-        // Create an expired URL (created 2 hours ago with 1 hour TTL)
-        let expired_url = Url {
-            id: "exp123".to_string(),
-            original_url: "https://example.com/expired".to_string(),
-            ttl: 3600,                              // 1 hour in seconds
-            created: Utc::now().timestamp() - 7200, // 2 hours ago
-            user_id: None,
-            custom_name: None,
-            last_accessed: Some(Utc::now().timestamp() - 7200),
-        };
-
-        db.save(&expired_url).await.unwrap();
-
-        // Verify URL exists before deletion
-        let url_before = db.find_by_id("exp123").await.unwrap();
-        assert!(url_before.is_some());
-
-        // Delete expired URLs
-        let result = db.delete_expired().await;
-        assert!(result.is_ok());
-
-        // Verify URL was deleted
-        let url_after = db.find_by_id("exp123").await.unwrap();
-        assert!(url_after.is_none());
-    }
-
-    #[tokio::test]
-    async fn test_delete_expired_keeps_valid_urls() {
-        let db = get_in_memory_db().await;
-
-        // Create an expired URL (created 2 hours ago with 1 hour TTL)
-        let expired_url = Url {
-            id: "exp456".to_string(),
-            original_url: "https://example.com/expired".to_string(),
-            ttl: 3600,                              // 1 hour
-            created: Utc::now().timestamp() - 7200, // 2 hours ago
-            user_id: None,
-            custom_name: None,
-            last_accessed: Some(Utc::now().timestamp() - 7200),
-        };
-
-        // Create a valid URL (created now with 1 week TTL)
-        let valid_url = Url {
-            id: "val789".to_string(),
-            original_url: "https://example.com/valid".to_string(),
-            ttl: 604800, // 1 week in seconds
-            created: Utc::now().timestamp(),
-            user_id: None,
-            custom_name: None,
-            last_accessed: Some(Utc::now().timestamp()),
-        };
-
-        db.save(&expired_url).await.unwrap();
-        db.save(&valid_url).await.unwrap();
-
-        // Delete expired URLs
-        let result = db.delete_expired().await;
-        assert!(result.is_ok());
-
-        // Verify expired URL was deleted
-        let expired_after = db.find_by_id("exp456").await.unwrap();
-        assert!(expired_after.is_none());
-
-        // Verify valid URL still exists
-        let valid_after = db.find_by_id("val789").await.unwrap();
-        assert!(valid_after.is_some());
-        assert_eq!(valid_after.unwrap().id, "val789");
-    }
-
-    #[tokio::test]
-    async fn test_delete_expired_keeps_named_urls() {
-        let db = get_in_memory_db().await;
-
-        // Create an expired regular URL
-        let expired_url = Url {
-            id: "exp123".to_string(),
-            original_url: "https://example.com/expired".to_string(),
-            ttl: 3600,                              // 1 hour
-            created: Utc::now().timestamp() - 7200, // 2 hours ago
-            user_id: Some(1),
-            custom_name: None,
-            last_accessed: Some(Utc::now().timestamp() - 7200),
-        };
-
-        // Create a named URL with ttl=0 (should never expire)
-        let named_url = Url {
-            id: "hash456".to_string(),
-            original_url: "https://example.com/named".to_string(),
-            ttl: 0,                                        // Named URLs have no expiration
-            created: Utc::now().timestamp() - 86400 * 365, // 1 year ago
-            user_id: Some(1),
-            custom_name: Some("my-link".to_string()),
-            last_accessed: Some(Utc::now().timestamp() - 86400 * 365),
-        };
-
-        db.save(&expired_url).await.unwrap();
-        db.save(&named_url).await.unwrap();
-
-        // Delete expired URLs
-        db.delete_expired().await.unwrap();
-
-        // Verify expired regular URL was deleted
-        assert!(db.find_by_id("exp123").await.unwrap().is_none());
-
-        // Verify named URL still exists
-        let found_named = db.find_by_id("hash456").await.unwrap();
-        assert!(found_named.is_some());
-        assert_eq!(
-            found_named.unwrap().custom_name,
-            Some("my-link".to_string())
-        );
     }
 }

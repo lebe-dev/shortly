@@ -58,17 +58,17 @@ pub async fn auth_middleware(
     if path == "/api/config" && method == "GET" {
         debug!("Config request: attempting optional auth");
 
-        if let Some(token) = extract_session_token(request.headers()) {
-            if let Some(auth_service) = &state.auth_service {
-                match auth_service.validate_session(&token).await {
-                    Ok(user) => {
-                        debug!("optional auth successful for user: {}", user.username);
-                        request.extensions_mut().insert(user);
-                        return next.run(request).await;
-                    }
-                    Err(e) => {
-                        debug!("session validation failed: {:?}", e);
-                    }
+        if let Some(token) = extract_session_token(request.headers())
+            && let Some(auth_service) = &state.auth_service
+        {
+            match auth_service.validate_session(&token).await {
+                Ok(user) => {
+                    debug!("optional auth successful for user: {}", user.username);
+                    request.extensions_mut().insert(user);
+                    return next.run(request).await;
+                }
+                Err(e) => {
+                    debug!("session validation failed: {:?}", e);
                 }
             }
         }
@@ -160,21 +160,20 @@ fn unauthorized_response() -> Response {
 
 /// Extract session token from request headers (Authorization header or cookies)
 pub fn extract_session_token(headers: &HeaderMap) -> Option<String> {
-    if let Some(auth_header) = headers.get("authorization") {
-        if let Ok(auth_str) = auth_header.to_str() {
-            if let Some(token) = auth_str.strip_prefix("Bearer ") {
-                return Some(token.to_string());
-            }
-        }
+    if let Some(auth_header) = headers.get("authorization")
+        && let Ok(auth_str) = auth_header.to_str()
+        && let Some(token) = auth_str.strip_prefix("Bearer ")
+    {
+        return Some(token.to_string());
     }
 
-    if let Some(cookie_header) = headers.get("cookie") {
-        if let Ok(cookie_str) = cookie_header.to_str() {
-            for cookie in cookie_str.split(';') {
-                let cookie = cookie.trim();
-                if let Some(token) = cookie.strip_prefix("session_token=") {
-                    return Some(token.to_string());
-                }
+    if let Some(cookie_header) = headers.get("cookie")
+        && let Ok(cookie_str) = cookie_header.to_str()
+    {
+        for cookie in cookie_str.split(';') {
+            let cookie = cookie.trim();
+            if let Some(token) = cookie.strip_prefix("session_token=") {
+                return Some(token.to_string());
             }
         }
     }

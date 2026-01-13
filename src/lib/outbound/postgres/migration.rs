@@ -1,6 +1,6 @@
 use anyhow::{Result, anyhow};
 use log::{info, warn};
-use sqlx::sqlite::SqlitePool;
+use sqlx::PgPool;
 use std::collections::BTreeMap;
 
 /// Splits a SQL file content into individual statements
@@ -16,25 +16,25 @@ fn split_sql_statements(sql: &str) -> Vec<String> {
         .collect()
 }
 
-pub struct MigrationManager {
-    pool: SqlitePool,
+pub struct PostgresMigrationManager {
+    pool: PgPool,
     migrations: BTreeMap<String, String>,
 }
 
-impl MigrationManager {
-    pub fn new(pool: SqlitePool, migrations: BTreeMap<String, String>) -> Self {
+impl PostgresMigrationManager {
+    pub fn new(pool: PgPool, migrations: BTreeMap<String, String>) -> Self {
         Self { pool, migrations }
     }
 
     pub async fn initialize(&self) -> Result<()> {
-        info!("Initializing migration system");
+        info!("Initializing PostgreSQL migration system");
 
         sqlx::query(
             r#"
             CREATE TABLE IF NOT EXISTS _migrations (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id BIGSERIAL PRIMARY KEY,
                 name TEXT NOT NULL UNIQUE,
-                applied_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
             "#,
         )
@@ -46,7 +46,7 @@ impl MigrationManager {
     }
 
     pub async fn run_migrations(&self) -> Result<()> {
-        info!("Starting database migrations");
+        info!("Starting PostgreSQL database migrations");
 
         if self.migrations.is_empty() {
             warn!("No migration files provided");
@@ -70,7 +70,7 @@ impl MigrationManager {
                     .map_err(|e| anyhow!("Failed to execute migration {}: {}", name, e))?;
             }
 
-            sqlx::query("INSERT INTO _migrations (name) VALUES (?1)")
+            sqlx::query("INSERT INTO _migrations (name) VALUES ($1)")
                 .bind(name)
                 .execute(&mut *tx)
                 .await
@@ -86,7 +86,7 @@ impl MigrationManager {
 
     async fn is_migration_applied(&self, name: &str) -> Result<bool> {
         let result =
-            sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM _migrations WHERE name = ?1")
+            sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM _migrations WHERE name = $1")
                 .bind(name)
                 .fetch_one(&self.pool)
                 .await?;

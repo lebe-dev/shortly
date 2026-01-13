@@ -7,7 +7,7 @@ use axum::{
 use log::error;
 use serde::{Deserialize, Serialize};
 use server_lib::domain::auth::model::User;
-use server_lib::domain::url::audit::AuditEventType;
+use server_lib::domain::url::audit::{AuditEventType, AuditQueryParams as DomainAuditQueryParams};
 use server_lib::domain::url::ports::UrlService;
 use std::sync::Arc;
 
@@ -15,7 +15,7 @@ use crate::AppState;
 use crate::route::config::is_user_admin;
 
 #[derive(Deserialize)]
-pub struct AuditQueryParams {
+pub struct AuditQueryRequest {
     #[serde(default = "default_page")]
     pub page: i64,
 
@@ -64,7 +64,7 @@ pub struct AuditEventDto {
 pub async fn list_audit_events_route(
     State(state): State<Arc<AppState>>,
     Extension(user): Extension<User>,
-    Query(params): Query<AuditQueryParams>,
+    Query(params): Query<AuditQueryRequest>,
 ) -> impl IntoResponse {
     if !is_user_admin(&user.username, &state.config) {
         return (
@@ -90,21 +90,19 @@ pub async fn list_audit_events_route(
         _ => None,
     });
 
-    match state
-        .url_service
-        .find_audit_events(
-            event_type,
-            params.user_id, // This will be used as actor_user_id filter
-            params.user_id, // This will be used as target_user_id filter
-            params.url_name,
-            params.username,
-            params.date_from,
-            params.date_to,
-            per_page,
-            offset,
-        )
-        .await
-    {
+    let query_params = DomainAuditQueryParams {
+        event_type,
+        actor_user_id: params.user_id,
+        target_user_id: params.user_id,
+        url_name: params.url_name,
+        username: params.username,
+        date_from: params.date_from,
+        date_to: params.date_to,
+        limit: per_page,
+        offset,
+    };
+
+    match state.url_service.find_audit_events(query_params).await {
         Ok((events, total_count)) => {
             let total_pages = (total_count as f64 / per_page as f64).ceil() as i64;
 
