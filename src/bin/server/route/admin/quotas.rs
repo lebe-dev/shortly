@@ -75,30 +75,30 @@ pub async fn update_user_quotas_route(
             .into_response();
     }
 
-    if let Some(val) = payload.max_urls_per_user {
-        if val < 0 {
-            return (
-                StatusCode::BAD_REQUEST,
-                Json(ErrorResponse {
-                    error: "Bad Request".to_string(),
-                    message: "max_urls_per_user must be non-negative".to_string(),
-                }),
-            )
-                .into_response();
-        }
+    if let Some(val) = payload.max_urls_per_user
+        && val < 0
+    {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(ErrorResponse {
+                error: "Bad Request".to_string(),
+                message: "max_urls_per_user must be non-negative".to_string(),
+            }),
+        )
+            .into_response();
     }
 
-    if let Some(val) = payload.max_urls_per_day {
-        if val < 0 {
-            return (
-                StatusCode::BAD_REQUEST,
-                Json(ErrorResponse {
-                    error: "Bad Request".to_string(),
-                    message: "max_urls_per_day must be non-negative".to_string(),
-                }),
-            )
-                .into_response();
-        }
+    if let Some(val) = payload.max_urls_per_day
+        && val < 0
+    {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(ErrorResponse {
+                error: "Bad Request".to_string(),
+                message: "max_urls_per_day must be non-negative".to_string(),
+            }),
+        )
+            .into_response();
     }
 
     match state
@@ -122,11 +122,11 @@ pub async fn update_user_quotas_route(
             };
 
             if let Err(e) = state.url_service.record_audit_event(&audit_event).await {
-                error!("Failed to record quota update audit event: {:?}", e);
+                error!("failed to record quota update audit event: {:?}", e);
             }
 
             info!(
-                "Admin user {} updated quotas for user {} (per_user: {:?}, per_day: {:?})",
+                "admin user {} updated quotas for user {} (per_user: {:?}, per_day: {:?})",
                 user.id, user_id, payload.max_urls_per_user, payload.max_urls_per_day
             );
 
@@ -143,7 +143,7 @@ pub async fn update_user_quotas_route(
                 .into_response()
         }
         Err(sqlx::Error::RowNotFound) => {
-            error!("User {} not found for quota update", user_id);
+            error!("user {} not found for quota update", user_id);
             (
                 StatusCode::NOT_FOUND,
                 Json(ErrorResponse {

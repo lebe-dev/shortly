@@ -2,7 +2,7 @@ use std::future::Future;
 
 use crate::domain::url::model::FindUrlError;
 
-use super::audit::{AuditEventType, AuditEventWithUser, UrlAuditEvent};
+use super::audit::{AuditEventWithUser, AuditQueryParams, UrlAuditEvent};
 use super::model::{CheckCustomNameError, DeleteUrlError, ShortUrlGenerationError, Url};
 
 pub trait UrlService: Clone + Send + Sync + 'static {
@@ -61,15 +61,7 @@ pub trait UrlService: Clone + Send + Sync + 'static {
 
     fn find_audit_events(
         &self,
-        event_type: Option<AuditEventType>,
-        actor_user_id: Option<i64>,
-        target_user_id: Option<i64>,
-        url_name: Option<String>,
-        username: Option<String>,
-        date_from: Option<i64>,
-        date_to: Option<i64>,
-        limit: i64,
-        offset: i64,
+        params: AuditQueryParams,
     ) -> impl Future<Output = Result<(Vec<AuditEventWithUser>, i64), FindUrlError>> + Send;
 }
 
@@ -113,15 +105,7 @@ pub trait UrlRepository: Send + Sync + Clone + 'static {
 
     fn find_audit_events(
         &self,
-        event_type: Option<AuditEventType>,
-        actor_user_id: Option<i64>,
-        target_user_id: Option<i64>,
-        url_name: Option<String>,
-        username: Option<String>,
-        date_from: Option<i64>,
-        date_to: Option<i64>,
-        limit: i64,
-        offset: i64,
+        params: &AuditQueryParams,
     ) -> impl Future<Output = Result<(Vec<AuditEventWithUser>, i64), sqlx::Error>> + Send;
 
     fn update_last_accessed(

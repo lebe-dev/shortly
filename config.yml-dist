@@ -18,7 +18,24 @@ log-level: info
 # Logging target: console, file (ENV: LOG_TARGET)
 log-target: file
 
-# SQLite database connection string (ENV: DB_CNN)
+# Database connection string (ENV: DB_CNN)
+#
+# Supported databases:
+#   - SQLite:     sqlite://./data/app.db?mode=rwc
+#   - PostgreSQL: postgres://user:password@host:5432/database
+#
+# The database type is automatically detected from the connection string prefix.
+#
+# SQLite is recommended for:
+#   - Single-instance deployments
+#   - Development and testing
+#   - Low to moderate traffic
+#
+# PostgreSQL is recommended for:
+#   - Production deployments
+#   - High availability setups
+#   - Multi-instance/clustered deployments
+#
 db-cnn: "sqlite://./data/app.db?mode=rwc"
 
 # Base URL for generating short links (ENV: BASE_URL)

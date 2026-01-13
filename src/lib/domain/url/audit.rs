@@ -1,11 +1,25 @@
 use serde::{Deserialize, Serialize};
 
+/// Parameters for querying audit events
+#[derive(Debug, Clone, Default)]
+pub struct AuditQueryParams {
+    pub event_type: Option<AuditEventType>,
+    pub actor_user_id: Option<i64>,
+    pub target_user_id: Option<i64>,
+    pub url_name: Option<String>,
+    pub username: Option<String>,
+    pub date_from: Option<i64>,
+    pub date_to: Option<i64>,
+    pub limit: i64,
+    pub offset: i64,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub struct UrlAuditEvent {
     pub id: Option<i64>,
     pub event_type: AuditEventType,
-    pub actor_user_id: i64,  // Who performed the action
-    pub target_user_id: i64, // On whom the action was performed
+    pub actor_user_id: i64,
+    pub target_user_id: i64,
     pub url_name: Option<String>,
     pub created_at: i64,
 }
