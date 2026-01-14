@@ -2,21 +2,49 @@ use std::sync::Arc;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use axum::Json;
-use axum::http::StatusCode;
+use axum::http::{HeaderMap, StatusCode};
 use axum::{Extension, extract::State, response::IntoResponse};
 use log::error;
 
 use crate::SharedAppState;
-use crate::domain::config::model::dto::{AdminDataDto, AdminUrlDto, AppConfigDto};
+use crate::domain::config::model::dto::{
+    AdminDataDto, AdminUrlDto, AppConfigDto, SessionDto, UserInfoDto,
+};
+use crate::route::middleware::extract_session_token;
 use server_lib::domain::auth::model::User;
-use server_lib::domain::auth::ports::UserRepository;
+use server_lib::domain::auth::ports::{AuthService, UserRepository};
 use server_lib::domain::url::ports::UrlService;
 
 pub async fn get_app_config_route(
     State(state): State<Arc<SharedAppState>>,
+    headers: HeaderMap,
     user: Option<Extension<User>>,
 ) -> impl IntoResponse {
     let mut dto: AppConfigDto = state.config.clone().into();
+
+    if state.config.auth.enabled
+        && let Some(ref auth_service) = state.auth_service
+        && let Some(token) = extract_session_token(&headers)
+    {
+        match auth_service.validate_session(&token).await {
+            Ok(session_user) => {
+                dto.session = SessionDto {
+                    authenticated: true,
+                    user: Some(UserInfoDto {
+                        username: session_user.username.clone(),
+                        email: session_user.email.clone(),
+                        avatar_url: session_user.avatar_url.clone(),
+                    }),
+                };
+            }
+            Err(_) => {
+                dto.session = SessionDto {
+                    authenticated: false,
+                    user: None,
+                };
+            }
+        }
+    }
 
     if let Some(ref user_ext) = user {
         let user_id = user_ext.id;

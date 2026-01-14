@@ -15,9 +15,7 @@ use log::{debug, error, info, warn};
 use logger::get_logging_config;
 use outbound::config::file::AppConfigServiceImpl;
 use route::{
-    auth::{
-        callback::callback_route, login::login_route, logout::logout_route, session::session_route,
-    },
+    auth::{callback::callback_route, login::login_route, logout::logout_route},
     config::get_app_config_route,
     health::health_route,
     metrics::metrics_route,
@@ -222,7 +220,6 @@ async fn main() -> anyhow::Result<()> {
                 .route("/api/config", get(get_app_config_route))
                 .route("/api/auth/login", get(login_route))
                 .route("/api/auth/callback", get(callback_route))
-                .route("/api/auth/session", get(session_route))
                 .route("/api/auth/logout", post(logout_route))
                 .route("/api/url/{url_id}", get(get_short_url_by_id_route))
                 .route("/api/url/{url_id}", axum::routing::delete(delete_url_route))

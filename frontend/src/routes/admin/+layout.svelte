@@ -1,18 +1,16 @@
 <script lang="ts">
-	import { fetchConfig } from '$lib/api/config';
-	import { authStore, authLoading } from '$lib/stores/auth';
+	import { authStore } from '$lib/stores/auth';
+	import { configStore } from '$lib/stores/config';
 	import { t } from 'svelte-intl-precompile';
 	import { toast } from 'svelte-sonner';
 	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
-	import type { AppConfig } from '$lib/domain/config';
 	import MonitorCog from 'lucide-svelte/icons/monitor-cog';
 
 	let { children } = $props();
 
-	let config: AppConfig | null = $state(null);
-	let loading = $state(true);
+	let hasCheckedAuth = $state(false);
 
 	const activeTab = $derived.by(() => {
 		const path = $page.url.pathname;
@@ -24,33 +22,19 @@
 	});
 
 	$effect(() => {
-		if (!$authLoading) {
+		if ($configStore && !hasCheckedAuth) {
+			hasCheckedAuth = true;
+
 			if (!$authStore.authenticated) {
 				window.location.href = '/login';
-			} else if (loading) {
-				loadConfig();
-			}
-		}
-	});
-
-	async function loadConfig() {
-		loading = true;
-		try {
-			config = await fetchConfig();
-
-			if (!config?.admin) {
+			} else if (!$configStore.admin) {
 				toast.error($t('adminPage.errors.notAuthorized'));
 				setTimeout(() => {
 					window.location.href = '/';
 				}, 2000);
 			}
-		} catch (e) {
-			console.error('Failed to load config:', e);
-			toast.error($t('adminPage.errors.notAuthorized'));
-		} finally {
-			loading = false;
 		}
-	}
+	});
 
 	function navigateToTab(tab: string) {
 		goto(`/admin/${tab}`);
@@ -65,11 +49,11 @@
 		<h1 class="text-xl font-bold">{$t('adminPage.header')}</h1>
 	</div>
 
-	{#if loading}
+	{#if !$configStore}
 		<div class="py-12 text-center">
 			<p class="text-muted-foreground">{$t('common.loading')}</p>
 		</div>
-	{:else if !config?.admin}
+	{:else if !$configStore.admin}
 		<div class="py-12 text-center">
 			<p class="text-muted-foreground text-lg">{$t('adminPage.errors.notAuthorized')}</p>
 		</div>

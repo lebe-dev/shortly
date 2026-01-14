@@ -1,26 +1,26 @@
 <script lang="ts">
 	import { getUserUrls, deleteUrl, type UserUrlResponse } from '$lib/api/url';
-	import { fetchConfig } from '$lib/api/config';
-	import { authStore, authLoading } from '$lib/stores/auth';
+	import { authStore } from '$lib/stores/auth';
+	import { configStore } from '$lib/stores/config';
 	import { t } from 'svelte-intl-precompile';
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
 	import ConsumptionDisplay from '$lib/components/ConsumptionDisplay.svelte';
 	import UrlCard from '$lib/components/UrlCard.svelte';
-	import type { AppConfig } from '$lib/domain/config';
 	import Link2 from 'lucide-svelte/icons/link-2';
 
 	let urls: UserUrlResponse[] = $state([]);
 	let loading = $state(true);
-	let config: AppConfig | null = $state(null);
+	let hasCheckedAuth = $state(false);
 
 	$effect(() => {
-		if (!$authLoading) {
+		if ($configStore && !hasCheckedAuth) {
+			hasCheckedAuth = true;
+
 			if (!$authStore.authenticated) {
 				window.location.href = '/login';
 			} else if (loading && urls.length === 0) {
 				loadUrls();
-				loadConfig();
 			}
 		}
 	});
@@ -37,14 +37,6 @@
 		}
 	}
 
-	async function loadConfig() {
-		try {
-			config = await fetchConfig();
-		} catch (e) {
-			console.error('Failed to load config:', e);
-		}
-	}
-
 	async function handleDelete(urlId: string) {
 		const confirmed = confirm($t('linksPage.deleteConfirm'));
 		if (!confirmed) return;
@@ -53,7 +45,8 @@
 			await deleteUrl(urlId);
 			toast.success($t('linksPage.deleteSuccess'));
 			await loadUrls();
-			await loadConfig();
+			const { fetchConfig } = await import('$lib/api/config');
+			await fetchConfig();
 		} catch (e) {
 			console.error('Failed to delete URL:', e);
 			toast.error($t('linksPage.errors.deleteFailed'));
@@ -84,9 +77,13 @@
 		<h1 class="text-xl font-bold">{$t('linksPage.header')}</h1>
 	</div>
 
-	{#if config}
+	{#if $configStore}
 		<div class="mb-6">
-			<ConsumptionDisplay config={config.features.createUrl} variant="default" showHint={true} />
+			<ConsumptionDisplay
+				config={$configStore.features.createUrl}
+				variant="default"
+				showHint={true}
+			/>
 		</div>
 	{/if}
 

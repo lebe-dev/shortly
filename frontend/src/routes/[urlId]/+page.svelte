@@ -85,7 +85,7 @@
 					class="mt-6 rounded border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800"
 				>
 					<div class="text-muted-foreground mb-2 text-xs font-medium">Your Usage</div>
-					<ConsumptionDisplay config={config.features.namedUrls} variant="compact" />
+					<ConsumptionDisplay config={config.features.createUrl} variant="compact" />
 				</div>
 			{/if}
 		</div>

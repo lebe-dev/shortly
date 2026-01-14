@@ -22,7 +22,7 @@
 	import { locale, t } from 'svelte-intl-precompile';
 	import { toggleMode } from 'mode-watcher';
 	import { authStore } from '$lib/stores/auth';
-	import { logout } from '$lib/api/auth';
+	import { logout } from '$lib/api/logout';
 	import { toast } from 'svelte-sonner';
 	import type { AppConfig } from '$lib/domain/config';
 

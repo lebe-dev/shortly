@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fetchConfig } from '$lib/api/config';
 	import { generateShortUrl } from '$lib/api/url';
 	import ConsumptionBadge from '$lib/components/ConsumptionBadge.svelte';
 	import CopyButton from '$lib/components/CopyButton.svelte';
@@ -13,8 +12,8 @@
 	import { slide } from 'svelte/transition';
 	import { toast } from 'svelte-sonner';
 	import { t } from 'svelte-intl-precompile';
-	import type { AppConfig } from '$lib/domain/config';
-	import { authStore, authLoading } from '$lib/stores/auth';
+	import { authStore } from '$lib/stores/auth';
+	import { configStore } from '$lib/stores/config';
 	import { copy } from 'svelte-copy';
 	import LoaderCircle from 'lucide-svelte/icons/loader-circle';
 
@@ -24,7 +23,6 @@
 
 	let url: string = $state('');
 	let shortUrl: string = $state('');
-	let config: AppConfig | null = $state(null);
 	let shortUrlTtl = $state(0);
 	let maxUrlLength = $state(2048);
 	let shortUrlExpiryDate: string = $state('');
@@ -45,20 +43,20 @@
 	const ttlFormatted = $derived(formatDuration(shortUrlTtl, $t));
 
 	const showCustomNameInput = $derived.by(() => {
-		if (!config) return false;
-		return config.features.namedUrls.enabled && $authStore.authenticated;
+		if (!$configStore) return false;
+		return $configStore.features.namedUrls.enabled && $authStore.authenticated;
 	});
 
 	const userAtLimit = $derived.by(() => {
-		if (!config || !showCustomNameInput) return false;
+		if (!$configStore || !showCustomNameInput) return false;
 
 		const totalLimit =
-			config.features.createUrl.currentUrls !== undefined &&
-			config.features.createUrl.currentUrls >= config.features.createUrl.maxPerUser;
+			$configStore.features.createUrl.currentUrls !== undefined &&
+			$configStore.features.createUrl.currentUrls >= $configStore.features.createUrl.maxPerUser;
 
 		const dailyLimit =
-			config.features.createUrl.currentUrlsToday !== undefined &&
-			config.features.createUrl.currentUrlsToday >= config.features.createUrl.maxPerDay;
+			$configStore.features.createUrl.currentUrlsToday !== undefined &&
+			$configStore.features.createUrl.currentUrlsToday >= $configStore.features.createUrl.maxPerDay;
 
 		return totalLimit || dailyLimit;
 	});
@@ -94,7 +92,7 @@
 			return $t('homePage.errors.urlTooLong', { values: { maxLength: maxUrlLength } });
 		}
 
-		if (!isUrlValid(trimmedUrl, maxUrlLength, config?.baseUrl)) {
+		if (!isUrlValid(trimmedUrl, maxUrlLength, $configStore?.baseUrl)) {
 			return $t('homePage.errors.invalidUrl');
 		}
 
@@ -168,22 +166,17 @@
 		}
 	}
 
-	onMount(async () => {
-		await fetchConfig()
-			.then((data) => {
-				config = data;
-				console.log('config:', data);
-				console.log('Named URLs consumption:', data.features.namedUrls);
-				shortUrlTtl = data.shortUrlTtl;
-				maxUrlLength = data.maxUrlLength;
-				inProgress = false;
-			})
-			.catch((e) => {
-				console.error(e);
-				toast.error($t('homePage.errors.configLoadFailed'));
-				inProgress = false;
-			});
+	$effect(() => {
+		if ($configStore) {
+			console.log('config:', $configStore);
+			console.log('Named URLs consumption:', $configStore.features.namedUrls);
+			shortUrlTtl = $configStore.shortUrlTtl;
+			maxUrlLength = $configStore.maxUrlLength;
+			inProgress = false;
+		}
+	});
 
+	onMount(async () => {
 		await tick();
 		if (urlInputRef) {
 			urlInputRef.focus();
@@ -203,7 +196,7 @@
 			return;
 		}
 
-		if (!isUrlValid(trimmedUrl, maxUrlLength, config?.baseUrl)) {
+		if (!isUrlValid(trimmedUrl, maxUrlLength, $configStore?.baseUrl)) {
 			toast.error($t('homePage.errors.invalidUrl'));
 			if (urlInputRef) {
 				urlInputRef.focus();
@@ -225,8 +218,8 @@
 			}
 
 			if (nameToUse) {
+				const { fetchConfig } = await import('$lib/api/config');
 				const updatedConfig = await fetchConfig();
-				config = updatedConfig;
 				console.log('Config reloaded after URL creation:', updatedConfig.features.namedUrls);
 			}
 		} catch (e: any) {
@@ -250,15 +243,13 @@
 <div
 	class="xs:w-[100px] w-[1300px] max-w-[1300px] rounded bg-white px-6 pt-22 pb-18 text-center shadow md:px-24 dark:bg-gray-900"
 >
-	{#if !config}
+	{#if !$configStore}
 		<div class="text-muted-foreground">{$t('common.loading')}</div>
-	{:else if $authLoading}
-		<div class="text-muted-foreground">{$t('common.loadingEllipsis')}</div>
-	{:else if !config.features.createUrl.enabled}
+	{:else if !$configStore.features.createUrl.enabled}
 		<div class="text-muted-foreground text-lg">
 			{$t('homePage.errors.serviceTitle')}
 		</div>
-	{:else if config.features.createUrl.authOnly && !$authStore.authenticated}
+	{:else if $configStore.features.createUrl.authOnly && !$authStore.authenticated}
 		<div class="flex flex-col items-center justify-center gap-3">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -305,7 +296,7 @@
 				{$t('homePage.hints.urlField.prefix')}<Kbd>Enter</Kbd>{$t('homePage.hints.urlField.suffix')}
 			</div>
 		{/if}
-		{#if showCustomNameInput && config}
+		{#if showCustomNameInput && $configStore}
 			<div class="mb-8">
 				<div
 					class="mt-3 mb-1 text-left text-xs {customName.length === 0
@@ -317,7 +308,7 @@
 				<CustomNameInput
 					bind:value={customName}
 					bind:inputRef={customNameInputRef}
-					config={config.features.namedUrls}
+					config={$configStore.features.namedUrls}
 					disabled={inProgress}
 					hideStatus={true}
 					onAvailabilityChange={handleAvailabilityChange}
@@ -377,8 +368,8 @@
 				{$t('common.buttons.generate')}
 			</Button>
 		</div>
-		{#if showCustomNameInput && config}
-			<div class="mt-4"><ConsumptionBadge config={config.features.createUrl} /></div>
+		{#if showCustomNameInput && $configStore}
+			<div class="mt-4"><ConsumptionBadge config={$configStore.features.createUrl} /></div>
 		{/if}
 	{:else}
 		<div>

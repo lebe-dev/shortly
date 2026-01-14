@@ -8,10 +8,9 @@
 	import MobileMenu from '$lib/components/MobileMenu.svelte';
 	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
 	import { fetchConfig } from '$lib/api/config';
-	import { checkSession } from '$lib/api/auth';
 	import type { AppConfig } from '$lib/domain/config';
 	import { onMount } from 'svelte';
-	import { authStore, authLoading } from '$lib/stores/auth';
+	import { authStore } from '$lib/stores/auth';
 
 	let { children } = $props();
 
@@ -26,19 +25,6 @@
 			.catch((e) => {
 				console.error('Failed to load config in layout:', e);
 			});
-
-		if (config?.auth.enabled) {
-			try {
-				const session = await checkSession();
-				authStore.set(session);
-			} catch (e) {
-				console.error('Failed to check session:', e);
-			} finally {
-				authLoading.set(false);
-			}
-		} else {
-			authLoading.set(false);
-		}
 	});
 </script>
 

@@ -1,3 +1,14 @@
+export interface SessionDto {
+	authenticated: boolean;
+	user?: UserInfoDto;
+}
+
+export interface UserInfoDto {
+	username: string;
+	email?: string;
+	avatarUrl?: string;
+}
+
 export class AppConfig {
 	constructor(
 		shortUrlTtl: number,
@@ -7,6 +18,7 @@ export class AppConfig {
 		auth: AuthConfig,
 		scheduler: SchedulerConfig,
 		metrics: MetricsConfig,
+		session: SessionDto,
 		admin?: AdminDataDto
 	) {
 		this.shortUrlTtl = shortUrlTtl;
@@ -16,6 +28,7 @@ export class AppConfig {
 		this.auth = auth;
 		this.scheduler = scheduler;
 		this.metrics = metrics;
+		this.session = session;
 		this.admin = admin;
 	}
 
@@ -26,6 +39,7 @@ export class AppConfig {
 	auth: AuthConfig;
 	scheduler: SchedulerConfig;
 	metrics: MetricsConfig;
+	session: SessionDto;
 	admin?: AdminDataDto;
 }
 

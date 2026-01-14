@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { authStore } from '$lib/stores/auth';
-	import { logout } from '$lib/api/auth';
+	import { logout } from '$lib/api/logout';
 	import { Button } from './ui/button';
 	import { toast } from 'svelte-sonner';
 	import { locale, t } from 'svelte-intl-precompile';

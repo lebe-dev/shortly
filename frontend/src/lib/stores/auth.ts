@@ -1,9 +1,7 @@
 import { writable } from 'svelte/store';
-import type { SessionResponse } from '$lib/api/auth';
+import type { SessionDto } from '$lib/domain/config';
 
-export const authStore = writable<SessionResponse>({
+export const authStore = writable<SessionDto>({
 	authenticated: false,
 	user: undefined
 });
-
-export const authLoading = writable<boolean>(true);

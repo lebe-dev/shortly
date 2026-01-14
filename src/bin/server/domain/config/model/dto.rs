@@ -6,6 +6,24 @@ use server_lib::domain::url::service::BASE_RESERVED_NAMES;
 
 #[derive(PartialEq, Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
+pub struct SessionDto {
+    pub authenticated: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub user: Option<UserInfoDto>,
+}
+
+#[derive(PartialEq, Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct UserInfoDto {
+    pub username: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub avatar_url: Option<String>,
+}
+
+#[derive(PartialEq, Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct AppConfigDto {
     /// Short URL TTL in hours
     pub short_url_ttl: u32,
@@ -21,6 +39,8 @@ pub struct AppConfigDto {
     pub scheduler: SchedulerConfigDto,
     /// Metrics configuration
     pub metrics: MetricsConfigDto,
+    /// Session information for the current user
+    pub session: SessionDto,
     /// Admin data (only present for admin users)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub admin: Option<AdminDataDto>,
@@ -208,6 +228,10 @@ impl From<AppConfig> for AppConfigDto {
             },
             metrics: MetricsConfigDto {
                 enabled: config.metrics.enabled,
+            },
+            session: SessionDto {
+                authenticated: false,
+                user: None,
             },
             admin: None,
         }
