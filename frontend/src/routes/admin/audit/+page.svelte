@@ -11,6 +11,7 @@
 	import * as Pagination from '$lib/components/ui/pagination';
 	import { RangeCalendar } from '$lib/components/ui/range-calendar';
 	import * as Popover from '$lib/components/ui/popover';
+	import { Card, CardContent } from '$lib/components/ui/card';
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table';
 	import { getCoreRowModel, type ColumnDef } from '@tanstack/table-core';
 	import { type DateValue } from '@internationalized/date';
@@ -287,37 +288,39 @@
 			</p>
 		</div>
 	{:else}
-		<div class="">
-			<Table.Root>
-				<Table.Header>
-					{#each table.getHeaderGroups() as headerGroup}
-						<Table.Row>
-							{#each headerGroup.headers as header}
-								<Table.Head>
-									{#if !header.isPlaceholder}
-										<FlexRender
-											content={header.column.columnDef.header}
-											context={header.getContext()}
-										/>
-									{/if}
-								</Table.Head>
-							{/each}
-						</Table.Row>
-					{/each}
-				</Table.Header>
-				<Table.Body>
-					{#each table.getRowModel().rows as row}
-						<Table.Row>
-							{#each row.getVisibleCells() as cell}
-								<Table.Cell>
-									<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
-								</Table.Cell>
-							{/each}
-						</Table.Row>
-					{/each}
-				</Table.Body>
-			</Table.Root>
-		</div>
+		<Card>
+			<CardContent>
+				<Table.Root>
+					<Table.Header>
+						{#each table.getHeaderGroups() as headerGroup}
+							<Table.Row>
+								{#each headerGroup.headers as header}
+									<Table.Head>
+										{#if !header.isPlaceholder}
+											<FlexRender
+												content={header.column.columnDef.header}
+												context={header.getContext()}
+											/>
+										{/if}
+									</Table.Head>
+								{/each}
+							</Table.Row>
+						{/each}
+					</Table.Header>
+					<Table.Body>
+						{#each table.getRowModel().rows as row}
+							<Table.Row>
+								{#each row.getVisibleCells() as cell}
+									<Table.Cell>
+										<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
+									</Table.Cell>
+								{/each}
+							</Table.Row>
+						{/each}
+					</Table.Body>
+				</Table.Root>
+			</CardContent>
+		</Card>
 
 		<!-- Pagination -->
 		{#if totalPages > 1}
