@@ -1,38 +1,18 @@
 <script lang="ts">
 	import { deleteUrl } from '$lib/api/url';
-	import { fetchConfig } from '$lib/api/config';
+	import { refreshConfig } from '$lib/api/config';
+	import { configStore } from '$lib/stores/config';
 	import { t } from 'svelte-intl-precompile';
 	import { toast } from 'svelte-sonner';
 	import UrlCard from '$lib/components/UrlCard.svelte';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
-	import type { AppConfig, AdminUrlDto } from '$lib/domain/config';
+	import type { AdminUrlDto } from '$lib/domain/config';
 	import Search from 'lucide-svelte/icons/search';
-
-	let config: AppConfig | null = $state(null);
-	let loading = $state(true);
 
 	let searchQuery = $state('');
 	let onlyNamed = $state(false);
 	let sortBy = $state<'created' | 'named'>('created');
-
-	$effect(() => {
-		if (loading) {
-			loadConfig();
-		}
-	});
-
-	async function loadConfig() {
-		loading = true;
-		try {
-			config = await fetchConfig();
-		} catch (e) {
-			console.error('Failed to load config:', e);
-			toast.error($t('adminPage.errors.notAuthorized'));
-		} finally {
-			loading = false;
-		}
-	}
 
 	async function handleDelete(urlId: string) {
 		const confirmed = confirm($t('linksPage.deleteConfirm'));
@@ -41,7 +21,7 @@
 		try {
 			await deleteUrl(urlId);
 			toast.success($t('adminPage.deleteSuccess'));
-			await loadConfig();
+			await refreshConfig();
 		} catch (e) {
 			console.error('Failed to delete URL:', e);
 			toast.error($t('adminPage.errors.deleteFailed'));
@@ -59,15 +39,15 @@
 	}
 
 	function getShortUrl(url: AdminUrlDto): string {
-		const base = config?.baseUrl || '';
+		const base = $configStore?.baseUrl || '';
 		const path = url.customName || url.id;
 		return `${base}/${path}`;
 	}
 
 	const filteredAndSortedUrls = $derived.by(() => {
-		if (!config?.admin?.allUrls) return [];
+		if (!$configStore?.admin?.allUrls) return [];
 
-		let urls = [...config.admin.allUrls];
+		let urls = [...$configStore.admin.allUrls];
 
 		if (searchQuery.trim()) {
 			const query = searchQuery.toLowerCase();
@@ -108,15 +88,11 @@
 	<meta name="description" content={$t('adminPage.description')} />
 </svelte:head>
 
-{#if loading}
-	<div class="py-12 text-center">
-		<p class="text-muted-foreground">{$t('common.loading')}</p>
-	</div>
-{:else if !config?.admin}
+{#if !$configStore?.admin}
 	<div class="py-12 text-center">
 		<p class="text-muted-foreground text-lg">{$t('adminPage.errors.notAuthorized')}</p>
 	</div>
-{:else if config.admin.allUrls.length === 0}
+{:else if $configStore.admin.allUrls.length === 0}
 	<div class="py-12 text-center">
 		<p class="text-muted-foreground text-lg">{$t('adminPage.empty')}</p>
 	</div>
@@ -165,11 +141,11 @@
 
 	<!-- Item count -->
 	<div class="mb-4 ps-1 text-xs text-gray-400 dark:text-gray-500">
-		{#if filteredAndSortedUrls.length !== config.admin.allUrls.length}
-			{$t('adminPage.filtered')}: {filteredAndSortedUrls.length} / {$t('adminPage.items')}: {config
+		{#if filteredAndSortedUrls.length !== $configStore.admin.allUrls.length}
+			{$t('adminPage.filtered')}: {filteredAndSortedUrls.length} / {$t('adminPage.items')}: {$configStore
 				.admin.allUrls.length}
 		{:else}
-			{$t('adminPage.items')}: {config.admin.allUrls.length}
+			{$t('adminPage.items')}: {$configStore.admin.allUrls.length}
 		{/if}
 	</div>
 

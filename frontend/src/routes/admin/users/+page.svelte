@@ -1,47 +1,27 @@
 <script lang="ts">
 	import { t } from 'svelte-intl-precompile';
-	import { fetchConfig } from '$lib/api/config';
-	import { toast } from 'svelte-sonner';
+	import { refreshConfig } from '$lib/api/config';
+	import { configStore } from '$lib/stores/config';
 	import UserCard from '$lib/components/UserCard.svelte';
-	import type { AppConfig } from '$lib/domain/config';
-
-	let config: AppConfig | null = $state(null);
-	let loading = $state(true);
-
-	$effect(() => {
-		if (loading) {
-			loadConfig();
-		}
-	});
-
-	async function loadConfig() {
-		loading = true;
-		try {
-			config = await fetchConfig();
-		} catch (e) {
-			console.error('Failed to load config:', e);
-			toast.error($t('adminPage.errors.notAuthorized'));
-		} finally {
-			loading = false;
-		}
-	}
 
 	const sortedUsers = $derived.by(() => {
-		if (!config?.admin?.users) return [];
-		return [...config.admin.users].sort((a, b) => a.username.localeCompare(b.username));
+		if (!$configStore?.admin?.users) return [];
+		return [...$configStore.admin.users].sort((a, b) => a.username.localeCompare(b.username));
 	});
 
-	function handleQuotasUpdated(
+	async function handleQuotasUpdated(
 		userId: number,
 		updatedQuotas: { maxUrlsPerUser: number; maxUrlsPerDay: number }
 	) {
-		if (config?.admin?.users) {
-			const userIndex = config.admin.users.findIndex((u) => u.id === userId);
+		if ($configStore?.admin?.users) {
+			const userIndex = $configStore.admin.users.findIndex((u) => u.id === userId);
 			if (userIndex !== -1) {
-				config.admin.users[userIndex].maxUrlsPerUser = updatedQuotas.maxUrlsPerUser;
-				config.admin.users[userIndex].maxUrlsPerDay = updatedQuotas.maxUrlsPerDay;
+				$configStore.admin.users[userIndex].maxUrlsPerUser = updatedQuotas.maxUrlsPerUser;
+				$configStore.admin.users[userIndex].maxUrlsPerDay = updatedQuotas.maxUrlsPerDay;
 			}
 		}
+		// Явное обновление с сервера для консистентности
+		await refreshConfig();
 	}
 </script>
 
@@ -49,11 +29,7 @@
 	<title>{$t('adminPage.title')} - {$t('adminPage.tabs.users')}</title>
 </svelte:head>
 
-{#if loading}
-	<div class="py-12 text-center">
-		<p class="text-muted-foreground">{$t('common.loading')}</p>
-	</div>
-{:else if !config?.admin}
+{#if !$configStore?.admin}
 	<div class="py-12 text-center">
 		<p class="text-muted-foreground text-lg">{$t('adminPage.errors.notAuthorized')}</p>
 	</div>

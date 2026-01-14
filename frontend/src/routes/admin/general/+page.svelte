@@ -1,34 +1,13 @@
 <script lang="ts">
-	import { fetchConfig } from '$lib/api/config';
+	import { configStore } from '$lib/stores/config';
 	import { t } from 'svelte-intl-precompile';
 	import { Card, CardHeader, CardTitle, CardContent } from '$lib/components/ui/card';
-	import type { AppConfig } from '$lib/domain/config';
 	import Settings from 'lucide-svelte/icons/settings';
 	import Link from 'lucide-svelte/icons/link';
 	import FileText from 'lucide-svelte/icons/file-text';
 	import ShieldCheck from 'lucide-svelte/icons/shield-check';
 	import Calendar from 'lucide-svelte/icons/calendar';
 	import BarChart from 'lucide-svelte/icons/bar-chart';
-
-	let config: AppConfig | null = $state(null);
-	let loading = $state(true);
-
-	$effect(() => {
-		if (loading) {
-			loadConfig();
-		}
-	});
-
-	async function loadConfig() {
-		loading = true;
-		try {
-			config = await fetchConfig();
-		} catch (e) {
-			console.error('Failed to load config:', e);
-		} finally {
-			loading = false;
-		}
-	}
 
 	function formatReservedNames(names: string[]): string {
 		return names.join(', ');
@@ -39,11 +18,7 @@
 	<title>{$t('adminPage.title')} - {$t('adminPage.tabs.general')}</title>
 </svelte:head>
 
-{#if loading}
-	<div class="py-12 text-center">
-		<p class="text-muted-foreground">{$t('common.loading')}</p>
-	</div>
-{:else if !config}
+{#if !$configStore}
 	<div class="py-12 text-center">
 		<p class="text-muted-foreground text-lg">{$t('adminPage.errors.notAuthorized')}</p>
 	</div>
@@ -64,7 +39,7 @@
 							>{$t('adminPage.general.fields.baseUrl')}:</span
 						>
 						<span class="max-w-[60%] text-right text-sm font-medium break-all"
-							>{config.baseUrl}</span
+							>{$configStore.baseUrl}</span
 						>
 					</div>
 					<div class="flex items-start justify-between">
@@ -73,7 +48,7 @@
 						>
 						<span class="text-sm font-medium"
 							>{$t('adminPage.general.values.hours', {
-								values: { count: config.shortUrlTtl }
+								values: { count: $configStore.shortUrlTtl }
 							})}</span
 						>
 					</div>
@@ -83,7 +58,7 @@
 						>
 						<span class="text-sm font-medium"
 							>{$t('adminPage.general.values.characters', {
-								values: { count: config.maxUrlLength }
+								values: { count: $configStore.maxUrlLength }
 							})}</span
 						>
 					</div>
@@ -107,12 +82,12 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-green-600={config.features.createUrl.enabled}
-							class:dark:text-green-400={config.features.createUrl.enabled}
-							class:text-red-600={!config.features.createUrl.enabled}
-							class:dark:text-red-400={!config.features.createUrl.enabled}
+							class:text-green-600={$configStore.features.createUrl.enabled}
+							class:dark:text-green-400={$configStore.features.createUrl.enabled}
+							class:text-red-600={!$configStore.features.createUrl.enabled}
+							class:dark:text-red-400={!$configStore.features.createUrl.enabled}
 						>
-							{config.features.createUrl.enabled
+							{$configStore.features.createUrl.enabled
 								? $t('adminPage.general.values.yes')
 								: $t('adminPage.general.values.no')}
 						</span>
@@ -123,12 +98,12 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-green-600={config.features.createUrl.authOnly}
-							class:dark:text-green-400={config.features.createUrl.authOnly}
-							class:text-red-600={!config.features.createUrl.authOnly}
-							class:dark:text-red-400={!config.features.createUrl.authOnly}
+							class:text-green-600={$configStore.features.createUrl.authOnly}
+							class:dark:text-green-400={$configStore.features.createUrl.authOnly}
+							class:text-red-600={!$configStore.features.createUrl.authOnly}
+							class:dark:text-red-400={!$configStore.features.createUrl.authOnly}
 						>
-							{config.features.createUrl.authOnly
+							{$configStore.features.createUrl.authOnly
 								? $t('adminPage.general.values.yes')
 								: $t('adminPage.general.values.no')}
 						</span>
@@ -137,13 +112,13 @@
 						<span class="text-muted-foreground text-sm"
 							>{$t('adminPage.general.fields.maxPerUser')}:</span
 						>
-						<span class="text-sm font-medium">{config.features.createUrl.maxPerUser}</span>
+						<span class="text-sm font-medium">{$configStore.features.createUrl.maxPerUser}</span>
 					</div>
 					<div class="flex items-start justify-between">
 						<span class="text-muted-foreground text-sm"
 							>{$t('adminPage.general.fields.maxPerDay')}:</span
 						>
-						<span class="text-sm font-medium">{config.features.createUrl.maxPerDay}</span>
+						<span class="text-sm font-medium">{$configStore.features.createUrl.maxPerDay}</span>
 					</div>
 				</div>
 			</CardContent>
@@ -165,12 +140,12 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-green-600={config.features.namedUrls.enabled}
-							class:dark:text-green-400={config.features.namedUrls.enabled}
-							class:text-red-600={!config.features.namedUrls.enabled}
-							class:dark:text-red-400={!config.features.namedUrls.enabled}
+							class:text-green-600={$configStore.features.namedUrls.enabled}
+							class:dark:text-green-400={$configStore.features.namedUrls.enabled}
+							class:text-red-600={!$configStore.features.namedUrls.enabled}
+							class:dark:text-red-400={!$configStore.features.namedUrls.enabled}
 						>
-							{config.features.namedUrls.enabled
+							{$configStore.features.namedUrls.enabled
 								? $t('adminPage.general.values.yes')
 								: $t('adminPage.general.values.no')}
 						</span>
@@ -179,20 +154,20 @@
 						<span class="text-muted-foreground text-sm"
 							>{$t('adminPage.general.fields.minLength')}:</span
 						>
-						<span class="text-sm font-medium">{config.features.namedUrls.minLength}</span>
+						<span class="text-sm font-medium">{$configStore.features.namedUrls.minLength}</span>
 					</div>
 					<div class="flex items-start justify-between">
 						<span class="text-muted-foreground text-sm"
 							>{$t('adminPage.general.fields.maxLength')}:</span
 						>
-						<span class="text-sm font-medium">{config.features.namedUrls.maxLength}</span>
+						<span class="text-sm font-medium">{$configStore.features.namedUrls.maxLength}</span>
 					</div>
 					<div class="flex flex-col gap-1">
 						<span class="text-muted-foreground text-sm"
 							>{$t('adminPage.general.fields.reservedNames')}:</span
 						>
 						<span class="text-sm font-medium">
-							{formatReservedNames(config.features.namedUrls.reservedNames)}
+							{formatReservedNames($configStore.features.namedUrls.reservedNames)}
 						</span>
 					</div>
 				</div>
@@ -215,12 +190,12 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-green-600={config.auth.enabled}
-							class:dark:text-green-400={config.auth.enabled}
-							class:text-red-600={!config.auth.enabled}
-							class:dark:text-red-400={!config.auth.enabled}
+							class:text-green-600={$configStore.auth.enabled}
+							class:dark:text-green-400={$configStore.auth.enabled}
+							class:text-red-600={!$configStore.auth.enabled}
+							class:dark:text-red-400={!$configStore.auth.enabled}
 						>
-							{config.auth.enabled
+							{$configStore.auth.enabled
 								? $t('adminPage.general.values.yes')
 								: $t('adminPage.general.values.no')}
 						</span>
@@ -229,15 +204,15 @@
 						<span class="text-muted-foreground text-sm"
 							>{$t('adminPage.general.fields.authType')}:</span
 						>
-						<span class="text-sm font-medium">{config.auth.authType}</span>
+						<span class="text-sm font-medium">{$configStore.auth.authType}</span>
 					</div>
-					{#if config.auth.gitlab}
+					{#if $configStore.auth.gitlab}
 						<div class="flex items-start justify-between">
 							<span class="text-muted-foreground text-sm"
 								>{$t('adminPage.general.fields.gitlabBaseUrl')}:</span
 							>
 							<span class="max-w-[60%] text-right text-sm font-medium break-all">
-								{config.auth.gitlab.baseUrl}
+								{$configStore.auth.gitlab.baseUrl}
 							</span>
 						</div>
 						<div class="flex items-start justify-between">
@@ -246,9 +221,9 @@
 							>
 							<span
 								class="max-w-[60%] overflow-hidden text-right text-sm font-medium text-ellipsis whitespace-nowrap"
-								title={config.auth.gitlab.applicationId}
+								title={$configStore.auth.gitlab.applicationId}
 							>
-								{config.auth.gitlab.applicationId}
+								{$configStore.auth.gitlab.applicationId}
 							</span>
 						</div>
 					{/if}
@@ -256,7 +231,7 @@
 						<span class="text-muted-foreground text-sm">{$t('adminPage.general.fields.note')}:</span
 						>
 						<span class="max-w-[60%] text-right text-sm font-medium">
-							{config.auth.note || $t('adminPage.general.values.none')}
+							{$configStore.auth.note || $t('adminPage.general.values.none')}
 						</span>
 					</div>
 				</div>
@@ -277,7 +252,9 @@
 						<span class="text-muted-foreground text-sm"
 							>{$t('adminPage.general.fields.cleanupCron')}:</span
 						>
-						<span class="font-mono text-sm font-medium">{config.scheduler.cleanupExpiredUrls}</span>
+						<span class="font-mono text-sm font-medium"
+							>{$configStore.scheduler.cleanupExpiredUrls}</span
+						>
 					</div>
 				</div>
 			</CardContent>
@@ -299,17 +276,17 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-green-600={config.metrics.enabled}
-							class:dark:text-green-400={config.metrics.enabled}
-							class:text-red-600={!config.metrics.enabled}
-							class:dark:text-red-400={!config.metrics.enabled}
+							class:text-green-600={$configStore.metrics.enabled}
+							class:dark:text-green-400={$configStore.metrics.enabled}
+							class:text-red-600={!$configStore.metrics.enabled}
+							class:dark:text-red-400={!$configStore.metrics.enabled}
 						>
-							{config.metrics.enabled
+							{$configStore.metrics.enabled
 								? $t('adminPage.general.values.yes')
 								: $t('adminPage.general.values.no')}
 						</span>
 					</div>
-					{#if config.metrics.enabled}
+					{#if $configStore.metrics.enabled}
 						<div class="flex items-start justify-between">
 							<span class="text-muted-foreground text-sm"
 								>{$t('adminPage.general.fields.metricsEndpoint')}:</span

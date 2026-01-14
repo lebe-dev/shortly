@@ -28,3 +28,5 @@ export async function fetchConfig(): Promise<AppConfig> {
 		throw new Error('Config fetch error');
 	}
 }
+
+export const refreshConfig = fetchConfig;
