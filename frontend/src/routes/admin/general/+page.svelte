@@ -82,7 +82,7 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-green-600={$configStore.features.createUrl.enabled}
+							class:text-primary={$configStore.features.createUrl.enabled}
 							class:dark:text-blue-300={$configStore.features.createUrl.enabled}
 							class:text-red-600={!$configStore.features.createUrl.enabled}
 							class:dark:text-red-400={!$configStore.features.createUrl.enabled}
@@ -98,7 +98,7 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-green-600={$configStore.features.createUrl.authOnly}
+							class:text-primary={$configStore.features.createUrl.authOnly}
 							class:dark:text-blue-300={$configStore.features.createUrl.authOnly}
 							class:text-red-600={!$configStore.features.createUrl.authOnly}
 							class:dark:text-red-400={!$configStore.features.createUrl.authOnly}
@@ -140,7 +140,7 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-green-600={$configStore.features.namedUrls.enabled}
+							class:text-primary={$configStore.features.namedUrls.enabled}
 							class:dark:text-blue-300={$configStore.features.namedUrls.enabled}
 							class:text-red-600={!$configStore.features.namedUrls.enabled}
 							class:dark:text-red-400={!$configStore.features.namedUrls.enabled}
@@ -190,7 +190,7 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-green-600={$configStore.auth.enabled}
+							class:text-primary={$configStore.auth.enabled}
 							class:dark:text-blue-300={$configStore.auth.enabled}
 							class:text-red-600={!$configStore.auth.enabled}
 							class:dark:text-red-400={!$configStore.auth.enabled}
@@ -276,7 +276,7 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-green-600={$configStore.metrics.enabled}
+							class:text-primary={$configStore.metrics.enabled}
 							class:dark:text-blue-300={$configStore.metrics.enabled}
 							class:text-red-600={!$configStore.metrics.enabled}
 							class:dark:text-red-400={!$configStore.metrics.enabled}
