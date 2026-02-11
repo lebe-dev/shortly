@@ -61,16 +61,11 @@ service:
 ingress:
   enabled: false
   className: ""
-  annotations:
-    # Cache static assets (nginx ingress controller only)
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      location ~* \.(?:jpg|jpeg|gif|png|ico|js|svg|woff|woff2|ttf|css)$ {
-        expires max;
-        access_log off;
-        add_header Cache-Control "public";
-      }
+  annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
+    # Note: For caching static assets, enable nginx sidecar instead of using configuration-snippet
+    # The nginx sidecar provides properly configured caching with correct proxy_pass directives
   hosts:
     - host: chart-example.local
       paths:
@@ -314,7 +309,8 @@ config:
           scgi_temp_path /tmp/scgi_temp;
 
           upstream backend {
-              server localhost:8081;
+              # Use explicit IPv4 address to avoid IPv6 resolution issues
+              server 127.0.0.1:8081;
           }
 
           server {
@@ -408,7 +404,7 @@ probes:
       enabled: true
       httpGet:
         path: /api/health
-        port: backend  # 8081 with nginx, 8080 without
+        port: backend # 8081 with nginx, 8080 without
       initialDelaySeconds: 10
       periodSeconds: 30
       timeoutSeconds: 5
@@ -435,7 +431,7 @@ probes:
       periodSeconds: 2
       timeoutSeconds: 5
       successThreshold: 1
-      failureThreshold: 15  # 30 seconds total (15 * 2s)
+      failureThreshold: 15 # 30 seconds total (15 * 2s)
 
   # Nginx container probes (when enabled)
   nginx:
@@ -467,4 +463,4 @@ probes:
       periodSeconds: 1
       timeoutSeconds: 3
       successThreshold: 1
-      failureThreshold: 10  # 10 seconds total
+      failureThreshold: 10 # 10 seconds total
