@@ -309,7 +309,6 @@ config:
           scgi_temp_path /tmp/scgi_temp;
 
           upstream backend {
-              # Use explicit IPv4 address to avoid IPv6 resolution issues
               server 127.0.0.1:8081;
           }
 
