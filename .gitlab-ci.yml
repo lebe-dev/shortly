@@ -47,7 +47,7 @@ check-cve:
     - build-image
 
   image:
-    name: aquasec/trivy:latest
+    name: aquasec/trivy:0.69.3
     entrypoint: [""]
 
   before_script:
