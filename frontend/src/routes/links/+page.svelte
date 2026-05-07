@@ -8,6 +8,7 @@
 	import ConsumptionDisplay from '$lib/components/ConsumptionDisplay.svelte';
 	import UrlCard from '$lib/components/UrlCard.svelte';
 	import Link2 from 'lucide-svelte/icons/link-2';
+	import Plus from 'lucide-svelte/icons/plus';
 
 	let urls: UserUrlResponse[] = $state([]);
 	let loading = $state(true);
@@ -72,9 +73,17 @@
 <div
 	class="w-full max-w-[1300px] rounded bg-white px-3 pt-8 pb-18 shadow md:px-14 dark:bg-gray-900"
 >
-	<div class="mb-6 flex items-center gap-2">
-		<Link2 class="h-5 w-5" />
-		<h1 class="text-xl font-bold">{$t('linksPage.header')}</h1>
+	<div class="mb-6 flex items-center justify-between gap-2">
+		<div class="flex items-center gap-2">
+			<Link2 class="h-5 w-5" />
+			<h1 class="text-xl font-bold">{$t('linksPage.header')}</h1>
+		</div>
+		<a href="/">
+			<Button variant="secondary" class="hover:cursor-pointer">
+				<Plus class="h-4 w-4" />
+				{$t('linksPage.createNew')}
+			</Button>
+		</a>
 	</div>
 
 	{#if $configStore}
