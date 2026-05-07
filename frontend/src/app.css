@@ -130,3 +130,7 @@
 		overflow-y: scroll;
 	}
 }
+
+[data-slot='button'] {
+	border-radius: var(--radius-sm);
+}

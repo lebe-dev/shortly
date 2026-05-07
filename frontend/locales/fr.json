@@ -126,6 +126,7 @@
 		"header": "Mes Liens",
 		"empty": "Vous n'avez pas encore créé de liens courts",
 		"createFirst": "Créer votre premier lien",
+		"createNew": "Créer",
 		"expired": "Expiré",
 		"deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce lien ? Cette action ne peut pas être annulée.",
 		"deleteSuccess": "Lien supprimé avec succès",

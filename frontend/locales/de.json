@@ -126,6 +126,7 @@
 		"header": "Meine Links",
 		"empty": "Sie haben noch keine Kurz-Links erstellt",
 		"createFirst": "Erstellen Sie Ihren ersten Link",
+		"createNew": "Erstellen",
 		"expired": "Abgelaufen",
 		"deleteConfirm": "Sind Sie sicher, dass Sie diesen Link löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
 		"deleteSuccess": "Link erfolgreich gelöscht",

@@ -126,6 +126,7 @@
 		"header": "我的链接",
 		"empty": "您还没有创建任何短链接",
 		"createFirst": "创建您的第一个链接",
+		"createNew": "创建",
 		"expired": "已过期",
 		"deleteConfirm": "您确定要删除此链接吗？此操作无法撤消。",
 		"deleteSuccess": "链接删除成功",

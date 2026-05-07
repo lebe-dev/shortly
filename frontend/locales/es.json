@@ -126,6 +126,7 @@
 		"header": "Mis Enlaces",
 		"empty": "Aún no ha creado ningún enlace corto",
 		"createFirst": "Crear su primer enlace",
+		"createNew": "Crear",
 		"expired": "Expirado",
 		"deleteConfirm": "¿Está seguro de que desea eliminar este enlace? Esta acción no se puede deshacer.",
 		"deleteSuccess": "Enlace eliminado exitosamente",

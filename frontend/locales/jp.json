@@ -126,6 +126,7 @@
 		"header": "マイリンク",
 		"empty": "まだ短縮URLを作成していません",
 		"createFirst": "最初のリンクを作成",
+		"createNew": "作成",
 		"expired": "期限切れ",
 		"deleteConfirm": "このリンクを削除してもよろしいですか？この操作は元に戻せません。",
 		"deleteSuccess": "リンクを削除しました",
