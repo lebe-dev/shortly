@@ -11,6 +11,7 @@
 	import type { AppConfig } from '$lib/domain/config';
 	import { onMount } from 'svelte';
 	import { authStore } from '$lib/stores/auth';
+	import { version as appVersion } from '../../package.json';
 
 	let { children } = $props();
 
@@ -112,7 +113,7 @@
 		<div
 			class="flex items-center justify-center bg-gray-50 p-2 text-center text-xs text-gray-500 dark:bg-gray-900 dark:text-gray-400"
 		>
-			<span>v1.4.1</span>
+			<span>v{appVersion}</span>
 		</div>
 	</div>
 {/await}

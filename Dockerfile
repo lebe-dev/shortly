@@ -3,8 +3,12 @@ FROM node:25.9.0-alpine3.23 AS frontend-build
 WORKDIR /build
 
 COPY frontend/ /build
+COPY Cargo.toml /tmp/Cargo.toml
 
-RUN yarn && \
+RUN VERSION=$(awk -F'"' '/^version[[:space:]]*=/{print $2; exit}' /tmp/Cargo.toml) && \
+    test -n "$VERSION" && \
+    sed -i "s/\"version\": \"[^\"]*\"/\"version\": \"${VERSION}\"/" package.json && \
+    yarn && \
     yarn test run && \
     yarn build
 
