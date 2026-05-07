@@ -7,6 +7,7 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import MonitorCog from 'lucide-svelte/icons/monitor-cog';
+	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
 
 	let { children } = $props();
 
@@ -44,6 +45,13 @@
 <div
 	class="w-full max-w-[1300px] rounded bg-white px-3 pt-8 pb-18 shadow md:px-14 dark:bg-gray-900"
 >
+	<a
+		href="/"
+		class="text-muted-foreground/60 hover:text-muted-foreground mb-2 inline-flex items-center gap-1 text-xs hover:underline"
+	>
+		<ArrowLeft class="h-3 w-3" />
+		{$t('common.backToHome')}
+	</a>
 	<div class="mb-6 flex items-center gap-2">
 		<MonitorCog class="h-5 w-5" />
 		<h1 class="text-xl font-bold">{$t('adminPage.header')}</h1>
