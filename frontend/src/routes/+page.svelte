@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { generateShortUrl } from '$lib/api/url';
+	import { fetchConfig } from '$lib/api/config';
 	import ConsumptionBadge from '$lib/components/ConsumptionBadge.svelte';
 	import CopyButton from '$lib/components/CopyButton.svelte';
 	import CustomNameInput from '$lib/components/CustomNameInput.svelte';
@@ -48,15 +49,11 @@
 	});
 
 	const userAtLimit = $derived.by(() => {
-		if (!$configStore || !showCustomNameInput) return false;
+		if (!$configStore || !$authStore.authenticated) return false;
 
-		const totalLimit =
-			$configStore.features.createUrl.currentUrls !== undefined &&
-			$configStore.features.createUrl.currentUrls >= $configStore.features.createUrl.maxPerUser;
-
-		const dailyLimit =
-			$configStore.features.createUrl.currentUrlsToday !== undefined &&
-			$configStore.features.createUrl.currentUrlsToday >= $configStore.features.createUrl.maxPerDay;
+		const cfg = $configStore.features.createUrl;
+		const totalLimit = cfg.currentUrls !== undefined && cfg.currentUrls >= cfg.maxPerUser;
+		const dailyLimit = cfg.currentUrlsToday !== undefined && cfg.currentUrlsToday >= cfg.maxPerDay;
 
 		return totalLimit || dailyLimit;
 	});
@@ -168,8 +165,6 @@
 
 	$effect(() => {
 		if ($configStore) {
-			console.log('config:', $configStore);
-			console.log('Named URLs consumption:', $configStore.features.namedUrls);
 			shortUrlTtl = $configStore.shortUrlTtl;
 			maxUrlLength = $configStore.maxUrlLength;
 			inProgress = false;
@@ -209,7 +204,6 @@
 			const nameToUse = customName.length > 0 ? customName : undefined;
 			const data = await generateShortUrl(trimmedUrl, nameToUse);
 			shortUrl = data.url;
-			console.log('short url:', shortUrl);
 
 			if (!nameToUse && shortUrlTtl > 0) {
 				const nowSeconds = Math.floor(Date.now() / 1000);
@@ -217,14 +211,15 @@
 				shortUrlExpiryDate = formatExpiryDate(nowSeconds, ttlSeconds);
 			}
 
-			if (nameToUse) {
-				const { fetchConfig } = await import('$lib/api/config');
-				const updatedConfig = await fetchConfig();
-				console.log('Config reloaded after URL creation:', updatedConfig.features.namedUrls);
+			if ($authStore.authenticated) {
+				await fetchConfig();
 			}
 		} catch (e: any) {
 			console.error(e);
 			toast.error(e.message || $t('homePage.errors.generateFailed'));
+			if (e.message === 'Rate limit exceeded' && $authStore.authenticated) {
+				await fetchConfig();
+			}
 		} finally {
 			inProgress = false;
 		}
@@ -368,7 +363,7 @@
 				{$t('common.buttons.generate')}
 			</Button>
 		</div>
-		{#if showCustomNameInput && $configStore}
+		{#if $authStore.authenticated && $configStore && $configStore.features.createUrl.currentUrls !== undefined}
 			<div class="mt-4"><ConsumptionBadge config={$configStore.features.createUrl} /></div>
 		{/if}
 	{:else}
