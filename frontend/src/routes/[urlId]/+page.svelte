@@ -58,20 +58,26 @@
 </svelte:head>
 
 <div
-	class="xs:w-[100px] h-80 w-[1300px] max-w-[1300px] rounded bg-white px-6 py-22 text-left shadow md:px-24 dark:bg-gray-900"
+	class="surface-card animate-surface-in xs:w-[100px] h-80 w-[1300px] max-w-[1300px] bg-white px-6 py-22 text-left md:px-24 dark:bg-gray-900"
 >
 	{#if inProgress}
 		<div>{$t('common.loading')}</div>
 	{:else if notFound || remainingTime === 'expired'}
-		<div class="mb-4 text-xl font-bold">{$t('urlPage.notFound.title')}</div>
+		<div class="mb-4 text-2xl font-semibold tracking-tight">
+			{$t('urlPage.notFound.title')}
+		</div>
 		<ul class="ms-4 list-disc">
 			<li>{$t('urlPage.notFound.wrongUrl')}</li>
 			<li>{$t('urlPage.notFound.expired')}</li>
 		</ul>
 	{:else}
-		<div>
-			<div>{$t('urlPage.display.fullUrlLabel')}</div>
-			<div class="mb-2 text-2xl wrap-break-word md:text-3xl">{url}</div>
+		<div class="animate-hero-in">
+			<div class="text-muted-foreground mb-1 text-xs tracking-wide uppercase">
+				{$t('urlPage.display.fullUrlLabel')}
+			</div>
+			<div class="font-mono-tech mb-2 text-2xl wrap-break-word md:text-3xl">
+				{url}
+			</div>
 			{#if remainingTime}
 				<div class="text-muted-foreground mb-4 text-sm">
 					{$t('urlPage.display.expirationInfo', { values: { remainingTime } })}

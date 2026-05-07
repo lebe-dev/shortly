@@ -36,11 +36,13 @@
 {#await waitLocale() then _}
 	<div class="flex min-h-screen flex-col">
 		<!-- Header -->
-		<div class="flex justify-center bg-black dark:bg-black">
+		<div
+			class="flex justify-center border-b border-blue-700 bg-black dark:border-blue-400 dark:bg-black"
+		>
 			<div class="flex w-full max-w-[1300px] items-center justify-between gap-1 lg:gap-5">
 				<a href="/" data-sveltekit-reload title={$t('layout.homeLink')}>
 					<div
-						class="dark:text-primary-foreground block w-32 bg-blue-700 ps-3 pe-4 pt-3 pb-3 text-sm font-medium text-gray-300 dark:bg-blue-400"
+						class="dark:text-primary-foreground block w-32 bg-blue-700 ps-3 pe-4 pt-3 pb-3 text-sm font-medium tracking-wider text-gray-300 transition-[filter,transform] duration-200 hover:brightness-110 dark:bg-blue-400"
 						onmouseenter={() => (showFullAppName = true)}
 						onmouseleave={() => (showFullAppName = false)}
 					>
@@ -113,7 +115,7 @@
 		<div
 			class="flex items-center justify-center bg-gray-50 p-2 text-center text-xs text-gray-500 dark:bg-gray-900 dark:text-gray-400"
 		>
-			<span>v{appVersion}</span>
+			<span class="font-mono-tech">v{appVersion}</span>
 		</div>
 	</div>
 {/await}

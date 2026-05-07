@@ -72,7 +72,7 @@
 </svelte:head>
 
 <div
-	class="w-full max-w-[1300px] rounded bg-white px-3 pt-8 pb-18 shadow md:px-14 dark:bg-gray-900"
+	class="surface-card animate-surface-in w-full max-w-[1300px] bg-white px-3 pt-8 pb-18 md:px-14 dark:bg-gray-900"
 >
 	<a
 		href="/"

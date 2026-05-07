@@ -28,7 +28,9 @@
 	<meta name="description" content={$t('loginPage.description')} />
 </svelte:head>
 
-<div class="h-80 w-full rounded bg-white px-8 py-22 text-center shadow md:px-24 dark:bg-gray-900">
+<div
+	class="surface-card animate-surface-in h-80 w-full bg-white px-8 py-22 text-center md:px-24 dark:bg-gray-900"
+>
 	{#if !config && inProgress}
 		<div class="text-muted-foreground">{$t('common.loading')}</div>
 	{:else if !config}
@@ -55,7 +57,7 @@
 		</div>
 	{:else if config.auth.enabled && config.auth.authType === 'gitlab'}
 		<div class="flex flex-col items-center justify-center gap-6">
-			<div class="text-2xl font-medium">
+			<div class="text-2xl font-semibold tracking-tight">
 				{$t('loginPage.title').replace(' :: SHRTLY', '')}
 			</div>
 			<div class="flex flex-col items-center gap-3">

@@ -225,8 +225,19 @@
 		}
 	}
 
+	let shortUrlPulsing = $state(false);
+	let shortUrlPulseTimer: ReturnType<typeof setTimeout> | null = null;
+
 	function handleShortUrlClick() {
 		toast.success($t('homePage.result.linkCopied'));
+
+		if (shortUrlPulseTimer) {
+			clearTimeout(shortUrlPulseTimer);
+		}
+		shortUrlPulsing = true;
+		shortUrlPulseTimer = setTimeout(() => {
+			shortUrlPulsing = false;
+		}, 480);
 	}
 </script>
 
@@ -236,7 +247,7 @@
 </svelte:head>
 
 <div
-	class="xs:w-[100px] w-[1300px] max-w-[1300px] rounded bg-white px-6 pt-22 pb-18 text-center shadow md:px-24 dark:bg-gray-900"
+	class="surface-card animate-surface-in xs:w-[100px] w-[1300px] max-w-[1300px] bg-white px-6 pt-22 pb-18 text-center md:px-24 dark:bg-gray-900"
 >
 	{#if !$configStore}
 		<div class="text-muted-foreground">{$t('common.loading')}</div>
@@ -268,7 +279,9 @@
 			</div>
 		</div>
 	{:else if shortUrl === ''}
-		<div class="mb-1 text-left">{$t('homePage.form.label')}</div>
+		<div class="mb-2 text-left text-base font-medium">
+			{$t('homePage.form.label')}
+		</div>
 		<Input
 			bind:ref={urlInputRef}
 			type="text"
@@ -356,7 +369,12 @@
 			{/if}
 		</div>
 		<div class="flex items-center justify-center gap-3">
-			<Button size="lg" disabled={inProgress || !canGenerate} onclick={generateUrl}>
+			<Button
+				size="lg"
+				disabled={inProgress || !canGenerate}
+				onclick={generateUrl}
+				class="hover:-translate-y-px hover:shadow-md"
+			>
 				{#if inProgress}
 					<LoaderCircle class="mr-2 h-4 w-4 animate-spin" />
 				{/if}
@@ -367,12 +385,16 @@
 			<div class="mt-4"><ConsumptionBadge config={$configStore.features.createUrl} /></div>
 		{/if}
 	{:else}
-		<div>
-			<div>{$t('homePage.result.title')}</div>
+		<div class="animate-hero-in">
+			<div class="text-muted-foreground mb-3 text-sm tracking-wide uppercase">
+				{$t('homePage.result.title')}
+			</div>
 			<div
 				use:copy={shortUrl}
 				onclick={handleShortUrlClick}
-				class="mb-2 cursor-pointer text-3xl transition-colors hover:text-blue-600 dark:hover:text-blue-400"
+				class="font-mono-tech mb-2 inline-block cursor-pointer text-3xl tracking-tight transition-colors hover:text-blue-600 md:text-4xl dark:hover:text-blue-400 {shortUrlPulsing
+					? 'animate-pulse-once'
+					: ''}"
 			>
 				{shortUrl}
 			</div>
