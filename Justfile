@@ -10,7 +10,7 @@ lint:
     cargo clippy
 
 bump-frontend-deps:
-    cd frontend && yarn upgrade
+    cd frontend && rm -rf node_modules yarn.lock && yarn install
 
 bump-backend-deps:
     cargo update
