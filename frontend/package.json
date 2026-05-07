@@ -33,7 +33,7 @@
 		"globals": "^16.0.0",
 		"jsdom": "^27.2.0",
 		"lucide-svelte": "^0.554.0",
-		"prettier": "^3.4.2",
+		"prettier": "~3.6.2",
 		"prettier-plugin-svelte": "^3.3.3",
 		"prettier-plugin-tailwindcss": "^0.6.11",
 		"svelte": "^5.0.0",
@@ -53,5 +53,8 @@
 		"date-fns": "^4.1.0",
 		"mode-watcher": "^1.1.0",
 		"svelte-copy": "^2.0.0"
+	},
+	"resolutions": {
+		"vite": "^6.2.6"
 	}
 }
