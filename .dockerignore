@@ -9,7 +9,6 @@
 **/.DS_Store
 /data
 /logs
-/test-data
 /Justfile
 /*.tgz
 /.git
