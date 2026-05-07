@@ -19,7 +19,11 @@ WORKDIR /build
 RUN mkdir -p /build/static && \
     apk add elfutils pkgconfig perl make upx openssl-dev openssl-libs-static
 
-COPY . /build
+COPY Cargo.toml Cargo.lock /build/
+COPY .cargo/ /build/.cargo/
+COPY src/ /build/src/
+COPY migrations/ /build/migrations/
+COPY config.yml-dist /build/config.yml-dist
 COPY --from=frontend-build /build/build/ /build/static/
 
 RUN cargo test --lib && \
