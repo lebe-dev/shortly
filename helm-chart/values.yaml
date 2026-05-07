@@ -39,11 +39,10 @@ podAnnotations: {}
 podLabels: {}
 
 podSecurityContext:
-  fsGroup: 1000
-  runAsNonRoot: true
+  fsGroup: 10001
 
 securityContext:
-  runAsUser: 1000
+  runAsUser: 10001
   runAsNonRoot: true
   allowPrivilegeEscalation: false
   capabilities:
@@ -249,10 +248,10 @@ config:
       pullPolicy: IfNotPresent
 
     # Nginx container port (internal)
-    port: 8080
+    port: 80
 
     # Backend application port (where Shortly app will listen)
-    backendPort: 8081
+    backendPort: 8080
 
     # Resource limits for nginx container
     resources: {}
@@ -309,11 +308,11 @@ config:
           scgi_temp_path /tmp/scgi_temp;
 
           upstream backend {
-              server 127.0.0.1:8081;
+              server 127.0.0.1:8080;
           }
 
           server {
-              listen 8080;
+              listen 80;
               server_name _;
 
               # SvelteKit immutable assets - aggressive caching
@@ -386,6 +385,8 @@ secrets:
 
   # Database connection string
   dbCnn: "sqlite:///data/shortly.db?mode=rwc"
+  # Postgres:
+  # dbCnn: "postgres://USERNAME:PASSWORD@pg-standalone-cluster-rw.postgres.svc:5432/DBNAME"
 
   auth:
     providers:
@@ -403,7 +404,7 @@ probes:
       enabled: true
       httpGet:
         path: /api/health
-        port: backend # 8081 with nginx, 8080 without
+        port: backend
       initialDelaySeconds: 10
       periodSeconds: 30
       timeoutSeconds: 5
@@ -437,7 +438,7 @@ probes:
     livenessProbe:
       enabled: true
       tcpSocket:
-        port: 8080
+        port: 80
       initialDelaySeconds: 5
       periodSeconds: 30
       timeoutSeconds: 3
@@ -447,7 +448,7 @@ probes:
     readinessProbe:
       enabled: true
       tcpSocket:
-        port: 8080
+        port: 80
       initialDelaySeconds: 2
       periodSeconds: 10
       timeoutSeconds: 3
@@ -457,7 +458,7 @@ probes:
     startupProbe:
       enabled: true
       tcpSocket:
-        port: 8080
+        port: 80
       initialDelaySeconds: 0
       periodSeconds: 1
       timeoutSeconds: 3

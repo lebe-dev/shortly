@@ -40,12 +40,9 @@ spec:
               containerPort: {{ .Values.config.nginx.port }}
               protocol: TCP
           securityContext:
-            runAsUser: 101
-            runAsNonRoot: true
+            runAsUser: 0
+            runAsNonRoot: false
             allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
           volumeMounts:
             - name: nginx-config
               mountPath: /etc/nginx/nginx.conf
