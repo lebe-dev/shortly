@@ -214,10 +214,11 @@
 			if ($authStore.authenticated) {
 				await fetchConfig();
 			}
-		} catch (e: any) {
+		} catch (e) {
 			console.error(e);
-			toast.error(e.message || $t('homePage.errors.generateFailed'));
-			if (e.message === 'Rate limit exceeded' && $authStore.authenticated) {
+			const message = e instanceof Error ? e.message : '';
+			toast.error(message || $t('homePage.errors.generateFailed'));
+			if (message === 'Rate limit exceeded' && $authStore.authenticated) {
 				await fetchConfig();
 			}
 		} finally {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { authStore } from '$lib/stores/auth';
 	import { logout } from '$lib/api/logout';
 	import { Button } from './ui/button';
@@ -73,7 +74,7 @@
 
 			<!-- My Links -->
 			<DropdownMenuItem>
-				<a href="/links" class="flex w-full items-center gap-2">
+				<a href={resolve('/links')} class="flex w-full items-center gap-2">
 					<Link2 class="h-4 w-4" />
 					<span class="text-sm">{$t('layout.myLinks')}</span>
 				</a>
@@ -82,7 +83,7 @@
 			<!-- Admin Panel (only visible for admins) -->
 			{#if config?.admin}
 				<DropdownMenuItem>
-					<a href="/admin" class="flex w-full items-center gap-2">
+					<a href={resolve('/admin')} class="flex w-full items-center gap-2">
 						<MonitorCog class="h-4 w-4" />
 						<span class="text-sm">{$t('layout.adminPanel')}</span>
 					</a>
@@ -99,7 +100,7 @@
 					>
 				</DropdownMenuSubTrigger>
 				<DropdownMenuSubContent class="border-secondary border">
-					{#each languages as lang}
+					{#each languages as lang (lang)}
 						<DropdownMenuItem
 							onclick={() => changeLanguage(lang)}
 							class={$locale === lang
@@ -121,7 +122,7 @@
 		</DropdownMenuContent>
 	</DropdownMenu>
 {:else}
-	<a href="/login" title={$t('layout.login')}>
+	<a href={resolve('/login')} title={$t('layout.login')}>
 		<Button
 			variant="outline"
 			size="icon"

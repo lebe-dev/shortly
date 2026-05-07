@@ -6,6 +6,7 @@
 	import { Tabs, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import MonitorCog from 'lucide-svelte/icons/monitor-cog';
 	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
 
@@ -37,8 +38,16 @@
 		}
 	});
 
-	function navigateToTab(tab: string) {
-		goto(`/admin/${tab}`);
+	function navigateToTab(tab: 'general' | 'links' | 'users' | 'audit') {
+		const path =
+			tab === 'general'
+				? resolve('/admin/general')
+				: tab === 'links'
+					? resolve('/admin/links')
+					: tab === 'users'
+						? resolve('/admin/users')
+						: resolve('/admin/audit');
+		goto(path);
 	}
 </script>
 
@@ -46,7 +55,7 @@
 	class="w-full max-w-[1300px] rounded bg-white px-3 pt-8 pb-18 shadow md:px-14 dark:bg-gray-900"
 >
 	<a
-		href="/"
+		href={resolve('/')}
 		class="text-muted-foreground/60 hover:text-muted-foreground mb-2 inline-flex items-center gap-1 text-xs hover:underline"
 	>
 		<ArrowLeft class="h-3 w-3" />

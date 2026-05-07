@@ -1,10 +1,11 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import { t } from 'svelte-intl-precompile';
 
 	onMount(() => {
-		goto('/admin/links', { replaceState: true });
+		goto(resolve('/admin/links'), { replaceState: true });
 	});
 </script>
 

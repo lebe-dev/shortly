@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import Menu from 'lucide-svelte/icons/menu';
 	import Sun from 'lucide-svelte/icons/sun';
 	import Moon from 'lucide-svelte/icons/moon';
@@ -70,7 +71,7 @@
 
 			<!-- My Links -->
 			<DropdownMenuItem>
-				<a href="/links" class="flex w-full items-center gap-2">
+				<a href={resolve('/links')} class="flex w-full items-center gap-2">
 					<Link2 class="h-4 w-4" />
 					<span class="text-sm">{$t('layout.myLinks')}</span>
 				</a>
@@ -79,7 +80,7 @@
 			<!-- Admin Panel (only visible for admins) -->
 			{#if config?.admin}
 				<DropdownMenuItem>
-					<a href="/admin" class="flex w-full items-center gap-2">
+					<a href={resolve('/admin')} class="flex w-full items-center gap-2">
 						<MonitorCog class="h-4 w-4" />
 						<span class="text-sm">{$t('layout.adminPanel')}</span>
 					</a>
@@ -95,7 +96,7 @@
 				<span class="text-sm">{$t('layout.language')} ({$locale.toUpperCase()})</span>
 			</DropdownMenuSubTrigger>
 			<DropdownMenuSubContent>
-				{#each languages as lang}
+				{#each languages as lang (lang)}
 					<DropdownMenuItem
 						onclick={() => changeLanguage(lang)}
 						class={$locale === lang ? 'bg-blue-50 text-sm dark:bg-blue-900' : 'text-sm'}

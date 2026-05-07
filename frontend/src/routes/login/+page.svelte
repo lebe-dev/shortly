@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { fetchConfig } from '$lib/api/config';
 	import { Button } from '$lib/components/ui/button';
 	import { onMount } from 'svelte';
@@ -90,7 +91,7 @@
 						{config.auth.note}
 					</div>
 				{/if}
-				<a href="/" class="text-muted-foreground text-sm hover:underline">
+				<a href={resolve('/')} class="text-muted-foreground text-sm hover:underline">
 					{$t('common.backToHome')}
 				</a>
 			</div>

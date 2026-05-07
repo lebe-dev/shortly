@@ -13,10 +13,11 @@
 	import * as Popover from '$lib/components/ui/popover';
 	import { Card, CardContent } from '$lib/components/ui/card';
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table';
-	import { getCoreRowModel, type ColumnDef } from '@tanstack/table-core';
+	import { getCoreRowModel, type ColumnDef, type CellContext } from '@tanstack/table-core';
 	import { type DateValue } from '@internationalized/date';
 	import { CalendarIcon } from 'lucide-svelte';
 	import { cn } from '$lib/utils';
+	import type { PageItem } from 'bits-ui';
 
 	let events = $state<AuditEvent[]>([]);
 	let loading = $state(true);
@@ -132,22 +133,23 @@
 		{
 			accessorKey: 'eventType',
 			header: () => $t('adminPage.audit.table.eventType'),
-			cell: (info: any) => $t(`adminPage.audit.eventTypes.${info.getValue()}`)
+			cell: (info: CellContext<AuditEvent, unknown>) =>
+				$t(`adminPage.audit.eventTypes.${info.getValue()}`)
 		},
 		{
 			accessorKey: 'actorUsername',
 			header: () => $t('adminPage.audit.table.user'),
-			cell: (info: any) => formatUserColumn(info.row.original)
+			cell: (info: CellContext<AuditEvent, unknown>) => formatUserColumn(info.row.original)
 		},
 		{
 			accessorKey: 'urlName',
 			header: () => $t('adminPage.audit.table.urlName'),
-			cell: (info: any) => info.getValue() || '—'
+			cell: (info: CellContext<AuditEvent, unknown>) => info.getValue() || '—'
 		},
 		{
 			accessorKey: 'createdAt',
 			header: () => $t('adminPage.audit.table.timestamp'),
-			cell: (info: any) => formatTimestamp(info.getValue())
+			cell: (info: CellContext<AuditEvent, unknown>) => formatTimestamp(info.getValue() as number)
 		}
 	];
 
@@ -272,6 +274,7 @@
 	<!-- Results Count -->
 	{#if !loading}
 		<div class="text-muted-foreground ps-1 text-sm">
+			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html $t('adminPage.audit.showing', { values: { count: events.length, total: totalCount } })}
 		</div>
 	{/if}
@@ -292,9 +295,9 @@
 			<CardContent>
 				<Table.Root>
 					<Table.Header>
-						{#each table.getHeaderGroups() as headerGroup}
+						{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
 							<Table.Row>
-								{#each headerGroup.headers as header}
+								{#each headerGroup.headers as header (header.id)}
 									<Table.Head>
 										{#if !header.isPlaceholder}
 											<FlexRender
@@ -308,9 +311,9 @@
 						{/each}
 					</Table.Header>
 					<Table.Body>
-						{#each table.getRowModel().rows as row}
+						{#each table.getRowModel().rows as row (row.id)}
 							<Table.Row>
-								{#each row.getVisibleCells() as cell}
+								{#each row.getVisibleCells() as cell (cell.id)}
 									<Table.Cell>
 										<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
 									</Table.Cell>
@@ -326,7 +329,7 @@
 		{#if totalPages > 1}
 			<div class="flex justify-center">
 				<Pagination.Root count={totalCount} {perPage} page={currentPage}>
-					{#snippet children({ pages }: any)}
+					{#snippet children({ pages }: { pages: PageItem[] })}
 						<Pagination.Content>
 							<Pagination.Item>
 								<Pagination.Previous
@@ -335,7 +338,7 @@
 									}}
 								/>
 							</Pagination.Item>
-							{#each pages as page}
+							{#each pages as page (page.key)}
 								{#if page.type === 'ellipsis'}
 									<Pagination.Item>
 										<Pagination.Ellipsis />

@@ -156,7 +156,7 @@
 		</div>
 	{:else}
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-			{#each filteredAndSortedUrls as url}
+			{#each filteredAndSortedUrls as url (url.id)}
 				<UrlCard
 					id={url.id}
 					url={getShortUrl(url)}

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import { getUserUrls, deleteUrl, type UserUrlResponse } from '$lib/api/url';
 	import { authStore } from '$lib/stores/auth';
 	import { configStore } from '$lib/stores/config';
@@ -75,7 +76,7 @@
 	class="surface-card animate-surface-in w-full max-w-[1300px] bg-white px-3 pt-8 pb-18 md:px-14 dark:bg-gray-900"
 >
 	<a
-		href="/"
+		href={resolve('/')}
 		class="text-muted-foreground/60 hover:text-muted-foreground mb-2 inline-flex items-center gap-1 text-xs hover:underline"
 	>
 		<ArrowLeft class="h-3 w-3" />
@@ -86,7 +87,7 @@
 			<Link2 class="h-5 w-5" />
 			<h1 class="text-xl font-bold">{$t('linksPage.header')}</h1>
 		</div>
-		<a href="/">
+		<a href={resolve('/')}>
 			<Button variant="secondary" class="hover:cursor-pointer">
 				<Plus class="h-4 w-4" />
 				{$t('linksPage.createNew')}
@@ -111,13 +112,13 @@
 	{:else if urls.length === 0}
 		<div class="py-12 text-center">
 			<p class="text-muted-foreground text-lg">{$t('linksPage.empty')}</p>
-			<a href="/" class="mt-4 inline-block">
+			<a href={resolve('/')} class="mt-4 inline-block">
 				<Button>{$t('linksPage.createFirst')}</Button>
 			</a>
 		</div>
 	{:else}
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-			{#each urls as url}
+			{#each urls as url (url.id)}
 				<UrlCard
 					id={url.id}
 					url={url.url}

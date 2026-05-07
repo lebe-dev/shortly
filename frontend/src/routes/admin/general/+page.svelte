@@ -291,6 +291,7 @@
 							<span class="text-muted-foreground text-sm"
 								>{$t('adminPage.general.fields.metricsEndpoint')}:</span
 							>
+							<!-- eslint-disable svelte/no-navigation-without-resolve -->
 							<a
 								href="/api/metrics"
 								target="_blank"
@@ -298,6 +299,7 @@
 							>
 								/api/metrics
 							</a>
+							<!-- eslint-enable svelte/no-navigation-without-resolve -->
 						</div>
 					{/if}
 				</div>

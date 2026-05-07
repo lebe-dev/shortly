@@ -80,6 +80,7 @@
 		<CardTitle>
 			<div class="flex items-center justify-between gap-2">
 				<div class="flex items-center gap-2">
+					<!-- eslint-disable svelte/no-navigation-without-resolve -->
 					<a
 						href={url}
 						class="text-blue-600 hover:underline dark:text-blue-400"
@@ -128,6 +129,7 @@
 					>
 						{originalUrl}
 					</a>
+					<!-- eslint-enable svelte/no-navigation-without-resolve -->
 					<Button
 						variant="ghost"
 						size="sm"

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import '../app.css';
+	import { resolve } from '$app/paths';
 	import { Toaster } from '$lib/components/ui/sonner/index.js';
 	import { ModeWatcher } from 'mode-watcher';
 	import { t, waitLocale } from 'svelte-intl-precompile';
@@ -33,14 +34,14 @@
 
 <ModeWatcher defaultMode="light" />
 
-{#await waitLocale() then _}
+{#await waitLocale() then}
 	<div class="flex min-h-screen flex-col">
 		<!-- Header -->
 		<div
 			class="flex justify-center border-b border-blue-700 bg-black dark:border-blue-400 dark:bg-black"
 		>
 			<div class="flex w-full max-w-[1300px] items-center justify-between gap-1 lg:gap-5">
-				<a href="/" data-sveltekit-reload title={$t('layout.homeLink')}>
+				<a href={resolve('/')} data-sveltekit-reload title={$t('layout.homeLink')}>
 					<div
 						class="dark:text-primary-foreground block w-32 bg-blue-700 ps-3 pe-4 pt-3 pb-3 text-sm font-medium tracking-wider text-gray-300 transition-[filter,transform] duration-200 hover:brightness-110 dark:bg-blue-400"
 						onmouseenter={() => (showFullAppName = true)}

@@ -45,7 +45,7 @@
 
 	<!-- User cards grid -->
 	<div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-		{#each sortedUsers as user}
+		{#each sortedUsers as user (user.id)}
 			<UserCard {user} onQuotasUpdated={(quotas) => handleQuotasUpdated(user.id, quotas)} />
 		{/each}
 	</div>

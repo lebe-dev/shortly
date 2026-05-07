@@ -58,7 +58,7 @@
 			class="absolute top-full right-0 z-50 mt-1 min-w-[60px] rounded border border-gray-600 bg-white shadow-lg dark:bg-gray-800"
 		>
 			<ul class="py-1">
-				{#each languages as lang}
+				{#each languages as lang (lang)}
 					<li>
 						<button
 							onclick={() => changeLanguage(lang)}
