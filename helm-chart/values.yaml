@@ -244,8 +244,8 @@ config:
 
     # Nginx image configuration
     image:
-      repository: nginxinc/nginx-unprivileged
-      tag: 1.29.3-alpine-otel
+      repository: nginx
+      tag: 1.30.0-alpine3.23-slim
       pullPolicy: IfNotPresent
 
     # Nginx container port (internal)
