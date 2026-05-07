@@ -8,6 +8,7 @@ cleanup:
 lint:
     cargo fmt
     cargo clippy
+    cd frontend && yarn eslint .
 
 bump-frontend-deps:
     cd frontend && rm -rf node_modules yarn.lock && yarn install
