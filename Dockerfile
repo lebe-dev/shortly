@@ -1,4 +1,4 @@
-FROM node:25.2.1-alpine3.23 AS frontend-build
+FROM node:25.9.0-alpine3.23 AS frontend-build
 
 WORKDIR /build
 
@@ -8,7 +8,7 @@ RUN yarn && \
     yarn test run && \
     yarn build
 
-FROM rust:1.92.0-alpine3.23 AS app-build
+FROM rust:1.95.0-alpine3.23 AS app-build
 
 WORKDIR /build
 
