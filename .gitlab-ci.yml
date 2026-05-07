@@ -1,18 +1,17 @@
 stages:
   - build
   - security
-  - deploy
 
 variables:
   IMAGE_NAME: tinyops/shortly
   DOCKER_TLS_CERTDIR: ""
 
-build-image:
+build:
   stage: build
 
   when: manual
 
-  image: docker:29.0.1
+  image: docker:29.4.0-cli-alpine3.23
 
   cache:
     paths:
@@ -20,7 +19,7 @@ build-image:
       - target/
 
   services:
-    - name: docker:29.0.1-dind-alpine3.22
+    - name: docker:29.4.0-dind-alpine3.23
       alias: docker
 
   before_script:
@@ -28,14 +27,14 @@ build-image:
 
   script:
     - APP_VERSION=`cat Cargo.toml | grep "version = " | head -1 | cut -d "=" -f2 | tr -d '"' | tr -d ' '`
-    - "echo $APP_VERSION > version"
+    - echo "APP_VERSION=$APP_VERSION" > build.env
     - DOCKER_IMAGE=$IMAGE_NAME:$APP_VERSION
     - docker build --progress=plain --platform=linux/amd64 -t $DOCKER_IMAGE .
     - docker push $DOCKER_IMAGE
 
   artifacts:
-    paths:
-      - version
+    reports:
+      dotenv: build.env
     expire_in: 1 hour
 
 check-cve:
@@ -44,37 +43,15 @@ check-cve:
   allow_failure: true
 
   needs:
-    - build-image
+    - build
 
   image:
-    name: aquasec/trivy:0.69.3
+    name: aquasec/trivy:0.70.0
     entrypoint: [""]
 
   before_script:
-    - export IMAGE_TAG=$(cat version)
     - export TRIVY_USERNAME="$DOCKER_HUB_USER"
     - export TRIVY_PASSWORD="$DOCKER_HUB_TOKEN"
 
   script:
-    - trivy image --disable-telemetry -s HIGH,CRITICAL --exit-code 1 $IMAGE_NAME:$IMAGE_TAG
-
-deploy-dev:
-  stage: deploy
-
-  needs:
-    - build-image
-
-  before_script:
-    - export IMAGE_TAG=$(cat version)
-    - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_TOKEN
-
-  script:
-    - echo "Deploying version $APP_VERSION"
-    - yq -yi '.services.app.image = "'$IMAGE_NAME':'$IMAGE_TAG'"' /opt/shortly/docker-compose.yml
-    - cd /opt/shortly
-    - docker compose down
-    - docker compose pull
-    - docker compose up -d
-
-  tags:
-    - tinybull
+    - trivy image --disable-telemetry -s HIGH,CRITICAL --exit-code 1 $IMAGE_NAME:$APP_VERSION
