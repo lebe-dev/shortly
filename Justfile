@@ -1,3 +1,4 @@
+imageName := "tinyops/shortly"
 version := `cat Cargo.toml | grep version | head -1 | cut -d " " -f 3 | tr -d "\""`
 chartName := `cat helm-chart/Chart.yaml | yq -r '.name'`
 chartVersion := `cat helm-chart/Chart.yaml | yq -r '.version'`
@@ -67,11 +68,17 @@ release-chart: build-chart
 # RELEASE
 
 build-release-image: test
-    docker build --progress=plain --platform=linux/amd64 -t tinyops/shortly:{{ version }} .
+    docker build --progress=plain --platform=linux/amd64 -t {{ imageName }}:{{ version }} .
+
+push-image:
+    docker push {{ imageName }}:{{ version }}
 
 trivy:
-    trivy image --severity HIGH,CRITICAL tinyops/shortly:{{ version }}
+    trivy image --severity HIGH,CRITICAL {{ imageName }}:{{ version }}
+
+release-image: build-release-image
+    @just push-image
 
 release: build-release-image
-    docker push tinyops/shortly:{{ version }}
+    @just push-image
     @just release-chart
