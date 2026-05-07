@@ -23,6 +23,7 @@ COPY Cargo.toml Cargo.lock /build/
 COPY .cargo/ /build/.cargo/
 COPY src/ /build/src/
 COPY migrations/ /build/migrations/
+COPY test-data/ /build/test-data/
 COPY config.yml-dist /build/config.yml-dist
 COPY --from=frontend-build /build/build/ /build/static/
 
