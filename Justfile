@@ -30,7 +30,7 @@ run-backend:
 run-frontend:
     cd frontend && yarn && npm run dev -- --port=4200
 
-test-all:
+test:
     cd frontend && yarn test run
     cargo test --lib
     cargo test --bin server
@@ -66,7 +66,7 @@ release-chart: build-chart
 
 # RELEASE
 
-build-release-image: test-all
+build-release-image: test
     docker build --progress=plain --platform=linux/amd64 -t tinyops/shortly:{{ version }} .
 
 trivy:
