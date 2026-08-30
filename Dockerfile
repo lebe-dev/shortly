@@ -1,4 +1,4 @@
-FROM node:25.9.0-alpine3.23 AS frontend-build
+FROM node:25-alpine AS frontend-build
 
 WORKDIR /build
 
@@ -12,7 +12,7 @@ RUN VERSION=$(awk -F'"' '/^version[[:space:]]*=/{print $2; exit}' /tmp/Cargo.tom
     yarn test run && \
     yarn build
 
-FROM rust:1.95.0-alpine3.23 AS app-build
+FROM rust:1.98.0-alpine AS app-build
 
 WORKDIR /build
 
@@ -35,7 +35,7 @@ RUN cargo test --lib && \
     upx -9 --lzma target/release/server && \
     chmod +x target/release/server
 
-FROM alpine:3.23
+FROM alpine:3.24
 
 WORKDIR /app
 
