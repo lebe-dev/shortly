@@ -187,6 +187,10 @@
 							{$t('adminPage.audit.eventTypes.user_logout')}
 						{:else if eventTypeFilter === AuditEventType.UserQuotaUpdate}
 							{$t('adminPage.audit.eventTypes.user_quota_update')}
+						{:else if eventTypeFilter === AuditEventType.PasskeyRegister}
+							{$t('adminPage.audit.eventTypes.passkey_register')}
+						{:else if eventTypeFilter === AuditEventType.PasskeyDelete}
+							{$t('adminPage.audit.eventTypes.passkey_delete')}
 						{/if}
 					</Select.Trigger>
 					<Select.Content>
@@ -207,6 +211,12 @@
 						</Select.Item>
 						<Select.Item value={AuditEventType.UserQuotaUpdate}>
 							{$t('adminPage.audit.eventTypes.user_quota_update')}
+						</Select.Item>
+						<Select.Item value={AuditEventType.PasskeyRegister}>
+							{$t('adminPage.audit.eventTypes.passkey_register')}
+						</Select.Item>
+						<Select.Item value={AuditEventType.PasskeyDelete}>
+							{$t('adminPage.audit.eventTypes.passkey_delete')}
 						</Select.Item>
 					</Select.Content>
 				</Select.Root>

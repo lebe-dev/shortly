@@ -1,27 +1,46 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import { fetchConfig } from '$lib/api/config';
 	import { Button } from '$lib/components/ui/button';
-	import { onMount } from 'svelte';
-	import { toast } from 'svelte-sonner';
+	import { configStore } from '$lib/stores/config';
 	import { t } from 'svelte-intl-precompile';
-	import type { AppConfig } from '$lib/domain/config';
+	import { toast } from 'svelte-sonner';
+	import KeyRound from 'lucide-svelte/icons/key-round';
+	import {
+		isPasskeySupported,
+		loginWithPasskey,
+		PasskeyCancelledError,
+		PasskeyError
+	} from '$lib/api/passkey';
 
-	let inProgress = $state(true);
-	let config: AppConfig | null = $state(null);
+	const config = $derived($configStore);
 
-	onMount(async () => {
-		await fetchConfig()
-			.then((data) => {
-				config = data;
-				inProgress = false;
-			})
-			.catch((e) => {
-				console.error(e);
-				toast.error($t('loginPage.errors.configLoadFailed'));
-				inProgress = false;
-			});
-	});
+	let passkeyLoginInProgress = $state(false);
+
+	const passkeySupported = $derived(isPasskeySupported());
+
+	async function handlePasskeyLogin() {
+		passkeyLoginInProgress = true;
+
+		try {
+			await loginWithPasskey();
+			window.location.href = '/';
+		} catch (e) {
+			if (e instanceof PasskeyCancelledError) {
+				return;
+			}
+
+			console.error('Passkey login failed:', e);
+
+			if (e instanceof PasskeyError && e.code === 'unknown_account') {
+				toast.error($t('loginPage.errors.passkeyUnknownAccount'));
+				return;
+			}
+
+			toast.error($t('loginPage.errors.passkeyLoginFailed'));
+		} finally {
+			passkeyLoginInProgress = false;
+		}
+	}
 </script>
 
 <svelte:head>
@@ -32,9 +51,7 @@
 <div
 	class="surface-card animate-surface-in h-80 w-full bg-white px-8 py-22 text-center md:px-24 dark:bg-gray-900"
 >
-	{#if !config && inProgress}
-		<div class="text-muted-foreground">{$t('common.loading')}</div>
-	{:else if !config}
+	{#if !config}
 		<div class="flex flex-col items-center justify-center gap-3">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
@@ -86,6 +103,19 @@
 					</svg>
 					{$t('loginPage.buttons.gitlab')}
 				</Button>
+				{#if config.auth.passkey?.enabled && passkeySupported}
+					<Button
+						size="lg"
+						variant="outline"
+						disabled={passkeyLoginInProgress}
+						onclick={handlePasskeyLogin}
+					>
+						<KeyRound class="me-2 h-5 w-5" />
+						{passkeyLoginInProgress
+							? $t('loginPage.buttons.passkeyInProgress')
+							: $t('loginPage.buttons.passkey')}
+					</Button>
+				{/if}
 				{#if config.auth.note}
 					<div class="text-primary mt-2 mb-4 text-xs">
 						{config.auth.note}

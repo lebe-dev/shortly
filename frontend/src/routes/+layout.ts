@@ -1,5 +1,6 @@
 import { getLocaleFromNavigator, init, locale } from 'svelte-intl-precompile';
 import { registerAll } from '$locales';
+import { fetchConfig } from '$lib/api/config';
 
 registerAll();
 
@@ -53,3 +54,11 @@ if (typeof window !== 'undefined') {
 }
 
 export const ssr = false;
+
+export async function load() {
+	try {
+		await fetchConfig();
+	} catch (e) {
+		console.error('Failed to load config:', e);
+	}
+}

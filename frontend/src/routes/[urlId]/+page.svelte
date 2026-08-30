@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { HttpError } from '$lib/api/error.js';
 	import { fetchUrlById } from '$lib/api/url';
-	import { fetchConfig } from '$lib/api/config';
 	import CopyButton from '$lib/components/CopyButton.svelte';
 	import ConsumptionDisplay from '$lib/components/ConsumptionDisplay.svelte';
 	import { formatRemainingTime } from '$lib/date';
 	import { authStore } from '$lib/stores/auth';
-	import type { AppConfig } from '$lib/domain/config';
+	import { configStore } from '$lib/stores/config';
 	import { onMount } from 'svelte';
 	import { t } from 'svelte-intl-precompile';
 
@@ -17,16 +16,12 @@
 	let ttl = $state(0);
 	let created = $state(0);
 	let notFound: boolean = $state(false);
-	let config: AppConfig | null = $state(null);
 
 	const remainingTime = $derived(formatRemainingTime(ttl, created, $t, 'long'));
 
 	onMount(async () => {
-		console.log('url-id', data.urlId);
-
 		await fetchUrlById(data.urlId)
 			.then((response) => {
-				console.log('url: ', response.url);
 				url = response.url;
 				ttl = response.ttl;
 				created = response.created;
@@ -41,14 +36,6 @@
 
 				inProgress = false;
 			});
-
-		if ($authStore.authenticated) {
-			try {
-				config = await fetchConfig();
-			} catch (e) {
-				console.error('Failed to load config:', e);
-			}
-		}
 	});
 </script>
 
@@ -86,12 +73,12 @@
 
 			<CopyButton data={url} label={$t('common.buttons.copy')} />
 
-			{#if config && $authStore.authenticated}
+			{#if $configStore && $authStore.authenticated}
 				<div
 					class="mt-6 rounded border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800"
 				>
 					<div class="text-muted-foreground mb-2 text-xs font-medium">Your Usage</div>
-					<ConsumptionDisplay config={config.features.createUrl} variant="compact" />
+					<ConsumptionDisplay config={$configStore.features.createUrl} variant="compact" />
 				</div>
 			{/if}
 		</div>
