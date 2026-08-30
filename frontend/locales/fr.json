@@ -43,7 +43,8 @@
 		"login": "Se connecter",
 		"logout": "Se déconnecter",
 		"myLinks": "Mes Liens",
-		"adminPanel": "Panneau d'Administration"
+		"adminPanel": "Panneau d'Administration",
+		"profile": "Profil"
 	},
 	"homePage": {
 		"title": "Créer une URL courte :: SHRTLY",
@@ -113,11 +114,15 @@
 		"title": "Connexion :: SHRTLY",
 		"description": "Se connecter au service Shortly",
 		"buttons": {
-			"gitlab": "Se connecter avec GitLab"
+			"gitlab": "Se connecter avec GitLab",
+			"passkey": "Se connecter avec une passkey",
+			"passkeyInProgress": "En attente de la passkey..."
 		},
 		"errors": {
 			"configLoadFailed": "Impossible de charger la configuration de l'application",
-			"authDisabled": "L'authentification n'est pas disponible"
+			"authDisabled": "L'authentification n'est pas disponible",
+			"passkeyLoginFailed": "Échec de la connexion avec la passkey",
+			"passkeyUnknownAccount": "Cette passkey n'est liée à aucun compte"
 		}
 	},
 	"linksPage": {
@@ -250,7 +255,9 @@
 				"create_url": "URL créée",
 				"delete_url": "URL supprimée",
 				"user_login": "Connexion utilisateur",
-				"user_logout": "Déconnexion utilisateur"
+				"user_logout": "Déconnexion utilisateur",
+				"passkey_register": "Passkey enregistrée",
+				"passkey_delete": "Passkey supprimée"
 			},
 			"noEvents": "Aucun événement d'audit trouvé",
 			"showing": "Affichage de {count} sur {total} événements",
@@ -265,7 +272,41 @@
 			"urlCount": "URLs Créées",
 			"quotas": "Quotas",
 			"maxPerUser": "Max. par utilisateur",
-			"maxPerDay": "Max. par jour"
+			"maxPerDay": "Max. par jour",
+			"passkeyCount": "Passkeys",
+			"passkeysDelete": "Tout supprimer",
+			"passkeysDeleteConfirm": "Supprimer toutes les passkeys de cet utilisateur ?",
+			"passkeysDeleted": "Passkeys supprimées",
+			"passkeysDeleteFailed": "Impossible de supprimer les passkeys"
+		}
+	},
+	"profilePage": {
+		"title": "Profil :: SHRTLY",
+		"description": "Gérer votre compte et vos passkeys",
+		"header": "Profil",
+		"passkeys": {
+			"header": "Passkeys",
+			"hint": "Une passkey permet de se connecter sans GitLab. Les passkeys ne fonctionnent que pour les comptes déjà existants.",
+			"disabled": "La connexion par passkey est désactivée",
+			"unsupported": "Ce navigateur ne prend pas en charge les passkeys",
+			"namePlaceholder": "Nom de la passkey",
+			"register": "Ajouter une passkey",
+			"registering": "En attente de la passkey...",
+			"registered": "Passkey ajoutée",
+			"empty": "Aucune passkey pour le moment",
+			"name": "Nom",
+			"created": "Créée",
+			"lastUsed": "Dernière utilisation",
+			"neverUsed": "Jamais",
+			"delete": "Supprimer la passkey",
+			"deleted": "Passkey supprimée",
+			"deleteConfirm": "Supprimer cette passkey ?"
+		},
+		"errors": {
+			"loadFailed": "Impossible de charger les passkeys",
+			"registerFailed": "Impossible d'ajouter la passkey",
+			"deleteFailed": "Impossible de supprimer la passkey",
+			"alreadyRegistered": "Cette passkey est déjà enregistrée"
 		}
 	}
 }

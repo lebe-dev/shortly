@@ -313,6 +313,8 @@ impl UrlRepository for Sqlite {
                     "user_login" => AuditEventType::UserLogin,
                     "user_logout" => AuditEventType::UserLogout,
                     "user_quota_update" => AuditEventType::UserQuotaUpdate,
+                    "passkey_register" => AuditEventType::PasskeyRegister,
+                    "passkey_delete" => AuditEventType::PasskeyDelete,
                     _ => AuditEventType::UserLogin, // Default fallback
                 };
 

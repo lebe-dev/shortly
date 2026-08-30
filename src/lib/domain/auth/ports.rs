@@ -15,6 +15,12 @@ pub trait AuthService: Send + Sync + Clone + 'static {
         state: &str,
     ) -> impl Future<Output = Result<(User, Session), AuthError>> + Send;
 
+    /// Open a new session for an existing user (used by alternative login methods)
+    fn create_session(
+        &self,
+        user_id: i64,
+    ) -> impl Future<Output = Result<Session, AuthError>> + Send;
+
     /// Validate session token and return user
     fn validate_session(&self, token: &str)
     -> impl Future<Output = Result<User, AuthError>> + Send;

@@ -22,6 +22,7 @@
 	import LogIn from 'lucide-svelte/icons/log-in';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import Link2 from 'lucide-svelte/icons/link-2';
+	import UserRound from 'lucide-svelte/icons/user-round';
 	import MonitorCog from 'lucide-svelte/icons/monitor-cog';
 
 	interface Props {
@@ -77,6 +78,14 @@
 				<a href={resolve('/links')} class="flex w-full items-center gap-2">
 					<Link2 class="h-4 w-4" />
 					<span class="text-sm">{$t('layout.myLinks')}</span>
+				</a>
+			</DropdownMenuItem>
+
+			<!-- Profile -->
+			<DropdownMenuItem>
+				<a href={resolve('/profile')} class="flex w-full items-center gap-2">
+					<UserRound class="h-4 w-4" />
+					<span class="text-sm">{$t('layout.profile')}</span>
 				</a>
 			</DropdownMenuItem>
 

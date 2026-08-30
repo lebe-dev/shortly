@@ -87,6 +87,8 @@ pub async fn list_audit_events_route(
         "user_login" => Some(AuditEventType::UserLogin),
         "user_logout" => Some(AuditEventType::UserLogout),
         "user_quota_update" => Some(AuditEventType::UserQuotaUpdate),
+        "passkey_register" => Some(AuditEventType::PasskeyRegister),
+        "passkey_delete" => Some(AuditEventType::PasskeyDelete),
         _ => None,
     });
 

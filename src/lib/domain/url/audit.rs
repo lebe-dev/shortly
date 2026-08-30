@@ -32,6 +32,8 @@ pub enum AuditEventType {
     UserLogin,
     UserLogout,
     UserQuotaUpdate,
+    PasskeyRegister,
+    PasskeyDelete,
 }
 
 impl std::fmt::Display for AuditEventType {
@@ -42,6 +44,8 @@ impl std::fmt::Display for AuditEventType {
             AuditEventType::UserLogin => write!(f, "user_login"),
             AuditEventType::UserLogout => write!(f, "user_logout"),
             AuditEventType::UserQuotaUpdate => write!(f, "user_quota_update"),
+            AuditEventType::PasskeyRegister => write!(f, "passkey_register"),
+            AuditEventType::PasskeyDelete => write!(f, "passkey_delete"),
         }
     }
 }

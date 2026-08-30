@@ -10,12 +10,21 @@ use axum::{
     response::{Html, IntoResponse, Response},
     routing::{get, post},
 };
-use domain::config::model::{config::AppConfig, ports::AppConfigService};
+use domain::config::model::{config::AppConfig, passkey::PasskeyConfig, ports::AppConfigService};
 use log::{debug, error, info, warn};
 use logger::get_logging_config;
 use outbound::config::file::AppConfigServiceImpl;
 use route::{
-    auth::{callback::callback_route, login::login_route, logout::logout_route},
+    auth::{
+        callback::callback_route,
+        login::login_route,
+        logout::logout_route,
+        passkey::{
+            delete_passkey_route, delete_user_passkeys_route, list_passkeys_route,
+            passkey_login_finish_route, passkey_login_start_route, passkey_register_finish_route,
+            passkey_register_start_route,
+        },
+    },
     config::get_app_config_route,
     health::health_route,
     metrics::metrics_route,
@@ -28,6 +37,10 @@ use server_lib::{
     VERSION,
     domain::{
         auth::{ports::AuthService, service::AuthServiceImpl},
+        passkey::{
+            ports::PasskeyService,
+            service::{PasskeyServiceConfig, PasskeyServiceImpl},
+        },
         url::{
             ports::{UrlRepository, UrlService},
             service::{UrlServiceConfig, UrlServiceImpl as UrlServiceImplType},
@@ -58,17 +71,31 @@ pub mod route;
 
 pub type SharedAppState = AppState;
 
+type ServerAuthService = AuthServiceImpl<Database, Database, GitlabOAuthClient>;
+
+type ServerPasskeyService = PasskeyServiceImpl<Database, Database, Database, ServerAuthService>;
+
 #[derive(Clone)]
 pub struct AppState {
     config: AppConfig,
     url_service: UrlServiceImplType<Database>,
-    auth_service: Option<AuthServiceImpl<Database, Database, GitlabOAuthClient>>,
+    auth_service: Option<ServerAuthService>,
+    passkey_service: Option<ServerPasskeyService>,
     user_repository: Database,
     start_time: i64,
 }
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
+    // Environment variables may be provided through a .env file. They override
+    // the values of config.yml, so the file is loaded before the configuration.
+    if let Err(e) = dotenvy::dotenv()
+        && !e.not_found()
+    {
+        eprintln!("failed to load .env file: {}", e);
+        std::process::exit(1);
+    }
+
     let config_service = AppConfigServiceImpl;
 
     let config_file = Path::new("config.yml");
@@ -157,10 +184,19 @@ async fn main() -> anyhow::Result<()> {
                 None
             };
 
+            let passkey_service = match build_passkey_service(&db, auth_service.as_ref()) {
+                Ok(service) => service,
+                Err(e) => {
+                    eprintln!("failed to configure passkey authentication: {}", e);
+                    return Err(anyhow!("passkey configuration error"));
+                }
+            };
+
             let app_state = AppState {
                 config: app_config.clone(),
                 url_service: url_service.clone(),
                 auth_service: auth_service.clone(),
+                passkey_service: passkey_service.clone(),
                 user_repository: db.clone(),
                 start_time: chrono::Utc::now().timestamp(),
             };
@@ -207,6 +243,25 @@ async fn main() -> anyhow::Result<()> {
                     .expect("unable to add cleanup expired sessions cronjob to scheduler");
             }
 
+            if let Some(ref passkey_svc) = passkey_service {
+                let passkey_svc_clone = passkey_svc.clone();
+                sched
+                    .add(
+                        Job::new_async("0 */5 * * * *", move |_, _| {
+                            // Every five minutes
+                            let service = passkey_svc_clone.clone();
+                            Box::pin(async move {
+                                let _ = service.cleanup_expired_challenges().await;
+                            })
+                        })
+                        .expect("unable to create cronjob for cleanup expired passkey challenges"),
+                    )
+                    .await
+                    .expect(
+                        "unable to add cleanup expired passkey challenges cronjob to scheduler",
+                    );
+            }
+
             sched.start().await?;
 
             // SCHEDULER - END
@@ -221,6 +276,31 @@ async fn main() -> anyhow::Result<()> {
                 .route("/api/auth/login", get(login_route))
                 .route("/api/auth/callback", get(callback_route))
                 .route("/api/auth/logout", post(logout_route))
+                .route(
+                    "/api/auth/passkey/login/start",
+                    post(passkey_login_start_route),
+                )
+                .route(
+                    "/api/auth/passkey/login/finish",
+                    post(passkey_login_finish_route),
+                )
+                .route("/api/user/passkeys", get(list_passkeys_route))
+                .route(
+                    "/api/user/passkeys/register/start",
+                    post(passkey_register_start_route),
+                )
+                .route(
+                    "/api/user/passkeys/register/finish",
+                    post(passkey_register_finish_route),
+                )
+                .route(
+                    "/api/user/passkeys/{credential_id}",
+                    axum::routing::delete(delete_passkey_route),
+                )
+                .route(
+                    "/api/admin/user/{user_id}/passkeys",
+                    axum::routing::delete(delete_user_passkeys_route),
+                )
                 .route("/api/url/{url_id}", get(get_short_url_by_id_route))
                 .route("/api/url/{url_id}", axum::routing::delete(delete_url_route))
                 .route("/api/url", post(generate_short_url_route))
@@ -264,6 +344,38 @@ async fn main() -> anyhow::Result<()> {
             std::process::exit(1);
         }
     }
+}
+
+/// Build the passkey service when the feature is switched on through the environment.
+fn build_passkey_service(
+    db: &Database,
+    auth_service: Option<&ServerAuthService>,
+) -> anyhow::Result<Option<ServerPasskeyService>> {
+    let Some(passkey_config) = PasskeyConfig::from_env()? else {
+        return Ok(None);
+    };
+
+    let Some(auth_service) = auth_service else {
+        warn!("passkey authentication is enabled but authentication is disabled, skipping it");
+        return Ok(None);
+    };
+
+    info!("passkey authentication enabled: {}", passkey_config);
+
+    let service = PasskeyServiceImpl::new(
+        PasskeyServiceConfig {
+            rp_id: passkey_config.rp_id,
+            rp_origin: passkey_config.rp_origin,
+            rp_name: passkey_config.rp_name,
+            challenge_ttl: passkey_config.challenge_ttl,
+        },
+        db.clone(),
+        db.clone(),
+        db.clone(),
+        auth_service.clone(),
+    )?;
+
+    Ok(Some(service))
 }
 
 static INDEX_HTML: &str = "index.html";

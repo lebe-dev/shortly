@@ -40,6 +40,11 @@ The following parameters configure the Shortly application itself. All values ar
 | `config.auth.enabled` | Enable authentication | `true` | No |
 | `config.auth.type` | Authentication type | `gitlab` | No |
 | `config.auth.providers.gitlab.baseUrl` | GitLab instance URL | `https://gitlab.com` | No |
+| `config.auth.passkey.enabled` | Enable login with a passkey (WebAuthn) | `false` | No |
+| `config.auth.passkey.rpId` | Registrable domain, without scheme or port. Required when passkeys are enabled | `""` | No |
+| `config.auth.passkey.rpOrigin` | Origin the browser reports, including scheme and port. Required when passkeys are enabled | `""` | No |
+| `config.auth.passkey.rpName` | Name shown by the authenticator | `Shortly` | No |
+| `config.auth.passkey.challengeTtl` | Lifetime of an unfinished ceremony, in seconds | `300` | No |
 | `config.nginx.enabled` | Enable nginx reverse proxy sidecar | `true` | No |
 | `config.nginx.image.repository` | Nginx image repository | `nginxinc/nginx-unprivileged` | No |
 | `config.nginx.image.tag` | Nginx image tag | `1.29.3-alpine-otel` | No |

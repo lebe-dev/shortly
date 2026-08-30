@@ -43,7 +43,8 @@
 		"login": "Войти",
 		"logout": "Выйти",
 		"myLinks": "Мои ссылки",
-		"adminPanel": "Панель администратора"
+		"adminPanel": "Панель администратора",
+		"profile": "Профиль"
 	},
 	"homePage": {
 		"title": "Создать короткую ссылку :: SHRTLY",
@@ -113,11 +114,15 @@
 		"title": "Вход :: SHRTLY",
 		"description": "Войти в сервис Shortly",
 		"buttons": {
-			"gitlab": "Войти через GitLab"
+			"gitlab": "Войти через GitLab",
+			"passkey": "Войти по passkey",
+			"passkeyInProgress": "Ожидание passkey..."
 		},
 		"errors": {
 			"configLoadFailed": "Не удалось загрузить конфигурацию приложения",
-			"authDisabled": "Аутентификация недоступна"
+			"authDisabled": "Аутентификация недоступна",
+			"passkeyLoginFailed": "Не удалось войти по passkey",
+			"passkeyUnknownAccount": "Этот passkey не привязан ни к одному аккаунту"
 		}
 	},
 	"linksPage": {
@@ -253,7 +258,9 @@
 				"delete_url": "Удаление URL",
 				"user_login": "Вход",
 				"user_logout": "Выход",
-				"user_quota_update": "Изменение квот"
+				"user_quota_update": "Изменение квот",
+				"passkey_register": "Passkey добавлен",
+				"passkey_delete": "Passkey удалён"
 			},
 			"noEvents": "Событий не найдено",
 			"showing": "Показано {count} из {total}",
@@ -274,7 +281,41 @@
 			"cancelEdit": "Отмена",
 			"quotasUpdated": "Квоты успешно обновлены",
 			"quotasUpdateFailed": "Не удалось обновить квоты",
-			"quotasMustBeNonNegative": "Квоты должны быть неотрицательными"
+			"quotasMustBeNonNegative": "Квоты должны быть неотрицательными",
+			"passkeyCount": "Passkey",
+			"passkeysDelete": "Удалить все",
+			"passkeysDeleteConfirm": "Удалить все passkey этого пользователя?",
+			"passkeysDeleted": "Passkey удалены",
+			"passkeysDeleteFailed": "Не удалось удалить passkey"
+		}
+	},
+	"profilePage": {
+		"title": "Профиль :: SHRTLY",
+		"description": "Управление аккаунтом и passkey",
+		"header": "Профиль",
+		"passkeys": {
+			"header": "Passkey",
+			"hint": "Passkey позволяет входить без GitLab. Passkey работает только для уже существующих аккаунтов.",
+			"disabled": "Вход по passkey отключён",
+			"unsupported": "Браузер не поддерживает passkey",
+			"namePlaceholder": "Название passkey",
+			"register": "Добавить passkey",
+			"registering": "Ожидание passkey...",
+			"registered": "Passkey добавлен",
+			"empty": "Passkey ещё не добавлены",
+			"name": "Название",
+			"created": "Создан",
+			"lastUsed": "Последнее использование",
+			"neverUsed": "Никогда",
+			"delete": "Удалить passkey",
+			"deleted": "Passkey удалён",
+			"deleteConfirm": "Удалить этот passkey?"
+		},
+		"errors": {
+			"loadFailed": "Не удалось загрузить список passkey",
+			"registerFailed": "Не удалось добавить passkey",
+			"deleteFailed": "Не удалось удалить passkey",
+			"alreadyRegistered": "Этот passkey уже зарегистрирован"
 		}
 	}
 }

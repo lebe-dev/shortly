@@ -220,6 +220,22 @@ config:
     # Comma-separated list of admin usernames (e.g., "user1,user2,user3")
     adminUsers: ""
 
+    # Passkey (WebAuthn) login.
+    # Works as a second way into an account: a user signs in with GitLab first
+    # and then adds a passkey on the profile page.
+    # Requires HTTPS, see docs/configuration/passkey.md
+    passkey:
+      # Enable/disable login with a passkey
+      enabled: false
+      # Registrable domain of the service, without scheme or port
+      rpId: ""
+      # Origin the browser reports, including scheme and port
+      rpOrigin: ""
+      # Name shown by the authenticator
+      rpName: "Shortly"
+      # Lifetime of an unfinished registration or login, in seconds
+      challengeTtl: 300
+
     # Authentication provider settings
     providers:
       gitlab:

@@ -95,17 +95,33 @@ export class FeaturesConfig {
 export type AuthType = 'gitlab';
 
 export class AuthConfig {
-	constructor(enabled: boolean, authType: AuthType, note?: string, gitlab?: GitlabProvider) {
+	constructor(
+		enabled: boolean,
+		authType: AuthType,
+		passkey: PasskeyProvider,
+		note?: string,
+		gitlab?: GitlabProvider
+	) {
 		this.enabled = enabled;
 		this.authType = authType;
+		this.passkey = passkey;
 		this.note = note;
 		this.gitlab = gitlab;
 	}
 
 	enabled: boolean;
 	authType: AuthType;
+	passkey: PasskeyProvider;
 	note?: string;
 	gitlab?: GitlabProvider;
+}
+
+export class PasskeyProvider {
+	constructor(enabled: boolean) {
+		this.enabled = enabled;
+	}
+
+	enabled: boolean;
 }
 
 export class GitlabProvider {
@@ -155,6 +171,7 @@ export interface AdminUserDto {
 	maxUrlsPerUser: number;
 	maxUrlsPerDay: number;
 	isAdmin: boolean;
+	passkeyCount: number;
 }
 
 export interface AdminDataDto {

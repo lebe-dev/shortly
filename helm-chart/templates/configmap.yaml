@@ -32,6 +32,13 @@ data:
   AUTH_ADMIN_USERS: {{ .Values.config.auth.adminUsers | quote }}
   {{- end }}
   AUTH_PROVIDERS_GITLAB_BASE_URL: {{ .Values.config.auth.providers.gitlab.baseUrl | quote }}
+  PASSKEY_ENABLED: {{ .Values.config.auth.passkey.enabled | quote }}
+  {{- if .Values.config.auth.passkey.enabled }}
+  PASSKEY_RP_ID: {{ required "config.auth.passkey.rpId is required when passkeys are enabled" .Values.config.auth.passkey.rpId | quote }}
+  PASSKEY_RP_ORIGIN: {{ required "config.auth.passkey.rpOrigin is required when passkeys are enabled" .Values.config.auth.passkey.rpOrigin | quote }}
+  PASSKEY_RP_NAME: {{ .Values.config.auth.passkey.rpName | quote }}
+  PASSKEY_CHALLENGE_TTL: {{ .Values.config.auth.passkey.challengeTtl | quote }}
+  {{- end }}
   METRICS_ENABLED: {{ .Values.config.metrics.enabled | quote }}
 {{- if .Values.config.nginx.enabled }}
 ---

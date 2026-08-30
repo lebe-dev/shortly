@@ -4,4 +4,5 @@ The application configuration is loaded from `config.yml` file with support for 
 
 - [Environment variables](env.md)
 - [Nginx configuration](nginx.md)
-- [GitLab Authentication](configuration.md)
+- [GitLab Authentication](gitlab.md)
+- [Passkey Authentication](passkey.md)

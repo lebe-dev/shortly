@@ -43,7 +43,8 @@
 		"login": "התחבר",
 		"logout": "התנתק",
 		"myLinks": "הקישורים שלי",
-		"adminPanel": "פאנל ניהול"
+		"adminPanel": "פאנל ניהול",
+		"profile": "פרופיל"
 	},
 	"homePage": {
 		"title": "צור קישור קצר :: SHRTLY",
@@ -113,11 +114,15 @@
 		"title": "התחברות :: SHRTLY",
 		"description": "התחבר לשירות Shortly",
 		"buttons": {
-			"gitlab": "התחבר עם GitLab"
+			"gitlab": "התחבר עם GitLab",
+			"passkey": "התחברות עם מפתח גישה",
+			"passkeyInProgress": "ממתין למפתח הגישה..."
 		},
 		"errors": {
 			"configLoadFailed": "לא ניתן לטעון את הגדרות האפליקציה",
-			"authDisabled": "ההזדהות אינה זמינה"
+			"authDisabled": "ההזדהות אינה זמינה",
+			"passkeyLoginFailed": "ההתחברות עם מפתח הגישה נכשלה",
+			"passkeyUnknownAccount": "מפתח גישה זה אינו משויך לאף חשבון"
 		}
 	},
 	"linksPage": {
@@ -252,7 +257,9 @@
 				"delete_url": "כתובת נמחקה",
 				"user_login": "משתמש התחבר",
 				"user_logout": "משתמש התנתק",
-				"user_quota_update": "מכסה עודכנה"
+				"user_quota_update": "מכסה עודכנה",
+				"passkey_register": "מפתח גישה נרשם",
+				"passkey_delete": "מפתח גישה נמחק"
 			},
 			"noEvents": "לא נמצאו אירועי ביקורת",
 			"showing": "מוצג {count} מתוך {total} אירועים",
@@ -273,7 +280,41 @@
 			"cancelEdit": "בטל",
 			"quotasUpdated": "המכסות עודכנו בהצלחה",
 			"quotasUpdateFailed": "עדכון המכסות נכשל",
-			"quotasMustBeNonNegative": "המכסות חייבות להיות לא שליליות"
+			"quotasMustBeNonNegative": "המכסות חייבות להיות לא שליליות",
+			"passkeyCount": "מפתחות גישה",
+			"passkeysDelete": "מחיקת הכול",
+			"passkeysDeleteConfirm": "למחוק את כל מפתחות הגישה של המשתמש הזה?",
+			"passkeysDeleted": "מפתחות הגישה נמחקו",
+			"passkeysDeleteFailed": "מחיקת מפתחות הגישה נכשלה"
+		}
+	},
+	"profilePage": {
+		"title": "פרופיל :: SHRTLY",
+		"description": "ניהול החשבון ומפתחות הגישה",
+		"header": "פרופיל",
+		"passkeys": {
+			"header": "מפתחות גישה",
+			"hint": "מפתח גישה מאפשר להתחבר בלי GitLab. מפתחות גישה פועלים רק עבור חשבונות קיימים.",
+			"disabled": "ההתחברות עם מפתח גישה אינה מופעלת",
+			"unsupported": "הדפדפן הזה אינו תומך במפתחות גישה",
+			"namePlaceholder": "שם מפתח הגישה",
+			"register": "הוספת מפתח גישה",
+			"registering": "ממתין למפתח הגישה...",
+			"registered": "מפתח הגישה נוסף",
+			"empty": "אין עדיין מפתחות גישה",
+			"name": "שם",
+			"created": "נוצר",
+			"lastUsed": "שימוש אחרון",
+			"neverUsed": "מעולם לא",
+			"delete": "מחיקת מפתח גישה",
+			"deleted": "מפתח הגישה נמחק",
+			"deleteConfirm": "למחוק את מפתח הגישה הזה?"
+		},
+		"errors": {
+			"loadFailed": "טעינת מפתחות הגישה נכשלה",
+			"registerFailed": "הוספת מפתח הגישה נכשלה",
+			"deleteFailed": "מחיקת מפתח הגישה נכשלה",
+			"alreadyRegistered": "מפתח גישה זה כבר רשום"
 		}
 	}
 }

@@ -121,6 +121,22 @@ where
         Ok((user, session))
     }
 
+    async fn create_session(&self, user_id: i64) -> Result<Session, AuthError> {
+        let token = self.generate_session_token();
+        let current_time = self.get_current_timestamp()?;
+
+        let expires_at = self
+            .session_ttl_days
+            .map(|days| current_time + (days as i64 * 86400));
+
+        let session = self
+            .session_repo
+            .create(user_id, &token, expires_at)
+            .await?;
+
+        Ok(session)
+    }
+
     async fn validate_session(&self, token: &str) -> Result<User, AuthError> {
         let session = self
             .session_repo

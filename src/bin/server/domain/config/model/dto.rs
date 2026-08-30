@@ -90,6 +90,15 @@ pub struct AuthConfigDto {
     /// GitLab provider configuration
     #[serde(skip_serializing_if = "Option::is_none")]
     pub gitlab: Option<GitlabProviderDto>,
+    /// Passkey provider configuration
+    pub passkey: PasskeyProviderDto,
+}
+
+#[derive(PartialEq, Serialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct PasskeyProviderDto {
+    /// Whether login with a passkey is available
+    pub enabled: bool,
 }
 
 #[derive(PartialEq, Serialize, Clone, Debug)]
@@ -171,6 +180,8 @@ pub struct AdminUserDto {
     pub max_urls_per_day: i32,
     /// Whether this user is an admin
     pub is_admin: bool,
+    /// Number of passkeys registered by this user
+    pub passkey_count: i64,
 }
 
 impl From<AppConfig> for AppConfigDto {
@@ -222,6 +233,7 @@ impl From<AppConfig> for AppConfigDto {
                 auth_type: config.auth.auth_type,
                 note: config.auth.note,
                 gitlab: gitlab_dto,
+                passkey: PasskeyProviderDto { enabled: false },
             },
             scheduler: SchedulerConfigDto {
                 cleanup_expired_urls: config.scheduler.cleanup_expired_urls.clone(),
@@ -288,8 +300,8 @@ impl fmt::Display for AuthConfigDto {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "AuthConfigDto {{ enabled: {}, auth_type: {}, note: {:?}, gitlab: {:?} }}",
-            self.enabled, self.auth_type, self.note, self.gitlab
+            "AuthConfigDto {{ enabled: {}, auth_type: {}, note: {:?}, gitlab: {:?}, passkey: {} }}",
+            self.enabled, self.auth_type, self.note, self.gitlab, self.passkey.enabled
         )
     }
 }

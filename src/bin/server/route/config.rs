@@ -13,6 +13,7 @@ use crate::domain::config::model::dto::{
 use crate::route::middleware::extract_session_token;
 use server_lib::domain::auth::model::User;
 use server_lib::domain::auth::ports::{AuthService, UserRepository};
+use server_lib::domain::passkey::ports::PasskeyService;
 use server_lib::domain::url::ports::UrlService;
 
 pub async fn get_app_config_route(
@@ -21,6 +22,8 @@ pub async fn get_app_config_route(
     user: Option<Extension<User>>,
 ) -> impl IntoResponse {
     let mut dto: AppConfigDto = state.config.clone().into();
+
+    dto.auth.passkey.enabled = state.passkey_service.is_some();
 
     if state.config.auth.enabled
         && let Some(ref auth_service) = state.auth_service
@@ -153,6 +156,22 @@ pub async fn get_app_config_route(
 
                                 let is_admin = is_user_admin(&user.username, &state.config);
 
+                                let passkey_count = match state.passkey_service {
+                                    Some(ref service) => {
+                                        match service.count_credentials(user.id).await {
+                                            Ok(count) => count,
+                                            Err(e) => {
+                                                error!(
+                                                    "failed to count passkeys of user {}: {:?}",
+                                                    user.id, e
+                                                );
+                                                0
+                                            }
+                                        }
+                                    }
+                                    None => 0,
+                                };
+
                                 admin_users.push(crate::domain::config::model::dto::AdminUserDto {
                                     id: user.id,
                                     username: user.username.clone(),
@@ -163,6 +182,7 @@ pub async fn get_app_config_route(
                                     max_urls_per_user: user.max_urls_per_user,
                                     max_urls_per_day: user.max_urls_per_day,
                                     is_admin,
+                                    passkey_count,
                                 });
                             }
 

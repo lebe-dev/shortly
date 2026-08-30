@@ -49,6 +49,10 @@ lazy_static = "1.5.0"
 
 log = "0.4.28"
 log4rs = "1.4.0"
+webauthn-rs = { version = "0.5", features = ["danger-allow-state-serialisation", "conditional-ui"] }
+dotenvy = "0.15"
+uuid = { version = "1", features = ["v4", "serde"] }
+base64 = "0.22"
 
 [dev-dependencies]
 env_logger = "0.11.8"

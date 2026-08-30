@@ -43,7 +43,8 @@
 		"login": "登录",
 		"logout": "登出",
 		"myLinks": "我的链接",
-		"adminPanel": "管理面板"
+		"adminPanel": "管理面板",
+		"profile": "个人资料"
 	},
 	"homePage": {
 		"title": "创建短链接 :: SHRTLY",
@@ -113,11 +114,15 @@
 		"title": "登录 :: SHRTLY",
 		"description": "登录 Shortly 服务",
 		"buttons": {
-			"gitlab": "使用 GitLab 登录"
+			"gitlab": "使用 GitLab 登录",
+			"passkey": "使用通行密钥登录",
+			"passkeyInProgress": "等待通行密钥..."
 		},
 		"errors": {
 			"configLoadFailed": "无法加载应用配置",
-			"authDisabled": "身份验证不可用"
+			"authDisabled": "身份验证不可用",
+			"passkeyLoginFailed": "通行密钥登录失败",
+			"passkeyUnknownAccount": "该通行密钥未绑定任何账户"
 		}
 	},
 	"linksPage": {
@@ -250,7 +255,9 @@
 				"create_url": "创建URL",
 				"delete_url": "删除URL",
 				"user_login": "用户登录",
-				"user_logout": "用户登出"
+				"user_logout": "用户登出",
+				"passkey_register": "通行密钥已注册",
+				"passkey_delete": "通行密钥已删除"
 			},
 			"noEvents": "未找到审计事件",
 			"showing": "显示 {count} / {total} 个事件",
@@ -265,7 +272,41 @@
 			"urlCount": "创建的URL数",
 			"quotas": "配额",
 			"maxPerUser": "每用户最大",
-			"maxPerDay": "每日最大"
+			"maxPerDay": "每日最大",
+			"passkeyCount": "通行密钥",
+			"passkeysDelete": "全部删除",
+			"passkeysDeleteConfirm": "删除该用户的所有通行密钥？",
+			"passkeysDeleted": "通行密钥已删除",
+			"passkeysDeleteFailed": "删除通行密钥失败"
+		}
+	},
+	"profilePage": {
+		"title": "个人资料 :: SHRTLY",
+		"description": "管理账户与通行密钥",
+		"header": "个人资料",
+		"passkeys": {
+			"header": "通行密钥",
+			"hint": "通行密钥可让你无需 GitLab 即可登录。通行密钥仅适用于已存在的账户。",
+			"disabled": "通行密钥登录未启用",
+			"unsupported": "此浏览器不支持通行密钥",
+			"namePlaceholder": "通行密钥名称",
+			"register": "添加通行密钥",
+			"registering": "等待通行密钥...",
+			"registered": "通行密钥已添加",
+			"empty": "还没有通行密钥",
+			"name": "名称",
+			"created": "创建时间",
+			"lastUsed": "最后使用",
+			"neverUsed": "从未",
+			"delete": "删除通行密钥",
+			"deleted": "通行密钥已删除",
+			"deleteConfirm": "删除此通行密钥？"
+		},
+		"errors": {
+			"loadFailed": "无法加载通行密钥",
+			"registerFailed": "添加通行密钥失败",
+			"deleteFailed": "删除通行密钥失败",
+			"alreadyRegistered": "该通行密钥已注册"
 		}
 	}
 }

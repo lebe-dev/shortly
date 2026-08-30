@@ -43,7 +43,8 @@
 		"login": "ログイン",
 		"logout": "ログアウト",
 		"myLinks": "マイリンク",
-		"adminPanel": "管理パネル"
+		"adminPanel": "管理パネル",
+		"profile": "プロフィール"
 	},
 	"homePage": {
 		"title": "短縮URLを作成 :: SHRTLY",
@@ -113,11 +114,15 @@
 		"title": "ログイン :: SHRTLY",
 		"description": "Shortlyサービスにログイン",
 		"buttons": {
-			"gitlab": "GitLabでログイン"
+			"gitlab": "GitLabでログイン",
+			"passkey": "パスキーでログイン",
+			"passkeyInProgress": "パスキーを待っています..."
 		},
 		"errors": {
 			"configLoadFailed": "アプリ設定を読み込めませんでした",
-			"authDisabled": "認証は利用できません"
+			"authDisabled": "認証は利用できません",
+			"passkeyLoginFailed": "パスキーでのログインに失敗しました",
+			"passkeyUnknownAccount": "このパスキーはどのアカウントにも紐づいていません"
 		}
 	},
 	"linksPage": {
@@ -250,7 +255,9 @@
 				"create_url": "URL作成",
 				"delete_url": "URL削除",
 				"user_login": "ユーザーログイン",
-				"user_logout": "ユーザーログアウト"
+				"user_logout": "ユーザーログアウト",
+				"passkey_register": "パスキー登録",
+				"passkey_delete": "パスキー削除"
 			},
 			"noEvents": "監査イベントが見つかりません",
 			"showing": "{total}件中{count}件を表示",
@@ -265,7 +272,41 @@
 			"urlCount": "作成したURL数",
 			"quotas": "クォータ",
 			"maxPerUser": "ユーザーあたりの最大数",
-			"maxPerDay": "1日あたりの最大数"
+			"maxPerDay": "1日あたりの最大数",
+			"passkeyCount": "パスキー",
+			"passkeysDelete": "すべて削除",
+			"passkeysDeleteConfirm": "このユーザーのパスキーをすべて削除しますか？",
+			"passkeysDeleted": "パスキーを削除しました",
+			"passkeysDeleteFailed": "パスキーを削除できませんでした"
+		}
+	},
+	"profilePage": {
+		"title": "プロフィール :: SHRTLY",
+		"description": "アカウントとパスキーの管理",
+		"header": "プロフィール",
+		"passkeys": {
+			"header": "パスキー",
+			"hint": "パスキーを使うとGitLabなしでログインできます。パスキーは既存のアカウントでのみ利用できます。",
+			"disabled": "パスキーでのログインは無効です",
+			"unsupported": "このブラウザはパスキーに対応していません",
+			"namePlaceholder": "パスキーの名前",
+			"register": "パスキーを追加",
+			"registering": "パスキーを待っています...",
+			"registered": "パスキーを追加しました",
+			"empty": "パスキーはまだありません",
+			"name": "名前",
+			"created": "作成日",
+			"lastUsed": "最終使用",
+			"neverUsed": "なし",
+			"delete": "パスキーを削除",
+			"deleted": "パスキーを削除しました",
+			"deleteConfirm": "このパスキーを削除しますか？"
+		},
+		"errors": {
+			"loadFailed": "パスキーを読み込めませんでした",
+			"registerFailed": "パスキーを追加できませんでした",
+			"deleteFailed": "パスキーを削除できませんでした",
+			"alreadyRegistered": "このパスキーは既に登録されています"
 		}
 	}
 }

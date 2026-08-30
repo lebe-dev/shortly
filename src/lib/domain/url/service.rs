@@ -13,6 +13,7 @@ const MAX_RETRIES: usize = 100;
 /// Base reserved names that are always protected regardless of configuration
 pub const BASE_RESERVED_NAMES: &[&str] = &[
     "links", "api", "login", "logout", "assets", "static", "health", "metrics", "auth", "admin",
+    "profile",
 ];
 
 /// Configuration for URL service

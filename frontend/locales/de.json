@@ -43,7 +43,8 @@
 		"login": "Anmelden",
 		"logout": "Abmelden",
 		"myLinks": "Meine Links",
-		"adminPanel": "Admin-Panel"
+		"adminPanel": "Admin-Panel",
+		"profile": "Profil"
 	},
 	"homePage": {
 		"title": "Kurzen URL erstellen :: SHRTLY",
@@ -113,11 +114,15 @@
 		"title": "Anmelden :: SHRTLY",
 		"description": "Beim Shortly-Dienst anmelden",
 		"buttons": {
-			"gitlab": "Mit GitLab anmelden"
+			"gitlab": "Mit GitLab anmelden",
+			"passkey": "Mit Passkey anmelden",
+			"passkeyInProgress": "Warte auf Passkey..."
 		},
 		"errors": {
 			"configLoadFailed": "App-Konfiguration konnte nicht geladen werden",
-			"authDisabled": "Authentifizierung ist nicht verfügbar"
+			"authDisabled": "Authentifizierung ist nicht verfügbar",
+			"passkeyLoginFailed": "Anmeldung mit Passkey fehlgeschlagen",
+			"passkeyUnknownAccount": "Dieser Passkey ist mit keinem Konto verknüpft"
 		}
 	},
 	"linksPage": {
@@ -250,7 +255,9 @@
 				"create_url": "URL erstellt",
 				"delete_url": "URL gelöscht",
 				"user_login": "Benutzer angemeldet",
-				"user_logout": "Benutzer abgemeldet"
+				"user_logout": "Benutzer abgemeldet",
+				"passkey_register": "Passkey registriert",
+				"passkey_delete": "Passkey gelöscht"
 			},
 			"noEvents": "Keine Audit-Ereignisse gefunden",
 			"showing": "{count} von {total} Ereignissen werden angezeigt",
@@ -265,7 +272,41 @@
 			"urlCount": "Erstellte URLs",
 			"quotas": "Kontingente",
 			"maxPerUser": "Max. pro Benutzer",
-			"maxPerDay": "Max. pro Tag"
+			"maxPerDay": "Max. pro Tag",
+			"passkeyCount": "Passkeys",
+			"passkeysDelete": "Alle löschen",
+			"passkeysDeleteConfirm": "Alle Passkeys dieses Benutzers löschen?",
+			"passkeysDeleted": "Passkeys gelöscht",
+			"passkeysDeleteFailed": "Passkeys konnten nicht gelöscht werden"
+		}
+	},
+	"profilePage": {
+		"title": "Profil :: SHRTLY",
+		"description": "Konto und Passkeys verwalten",
+		"header": "Profil",
+		"passkeys": {
+			"header": "Passkeys",
+			"hint": "Mit einem Passkey melden Sie sich ohne GitLab an. Passkeys funktionieren nur für bereits bestehende Konten.",
+			"disabled": "Die Anmeldung mit Passkey ist deaktiviert",
+			"unsupported": "Dieser Browser unterstützt keine Passkeys",
+			"namePlaceholder": "Name des Passkeys",
+			"register": "Passkey hinzufügen",
+			"registering": "Warte auf Passkey...",
+			"registered": "Passkey hinzugefügt",
+			"empty": "Noch keine Passkeys",
+			"name": "Name",
+			"created": "Erstellt",
+			"lastUsed": "Zuletzt verwendet",
+			"neverUsed": "Nie",
+			"delete": "Passkey löschen",
+			"deleted": "Passkey gelöscht",
+			"deleteConfirm": "Diesen Passkey löschen?"
+		},
+		"errors": {
+			"loadFailed": "Passkeys konnten nicht geladen werden",
+			"registerFailed": "Passkey konnte nicht hinzugefügt werden",
+			"deleteFailed": "Passkey konnte nicht gelöscht werden",
+			"alreadyRegistered": "Dieser Passkey ist bereits registriert"
 		}
 	}
 }

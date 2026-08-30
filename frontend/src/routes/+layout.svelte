@@ -8,26 +8,13 @@
 	import UserMenu from '$lib/components/UserMenu.svelte';
 	import MobileMenu from '$lib/components/MobileMenu.svelte';
 	import LanguageSelector from '$lib/components/LanguageSelector.svelte';
-	import { fetchConfig } from '$lib/api/config';
-	import type { AppConfig } from '$lib/domain/config';
-	import { onMount } from 'svelte';
 	import { authStore } from '$lib/stores/auth';
+	import { configStore } from '$lib/stores/config';
 	import { version as appVersion } from '../../package.json';
 
 	let { children } = $props();
 
 	let showFullAppName: boolean = $state(false);
-	let config: AppConfig | null = $state(null);
-
-	onMount(async () => {
-		await fetchConfig()
-			.then((data) => {
-				config = data;
-			})
-			.catch((e) => {
-				console.error('Failed to load config in layout:', e);
-			});
-	});
 </script>
 
 <Toaster position="top-right" />
@@ -95,14 +82,14 @@
 						<LanguageSelector />
 					{/if}
 					<LightSwitch />
-					{#if config?.auth.enabled}
-						<UserMenu {config} />
+					{#if $configStore?.auth.enabled}
+						<UserMenu config={$configStore} />
 					{/if}
 				</div>
 
 				<!-- Mobile menu (hidden on desktop) -->
 				<div class="me-1 md:hidden">
-					<MobileMenu {config} />
+					<MobileMenu config={$configStore} />
 				</div>
 			</div>
 		</div>

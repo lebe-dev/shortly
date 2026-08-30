@@ -43,7 +43,8 @@
 		"login": "Login",
 		"logout": "Logout",
 		"myLinks": "My Links",
-		"adminPanel": "Admin Panel"
+		"adminPanel": "Admin Panel",
+		"profile": "Profile"
 	},
 	"homePage": {
 		"title": "Create short url :: SHRTLY",
@@ -113,11 +114,15 @@
 		"title": "Login :: SHRTLY",
 		"description": "Login to Shortly service",
 		"buttons": {
-			"gitlab": "Login with GitLab"
+			"gitlab": "Login with GitLab",
+			"passkey": "Login with passkey",
+			"passkeyInProgress": "Waiting for passkey..."
 		},
 		"errors": {
 			"configLoadFailed": "Unable to load app config",
-			"authDisabled": "Authentication is not available"
+			"authDisabled": "Authentication is not available",
+			"passkeyLoginFailed": "Passkey login failed",
+			"passkeyUnknownAccount": "This passkey is not linked to any account"
 		}
 	},
 	"linksPage": {
@@ -255,7 +260,9 @@
 				"delete_url": "URL Deleted",
 				"user_login": "User Login",
 				"user_logout": "User Logout",
-				"user_quota_update": "Quota Updated"
+				"user_quota_update": "Quota Updated",
+				"passkey_register": "Passkey Registered",
+				"passkey_delete": "Passkey Deleted"
 			},
 			"noEvents": "No audit events found",
 			"showing": "Showing {count} of {total} events",
@@ -276,7 +283,41 @@
 			"cancelEdit": "Cancel",
 			"quotasUpdated": "Quotas updated successfully",
 			"quotasUpdateFailed": "Failed to update quotas",
-			"quotasMustBeNonNegative": "Quotas must be non-negative"
+			"quotasMustBeNonNegative": "Quotas must be non-negative",
+			"passkeyCount": "Passkeys",
+			"passkeysDelete": "Delete all",
+			"passkeysDeleteConfirm": "Delete every passkey of this user?",
+			"passkeysDeleted": "Passkeys deleted",
+			"passkeysDeleteFailed": "Failed to delete the passkeys"
+		}
+	},
+	"profilePage": {
+		"title": "Profile :: SHRTLY",
+		"description": "Manage your account and passkeys",
+		"header": "Profile",
+		"passkeys": {
+			"header": "Passkeys",
+			"hint": "A passkey lets you sign in without GitLab. Passkeys work only for accounts that already exist.",
+			"disabled": "Passkey login is not enabled",
+			"unsupported": "This browser does not support passkeys",
+			"namePlaceholder": "Passkey name",
+			"register": "Add passkey",
+			"registering": "Waiting for passkey...",
+			"registered": "Passkey added",
+			"empty": "No passkeys yet",
+			"name": "Name",
+			"created": "Created",
+			"lastUsed": "Last used",
+			"neverUsed": "Never",
+			"delete": "Delete passkey",
+			"deleted": "Passkey deleted",
+			"deleteConfirm": "Delete this passkey?"
+		},
+		"errors": {
+			"loadFailed": "Failed to load passkeys",
+			"registerFailed": "Failed to add the passkey",
+			"deleteFailed": "Failed to delete the passkey",
+			"alreadyRegistered": "This passkey is already registered"
 		}
 	}
 }

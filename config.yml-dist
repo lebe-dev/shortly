@@ -80,6 +80,9 @@ features:
       # - profile
 
 # Authentication configuration
+#
+# Passkey (WebAuthn) login is configured through environment variables only,
+# see .env-dist and docs/configuration/passkey.md.
 auth:
   # Enable/disable authentication (ENV: AUTH_ENABLED)
   enabled: true

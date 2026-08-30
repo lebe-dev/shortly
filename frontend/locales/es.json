@@ -43,7 +43,8 @@
 		"login": "Iniciar sesión",
 		"logout": "Cerrar sesión",
 		"myLinks": "Mis Enlaces",
-		"adminPanel": "Panel de Administración"
+		"adminPanel": "Panel de Administración",
+		"profile": "Perfil"
 	},
 	"homePage": {
 		"title": "Crear URL corta :: SHRTLY",
@@ -113,11 +114,15 @@
 		"title": "Iniciar sesión :: SHRTLY",
 		"description": "Iniciar sesión en el servicio Shortly",
 		"buttons": {
-			"gitlab": "Iniciar sesión con GitLab"
+			"gitlab": "Iniciar sesión con GitLab",
+			"passkey": "Iniciar sesión con passkey",
+			"passkeyInProgress": "Esperando la passkey..."
 		},
 		"errors": {
 			"configLoadFailed": "No se pudo cargar la configuración de la aplicación",
-			"authDisabled": "La autenticación no está disponible"
+			"authDisabled": "La autenticación no está disponible",
+			"passkeyLoginFailed": "No se pudo iniciar sesión con la passkey",
+			"passkeyUnknownAccount": "Esta passkey no está vinculada a ninguna cuenta"
 		}
 	},
 	"linksPage": {
@@ -250,7 +255,9 @@
 				"create_url": "URL creada",
 				"delete_url": "URL eliminada",
 				"user_login": "Inicio de sesión",
-				"user_logout": "Cierre de sesión"
+				"user_logout": "Cierre de sesión",
+				"passkey_register": "Passkey registrada",
+				"passkey_delete": "Passkey eliminada"
 			},
 			"noEvents": "No se encontraron eventos de auditoría",
 			"showing": "Mostrando {count} de {total} eventos",
@@ -265,7 +272,41 @@
 			"urlCount": "URLs Creadas",
 			"quotas": "Cuotas",
 			"maxPerUser": "Máx. por usuario",
-			"maxPerDay": "Máx. por día"
+			"maxPerDay": "Máx. por día",
+			"passkeyCount": "Passkeys",
+			"passkeysDelete": "Eliminar todas",
+			"passkeysDeleteConfirm": "¿Eliminar todas las passkeys de este usuario?",
+			"passkeysDeleted": "Passkeys eliminadas",
+			"passkeysDeleteFailed": "No se pudieron eliminar las passkeys"
+		}
+	},
+	"profilePage": {
+		"title": "Perfil :: SHRTLY",
+		"description": "Gestiona tu cuenta y tus passkeys",
+		"header": "Perfil",
+		"passkeys": {
+			"header": "Passkeys",
+			"hint": "Una passkey permite iniciar sesión sin GitLab. Las passkeys solo funcionan con cuentas que ya existen.",
+			"disabled": "El inicio de sesión con passkey está desactivado",
+			"unsupported": "Este navegador no admite passkeys",
+			"namePlaceholder": "Nombre de la passkey",
+			"register": "Añadir passkey",
+			"registering": "Esperando la passkey...",
+			"registered": "Passkey añadida",
+			"empty": "Todavía no hay passkeys",
+			"name": "Nombre",
+			"created": "Creada",
+			"lastUsed": "Último uso",
+			"neverUsed": "Nunca",
+			"delete": "Eliminar passkey",
+			"deleted": "Passkey eliminada",
+			"deleteConfirm": "¿Eliminar esta passkey?"
+		},
+		"errors": {
+			"loadFailed": "No se pudieron cargar las passkeys",
+			"registerFailed": "No se pudo añadir la passkey",
+			"deleteFailed": "No se pudo eliminar la passkey",
+			"alreadyRegistered": "Esta passkey ya está registrada"
 		}
 	}
 }

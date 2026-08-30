@@ -3,7 +3,9 @@ export enum AuditEventType {
 	DeleteUrl = 'delete_url',
 	UserLogin = 'user_login',
 	UserLogout = 'user_logout',
-	UserQuotaUpdate = 'user_quota_update'
+	UserQuotaUpdate = 'user_quota_update',
+	PasskeyRegister = 'passkey_register',
+	PasskeyDelete = 'passkey_delete'
 }
 
 export interface AuditEvent {

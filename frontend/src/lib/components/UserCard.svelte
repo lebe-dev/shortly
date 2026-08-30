@@ -9,15 +9,23 @@
 	import Check from 'lucide-svelte/icons/check';
 	import X from 'lucide-svelte/icons/x';
 	import { toast } from 'svelte-sonner';
+	import KeyRound from 'lucide-svelte/icons/key-round';
 	import { updateUserQuotas } from '$lib/api/user';
+	import { deleteUserPasskeys } from '$lib/api/passkey';
+	import { configStore } from '$lib/stores/config';
 	import type { AdminUserDto } from '$lib/domain/config';
 
 	interface Props {
 		user: AdminUserDto;
 		onQuotasUpdated?: (updatedUser: { maxUrlsPerUser: number; maxUrlsPerDay: number }) => void;
+		onPasskeysDeleted?: () => void;
 	}
 
-	let { user, onQuotasUpdated }: Props = $props();
+	let { user, onQuotasUpdated, onPasskeysDeleted }: Props = $props();
+
+	let isDeletingPasskeys = $state(false);
+
+	const passkeyEnabled = $derived($configStore?.auth?.passkey?.enabled === true);
 
 	let isEditing = $state(false);
 	let editMaxPerUser = $state(user.maxUrlsPerUser);
@@ -46,6 +54,24 @@
 		isEditing = false;
 		editMaxPerUser = user.maxUrlsPerUser;
 		editMaxPerDay = user.maxUrlsPerDay;
+	}
+
+	async function deletePasskeys() {
+		const confirmed = confirm($t('adminPage.users.passkeysDeleteConfirm'));
+		if (!confirmed) return;
+
+		isDeletingPasskeys = true;
+
+		try {
+			await deleteUserPasskeys(user.id);
+			toast.success($t('adminPage.users.passkeysDeleted'));
+			onPasskeysDeleted?.();
+		} catch (error) {
+			console.error('Failed to delete passkeys:', error);
+			toast.error($t('adminPage.users.passkeysDeleteFailed'));
+		} finally {
+			isDeletingPasskeys = false;
+		}
 	}
 
 	async function saveQuotas() {
@@ -129,6 +155,29 @@
 				<span class="text-muted-foreground">{$t('adminPage.users.urlCount')}</span>
 				<span class="font-medium">{user.urlCount}</span>
 			</div>
+
+			{#if passkeyEnabled}
+				<div class="flex items-center justify-between text-sm">
+					<span class="text-muted-foreground flex items-center gap-2">
+						<KeyRound class="h-4 w-4" />
+						{$t('adminPage.users.passkeyCount')}
+					</span>
+					<span class="flex items-center gap-2">
+						<span class="font-medium">{user.passkeyCount}</span>
+						{#if user.passkeyCount > 0}
+							<Button
+								variant="ghost"
+								size="sm"
+								class="h-6 px-2 text-xs"
+								disabled={isDeletingPasskeys}
+								onclick={deletePasskeys}
+							>
+								{$t('adminPage.users.passkeysDelete')}
+							</Button>
+						{/if}
+					</span>
+				</div>
+			{/if}
 
 			<!-- Quotas -->
 			<div class="border-t pt-3">

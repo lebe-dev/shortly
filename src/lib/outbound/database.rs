@@ -3,6 +3,10 @@ use sqlx::{PgPool, SqlitePool};
 
 use crate::domain::auth::model::{GitlabUserInfo, Session, User};
 use crate::domain::auth::ports::{SessionRepository, UserRepository};
+use crate::domain::passkey::model::{PasskeyChallenge, PasskeyCredential};
+use crate::domain::passkey::ports::{
+    PasskeyChallengeRepository, PasskeyCredentialRepository, WebauthnUserRepository,
+};
 use crate::domain::url::audit::{AuditEventWithUser, AuditQueryParams, UrlAuditEvent};
 use crate::domain::url::model::{Url, UserQuotas};
 use crate::domain::url::ports::UrlRepository;
@@ -80,8 +84,8 @@ impl UrlRepository for Database {
 
     async fn find_by_user_id(&self, user_id: i64) -> Result<Vec<Url>, sqlx::Error> {
         match self {
-            Database::Sqlite(db) => db.find_by_user_id(user_id).await,
-            Database::Postgres(db) => db.find_by_user_id(user_id).await,
+            Database::Sqlite(db) => UrlRepository::find_by_user_id(db, user_id).await,
+            Database::Postgres(db) => UrlRepository::find_by_user_id(db, user_id).await,
         }
     }
 
@@ -94,8 +98,8 @@ impl UrlRepository for Database {
 
     async fn count_by_user_id(&self, user_id: i64) -> Result<i64, sqlx::Error> {
         match self {
-            Database::Sqlite(db) => db.count_by_user_id(user_id).await,
-            Database::Postgres(db) => db.count_by_user_id(user_id).await,
+            Database::Sqlite(db) => UrlRepository::count_by_user_id(db, user_id).await,
+            Database::Postgres(db) => UrlRepository::count_by_user_id(db, user_id).await,
         }
     }
 
@@ -207,8 +211,10 @@ impl SessionRepository for Database {
         expires_at: Option<i64>,
     ) -> Result<Session, sqlx::Error> {
         match self {
-            Database::Sqlite(db) => db.create(user_id, token, expires_at).await,
-            Database::Postgres(db) => db.create(user_id, token, expires_at).await,
+            Database::Sqlite(db) => SessionRepository::create(db, user_id, token, expires_at).await,
+            Database::Postgres(db) => {
+                SessionRepository::create(db, user_id, token, expires_at).await
+            }
         }
     }
 
@@ -228,8 +234,8 @@ impl SessionRepository for Database {
 
     async fn delete(&self, token: &str) -> Result<(), sqlx::Error> {
         match self {
-            Database::Sqlite(db) => db.delete(token).await,
-            Database::Postgres(db) => db.delete(token).await,
+            Database::Sqlite(db) => SessionRepository::delete(db, token).await,
+            Database::Postgres(db) => SessionRepository::delete(db, token).await,
         }
     }
 
@@ -237,6 +243,141 @@ impl SessionRepository for Database {
         match self {
             Database::Sqlite(db) => SessionRepository::delete_expired(db, current_time).await,
             Database::Postgres(db) => SessionRepository::delete_expired(db, current_time).await,
+        }
+    }
+}
+
+impl PasskeyCredentialRepository for Database {
+    async fn create(
+        &self,
+        user_id: i64,
+        credential_id: &str,
+        passkey: &str,
+        name: &str,
+    ) -> Result<PasskeyCredential, sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => {
+                PasskeyCredentialRepository::create(db, user_id, credential_id, passkey, name).await
+            }
+            Database::Postgres(db) => {
+                PasskeyCredentialRepository::create(db, user_id, credential_id, passkey, name).await
+            }
+        }
+    }
+
+    async fn find_by_user_id(&self, user_id: i64) -> Result<Vec<PasskeyCredential>, sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => PasskeyCredentialRepository::find_by_user_id(db, user_id).await,
+            Database::Postgres(db) => {
+                PasskeyCredentialRepository::find_by_user_id(db, user_id).await
+            }
+        }
+    }
+
+    async fn find_by_credential_id(
+        &self,
+        credential_id: &str,
+    ) -> Result<Option<PasskeyCredential>, sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => db.find_by_credential_id(credential_id).await,
+            Database::Postgres(db) => db.find_by_credential_id(credential_id).await,
+        }
+    }
+
+    async fn update_passkey(
+        &self,
+        credential_id: &str,
+        passkey: &str,
+        last_used_at: i64,
+    ) -> Result<(), sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => {
+                db.update_passkey(credential_id, passkey, last_used_at)
+                    .await
+            }
+            Database::Postgres(db) => {
+                db.update_passkey(credential_id, passkey, last_used_at)
+                    .await
+            }
+        }
+    }
+
+    async fn delete(&self, user_id: i64, credential_pk: i64) -> Result<u64, sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => {
+                PasskeyCredentialRepository::delete(db, user_id, credential_pk).await
+            }
+            Database::Postgres(db) => {
+                PasskeyCredentialRepository::delete(db, user_id, credential_pk).await
+            }
+        }
+    }
+
+    async fn delete_by_user_id(&self, user_id: i64) -> Result<u64, sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => db.delete_by_user_id(user_id).await,
+            Database::Postgres(db) => db.delete_by_user_id(user_id).await,
+        }
+    }
+
+    async fn count_by_user_id(&self, user_id: i64) -> Result<i64, sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => {
+                PasskeyCredentialRepository::count_by_user_id(db, user_id).await
+            }
+            Database::Postgres(db) => {
+                PasskeyCredentialRepository::count_by_user_id(db, user_id).await
+            }
+        }
+    }
+}
+
+impl PasskeyChallengeRepository for Database {
+    async fn create(&self, challenge: &PasskeyChallenge) -> Result<(), sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => PasskeyChallengeRepository::create(db, challenge).await,
+            Database::Postgres(db) => PasskeyChallengeRepository::create(db, challenge).await,
+        }
+    }
+
+    async fn take(&self, id: &str) -> Result<Option<PasskeyChallenge>, sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => db.take(id).await,
+            Database::Postgres(db) => db.take(id).await,
+        }
+    }
+
+    async fn delete_expired(&self, current_time: i64) -> Result<(), sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => {
+                PasskeyChallengeRepository::delete_expired(db, current_time).await
+            }
+            Database::Postgres(db) => {
+                PasskeyChallengeRepository::delete_expired(db, current_time).await
+            }
+        }
+    }
+}
+
+impl WebauthnUserRepository for Database {
+    async fn find_webauthn_id(&self, user_id: i64) -> Result<Option<String>, sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => db.find_webauthn_id(user_id).await,
+            Database::Postgres(db) => db.find_webauthn_id(user_id).await,
+        }
+    }
+
+    async fn set_webauthn_id(&self, user_id: i64, webauthn_id: &str) -> Result<(), sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => db.set_webauthn_id(user_id, webauthn_id).await,
+            Database::Postgres(db) => db.set_webauthn_id(user_id, webauthn_id).await,
+        }
+    }
+
+    async fn find_by_webauthn_id(&self, webauthn_id: &str) -> Result<Option<User>, sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => db.find_by_webauthn_id(webauthn_id).await,
+            Database::Postgres(db) => db.find_by_webauthn_id(webauthn_id).await,
         }
     }
 }

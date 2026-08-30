@@ -43,7 +43,8 @@
 		"login": "შესვლა",
 		"logout": "გასვლა",
 		"myLinks": "ჩემი ბმულები",
-		"adminPanel": "ადმინისტრატორის პანელი"
+		"adminPanel": "ადმინისტრატორის პანელი",
+		"profile": "პროფილი"
 	},
 	"homePage": {
 		"title": "მოკლე URL-ის შექმნა :: SHRTLY",
@@ -113,11 +114,15 @@
 		"title": "შესვლა :: SHRTLY",
 		"description": "Shortly სერვისში შესვლა",
 		"buttons": {
-			"gitlab": "შესვლა GitLab-ით"
+			"gitlab": "შესვლა GitLab-ით",
+			"passkey": "შესვლა passkey-ით",
+			"passkeyInProgress": "passkey-ის მოლოდინში..."
 		},
 		"errors": {
 			"configLoadFailed": "აპლიკაციის კონფიგურაციის ჩატვირთვა ვერ მოხერხდა",
-			"authDisabled": "აუთენტიფიკაცია არ არის ხელმისაწვდომი"
+			"authDisabled": "აუთენტიფიკაცია არ არის ხელმისაწვდომი",
+			"passkeyLoginFailed": "passkey-ით შესვლა ვერ მოხერხდა",
+			"passkeyUnknownAccount": "ეს passkey არცერთ ანგარიშს არ უკავშირდება"
 		}
 	},
 	"linksPage": {
@@ -250,7 +255,9 @@
 				"create_url": "URL შეიქმნა",
 				"delete_url": "URL წაიშალა",
 				"user_login": "მომხმარებლის შესვლა",
-				"user_logout": "მომხმარებლის გასვლა"
+				"user_logout": "მომხმარებლის გასვლა",
+				"passkey_register": "passkey დარეგისტრირდა",
+				"passkey_delete": "passkey წაიშალა"
 			},
 			"noEvents": "აუდიტის მოვლენები ვერ მოიძებნა",
 			"showing": "ნაჩვენებია {count} {total}-დან მოვლენა",
@@ -265,7 +272,41 @@
 			"urlCount": "შექმნილი URL-ები",
 			"quotas": "კვოტები",
 			"maxPerUser": "მაქს. მომხმარებელზე",
-			"maxPerDay": "მაქს. დღეში"
+			"maxPerDay": "მაქს. დღეში",
+			"passkeyCount": "Passkey",
+			"passkeysDelete": "ყველას წაშლა",
+			"passkeysDeleteConfirm": "წავშალოთ ამ მომხმარებლის ყველა passkey?",
+			"passkeysDeleted": "passkey-ები წაიშალა",
+			"passkeysDeleteFailed": "passkey-ების წაშლა ვერ მოხერხდა"
+		}
+	},
+	"profilePage": {
+		"title": "პროფილი :: SHRTLY",
+		"description": "ანგარიშისა და passkey-ების მართვა",
+		"header": "პროფილი",
+		"passkeys": {
+			"header": "Passkey",
+			"hint": "passkey საშუალებას გაძლევთ შეხვიდეთ GitLab-ის გარეშე. passkey მუშაობს მხოლოდ უკვე არსებულ ანგარიშებზე.",
+			"disabled": "passkey-ით შესვლა გამორთულია",
+			"unsupported": "ეს ბრაუზერი არ უჭერს მხარს passkey-ს",
+			"namePlaceholder": "passkey-ის სახელი",
+			"register": "passkey-ის დამატება",
+			"registering": "passkey-ის მოლოდინში...",
+			"registered": "passkey დაემატა",
+			"empty": "passkey ჯერ არ არის",
+			"name": "სახელი",
+			"created": "შექმნილია",
+			"lastUsed": "ბოლო გამოყენება",
+			"neverUsed": "არასოდეს",
+			"delete": "passkey-ის წაშლა",
+			"deleted": "passkey წაიშალა",
+			"deleteConfirm": "წავშალოთ ეს passkey?"
+		},
+		"errors": {
+			"loadFailed": "passkey-ების ჩატვირთვა ვერ მოხერხდა",
+			"registerFailed": "passkey-ის დამატება ვერ მოხერხდა",
+			"deleteFailed": "passkey-ის წაშლა ვერ მოხერხდა",
+			"alreadyRegistered": "ეს passkey უკვე რეგისტრირებულია"
 		}
 	}
 }

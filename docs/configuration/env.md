@@ -4,6 +4,8 @@
 
 You can override any configuration value using environment variables. Environment variables have **higher priority** than values from `config.yml`.
 
+The application also reads a `.env` file from the working directory at startup, so every variable below may be placed there instead of the shell environment. Use `.env-dist` as a template. Variables already present in the environment are not overwritten by the file.
+
 **Available variables:**
 
 | Environment Variable | Config File Field | Description | Example | Sensitive |
@@ -25,6 +27,27 @@ You can override any configuration value using environment variables. Environmen
 | `AUTH_PROVIDERS_GITLAB_BASE_URL` | `auth.providers.gitlab.base-url` | GitLab instance URL | `https://gitlab.com` | No |
 | `AUTH_PROVIDERS_GITLAB_APPLICATION_ID` | `auth.providers.gitlab.application-id` | GitLab OAuth application ID | `your-app-id` | **Yes** |
 | `AUTH_PROVIDERS_GITLAB_SECRET` | `auth.providers.gitlab.secret` | GitLab OAuth application secret | `your-secret` | **Yes** |
+| `AUTH_NOTE` | `auth.note` | Note shown on the login page | `VPN required` | No |
+| `AUTH_ADMIN_USERS` | `auth.admin-users` | Comma separated list of administrators | `alice,bob` | No |
+| `METRICS_ENABLED` | `metrics.enabled` | Enable the metrics endpoint | `true`, `false` | No |
+
+### Passkey variables
+
+Passkey (WebAuthn) login is configured through the environment only, `config.yml` carries nothing about it.
+
+| Environment Variable | Description | Example | Required |
+|---------------------|-------------|---------|----------|
+| `PASSKEY_ENABLED` | Enable login with a passkey | `true`, `false` | No, default `false` |
+| `PASSKEY_RP_ID` | Relying party ID: the registrable domain, without scheme or port | `shortly.company.com` | Yes, when enabled |
+| `PASSKEY_RP_ORIGIN` | Origin the browser reports, including scheme and port | `https://shortly.company.com` | Yes, when enabled |
+| `PASSKEY_RP_NAME` | Name shown by the authenticator | `Shortly` | No, default `Shortly` |
+| `PASSKEY_CHALLENGE_TTL` | Lifetime of an unfinished ceremony, in seconds | `300` | No, default `300` |
+
+**Notes:**
+
+- Passkeys require authentication to be enabled (`AUTH_ENABLED=true`), they are a second way into an account, not a replacement for GitLab.
+- Login with a passkey works for **existing accounts only**. A user signs in with GitLab first and adds a passkey on the profile page; an administrator can remove every passkey of a user from the admin panel.
+- Browsers only allow WebAuthn in a secure context: HTTPS, or `http://localhost` during development. `PASSKEY_RP_ID` must match the domain the service is served from, and `PASSKEY_RP_ORIGIN` must match scheme, host and port exactly.
 
 **URL limits:** `FEATURES_CREATE_URL_MAX_PER_USER` and `FEATURES_CREATE_URL_MAX_PER_DAY` are only a fallback. Per-user quotas assigned by an administrator (`max_urls_per_user` / `max_urls_per_day` in the `users` table, editable in the admin panel) always win. New users get the database defaults: 100 total and 10 per day.
 
@@ -46,7 +69,7 @@ Create a `.env` file in your project directory:
 
 ```bash
 # Copy the example file
-cp .env.example .env
+cp .env-dist .env
 
 # Edit with your values
 nano .env
