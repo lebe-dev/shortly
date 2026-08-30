@@ -1,5 +1,7 @@
 imageName := "tinyops/shortly"
 version := `cat Cargo.toml | grep version | head -1 | cut -d " " -f 3 | tr -d "\""`
+gitShortSha := `git rev-parse --short HEAD`
+devVersion := version + "-" + gitShortSha
 chartName := `cat helm-chart/Chart.yaml | yq -r '.name'`
 chartVersion := `cat helm-chart/Chart.yaml | yq -r '.version'`
 
@@ -70,8 +72,14 @@ release-chart: build-chart
 build-release-image: test
     docker build --progress=plain --platform=linux/amd64 -t {{ imageName }}:{{ version }} .
 
+build-release-dev-image: test
+    docker build --progress=plain --platform=linux/amd64 -t {{ imageName }}:{{ devVersion }} .
+
 push-image:
     docker push {{ imageName }}:{{ version }}
+
+push-dev-image:
+    docker push {{ imageName }}:{{ devVersion }}
 
 trivy:
     trivy image --severity HIGH,CRITICAL {{ imageName }}:{{ version }}
@@ -82,3 +90,6 @@ release-image: build-release-image
 release: build-release-image
     @just push-image
     @just release-chart
+
+release-dev: build-release-dev-image
+    @just push-dev-image
