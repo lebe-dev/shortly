@@ -49,6 +49,12 @@ features:
     # Require authentication to create URLs (ENV: FEATURES_CREATE_URL_AUTH_ONLY)
     auth-only: true
 
+    # Fallback limits for users without their own quotas.
+    #
+    # Quotas assigned to a user by an administrator (admin panel /
+    # POST /api/user/{user_id}/quotas) always take precedence over the values
+    # below. New users get the database defaults: 100 total / 10 per day.
+    #
     # Maximum URLs per user (ENV: FEATURES_CREATE_URL_MAX_PER_USER)
     max-per-user: 100
     # Maximum URLs per day (ENV: FEATURES_CREATE_URL_MAX_PER_DAY)

@@ -5,7 +5,7 @@ use sqlx::{Postgres as SqlxPostgres, Row};
 
 use crate::domain::url::{
     audit::{AuditEventType, AuditEventWithUser, AuditQueryParams, UrlAuditEvent},
-    model::Url,
+    model::{Url, UserQuotas},
     ports::UrlRepository,
 };
 
@@ -147,6 +147,21 @@ impl UrlRepository for Postgres {
         .await?;
 
         Ok(count)
+    }
+
+    async fn find_user_quotas(&self, user_id: i64) -> Result<Option<UserQuotas>, sqlx::Error> {
+        let quotas = sqlx::query_as::<SqlxPostgres, (Option<i32>, Option<i32>)>(
+            "SELECT max_urls_per_user, max_urls_per_day FROM users WHERE id = $1",
+        )
+        .bind(user_id)
+        .fetch_optional(self.get_pool())
+        .await?
+        .map(|(max_urls_per_user, max_urls_per_day)| UserQuotas {
+            max_urls_per_user: max_urls_per_user.map(i64::from),
+            max_urls_per_day: max_urls_per_day.map(i64::from),
+        });
+
+        Ok(quotas)
     }
 
     async fn record_audit_event(&self, event: &UrlAuditEvent) -> Result<(), sqlx::Error> {

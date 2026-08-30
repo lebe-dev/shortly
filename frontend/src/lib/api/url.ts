@@ -1,5 +1,15 @@
 import { HttpError } from './error';
 
+/** Which of the two URL quotas has been exhausted */
+export type RateLimitScope = 'daily' | 'total';
+
+export class RateLimitError extends Error {
+	constructor(public scope: RateLimitScope) {
+		super(scope === 'total' ? 'Total link limit reached' : 'Daily link limit reached');
+		this.name = 'RateLimitError';
+	}
+}
+
 export class RegisterUrlRequest {
 	constructor(url: string, name?: string) {
 		this.url = url;
@@ -68,7 +78,8 @@ export async function generateShortUrl(url: string, name?: string): Promise<Regi
 	} else if (response.status === 409) {
 		throw new Error('Custom name already exists or is reserved');
 	} else if (response.status === 429) {
-		throw new Error('Rate limit exceeded');
+		const data = await response.json().catch(() => ({}));
+		throw new RateLimitError(data.code === 'total_limit_exceeded' ? 'total' : 'daily');
 	} else if (response.status === 401) {
 		throw new Error('Authentication required for named URLs');
 	} else {

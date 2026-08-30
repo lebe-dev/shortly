@@ -18,11 +18,15 @@ You can override any configuration value using environment variables. Environmen
 | `SCHEDULER_CLEANUP_EXPIRED_URLS` | `scheduler.cleanup-expired-urls` | Cron expression for cleanup | `0 0 * * *` | No |
 | `FEATURES_CREATE_URL_ENABLED` | `features.create-url.enabled` | Enable URL creation feature | `true`, `false` | No |
 | `FEATURES_CREATE_URL_AUTH_ONLY` | `features.create-url.auth-only` | Require authentication for URL creation | `true`, `false` | No |
+| `FEATURES_CREATE_URL_MAX_PER_USER` | `features.create-url.max-per-user` | Fallback total URL limit per user | `100` | No |
+| `FEATURES_CREATE_URL_MAX_PER_DAY` | `features.create-url.max-per-day` | Fallback daily URL limit per user | `10` | No |
 | `AUTH_ENABLED` | `auth.enabled` | Enable authentication | `true`, `false` | No |
 | `AUTH_TYPE` | `auth.type` | Authentication type | `gitlab` | No |
 | `AUTH_PROVIDERS_GITLAB_BASE_URL` | `auth.providers.gitlab.base-url` | GitLab instance URL | `https://gitlab.com` | No |
 | `AUTH_PROVIDERS_GITLAB_APPLICATION_ID` | `auth.providers.gitlab.application-id` | GitLab OAuth application ID | `your-app-id` | **Yes** |
 | `AUTH_PROVIDERS_GITLAB_SECRET` | `auth.providers.gitlab.secret` | GitLab OAuth application secret | `your-secret` | **Yes** |
+
+**URL limits:** `FEATURES_CREATE_URL_MAX_PER_USER` and `FEATURES_CREATE_URL_MAX_PER_DAY` are only a fallback. Per-user quotas assigned by an administrator (`max_urls_per_user` / `max_urls_per_day` in the `users` table, editable in the admin panel) always win. New users get the database defaults: 100 total and 10 per day.
 
 **Security Note:** Variables marked as "Sensitive" contain credentials and should be stored securely (e.g., in Kubernetes Secrets, Docker secrets, or encrypted environment files).
 

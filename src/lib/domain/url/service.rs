@@ -139,12 +139,25 @@ where
     }
 
     /// Check rate limits for URL creation (applies to all URLs for authenticated users)
+    ///
+    /// Quotas assigned to the user by an administrator take precedence over the
+    /// service-wide configuration, which is only a fallback for users without
+    /// their own quotas.
     async fn check_rate_limits(
         &self,
         user_id: i64,
     ) -> Result<(), super::model::ShortUrlGenerationError> {
+        let quotas = self.repo.find_user_quotas(user_id).await?;
+
+        let max_urls_per_user = quotas
+            .and_then(|q| q.max_urls_per_user)
+            .unwrap_or(self.max_urls_per_user as i64);
+        let max_urls_per_day = quotas
+            .and_then(|q| q.max_urls_per_day)
+            .unwrap_or(self.max_urls_per_day as i64);
+
         let total_count = self.repo.count_by_user_id(user_id).await?;
-        if total_count >= self.max_urls_per_user as i64 {
+        if total_count >= max_urls_per_user {
             return Err(super::model::ShortUrlGenerationError::UserLimitExceeded);
         }
 
@@ -158,7 +171,7 @@ where
         let day_ago = timestamp - 86400;
         let daily_count = self.repo.count_by_user_id_since(user_id, day_ago).await?;
 
-        if daily_count >= self.max_urls_per_day as i64 {
+        if daily_count >= max_urls_per_day {
             return Err(super::model::ShortUrlGenerationError::RateLimitExceeded);
         }
 
@@ -515,7 +528,7 @@ mod tests {
         }
     }
 
-    // Helper function to create a test user in the database
+    // Helper function to create a test user in the database (with default quotas)
     async fn create_test_user(db: &crate::outbound::sqlite::init::Sqlite, user_id: i64) {
         let current_time = std::time::SystemTime::now()
             .duration_since(std::time::UNIX_EPOCH)
@@ -535,6 +548,24 @@ mod tests {
         .execute(db.get_pool())
         .await
         .unwrap();
+    }
+
+    // Helper function to create a test user with admin-assigned quotas
+    async fn create_test_user_with_quotas(
+        db: &crate::outbound::sqlite::init::Sqlite,
+        user_id: i64,
+        max_urls_per_user: Option<i64>,
+        max_urls_per_day: Option<i64>,
+    ) {
+        create_test_user(db, user_id).await;
+
+        sqlx::query("UPDATE users SET max_urls_per_user = $1, max_urls_per_day = $2 WHERE id = $3")
+            .bind(max_urls_per_user)
+            .bind(max_urls_per_day)
+            .bind(user_id)
+            .execute(db.get_pool())
+            .await
+            .unwrap();
     }
 
     #[tokio::test]
@@ -1215,7 +1246,8 @@ mod tests {
         let db = get_in_memory_db().await;
 
         let user_id = 1;
-        create_test_user(&db, user_id).await;
+        // No admin-assigned quotas: service configuration applies
+        create_test_user_with_quotas(&db, user_id, None, None).await;
 
         let service = UrlServiceImpl::new(
             UrlServiceConfig {
@@ -1271,7 +1303,8 @@ mod tests {
         let db = get_in_memory_db().await;
 
         let user_id = 1;
-        create_test_user(&db, user_id).await;
+        // No admin-assigned quotas: service configuration applies
+        create_test_user_with_quotas(&db, user_id, None, None).await;
 
         let service = UrlServiceImpl::new(
             UrlServiceConfig {
@@ -1324,7 +1357,8 @@ mod tests {
         let db = get_in_memory_db().await;
 
         let user_id = 1;
-        create_test_user(&db, user_id).await;
+        // No admin-assigned quotas: service configuration applies
+        create_test_user_with_quotas(&db, user_id, None, None).await;
 
         let service = UrlServiceImpl::new(
             UrlServiceConfig {
@@ -1366,7 +1400,8 @@ mod tests {
         let db = get_in_memory_db().await;
 
         let user_id = 1;
-        create_test_user(&db, user_id).await;
+        // No admin-assigned quotas: service configuration applies
+        create_test_user_with_quotas(&db, user_id, None, None).await;
 
         let service = UrlServiceImpl::new(
             UrlServiceConfig {
@@ -1426,8 +1461,9 @@ mod tests {
     async fn test_register_url_different_users_have_separate_limits() {
         let db = get_in_memory_db().await;
 
-        create_test_user(&db, 1).await;
-        create_test_user(&db, 2).await;
+        // No admin-assigned quotas: service configuration applies
+        create_test_user_with_quotas(&db, 1, None, None).await;
+        create_test_user_with_quotas(&db, 2, None, None).await;
 
         let service = UrlServiceImpl::new(
             UrlServiceConfig {
@@ -1478,5 +1514,271 @@ mod tests {
             result.is_ok(),
             "User 2 should have their own separate limits"
         );
+    }
+
+    // Tests for admin-assigned per-user quotas taking precedence over configuration
+
+    fn get_rate_limit_config(max_urls_per_user: u32, max_urls_per_day: u32) -> UrlServiceConfig {
+        UrlServiceConfig {
+            base_url: "http://localhost:8080/".to_string(),
+            ttl_hours: 1,
+            max_url_length: 2048,
+            named_urls_enabled: true,
+            named_url_min_length: 3,
+            named_url_max_length: 20,
+            reserved_names: vec![],
+            max_urls_per_user,
+            max_urls_per_day,
+        }
+    }
+
+    #[tokio::test]
+    async fn test_user_daily_quota_overrides_lower_config_limit() {
+        let db = get_in_memory_db().await;
+
+        let user_id = 1;
+        // Admin granted 5 URLs per day while the configuration allows only 1
+        create_test_user_with_quotas(&db, user_id, Some(100), Some(5)).await;
+
+        let service = UrlServiceImpl::new(get_rate_limit_config(100, 1), db);
+
+        for i in 1..=5 {
+            let result = service
+                .register_url(
+                    &format!("https://example{}.com", i),
+                    Some(user_id),
+                    Some(format!("quota{}", i)),
+                )
+                .await;
+            assert!(
+                result.is_ok(),
+                "URL {} of 5 should be allowed by the user quota, got: {:?}",
+                i,
+                result.err()
+            );
+        }
+
+        let result = service
+            .register_url(
+                "https://example6.com",
+                Some(user_id),
+                Some("quota6".to_string()),
+            )
+            .await;
+
+        assert!(matches!(
+            result,
+            Err(ShortUrlGenerationError::RateLimitExceeded)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_user_total_quota_overrides_lower_config_limit() {
+        let db = get_in_memory_db().await;
+
+        let user_id = 1;
+        // Admin granted 4 URLs in total while the configuration allows only 1
+        create_test_user_with_quotas(&db, user_id, Some(4), Some(100)).await;
+
+        let service = UrlServiceImpl::new(get_rate_limit_config(1, 100), db);
+
+        for i in 1..=4 {
+            let result = service
+                .register_url(
+                    &format!("https://example{}.com", i),
+                    Some(user_id),
+                    Some(format!("total{}", i)),
+                )
+                .await;
+            assert!(
+                result.is_ok(),
+                "URL {} of 4 should be allowed by the user quota, got: {:?}",
+                i,
+                result.err()
+            );
+        }
+
+        let result = service
+            .register_url(
+                "https://example5.com",
+                Some(user_id),
+                Some("total5".to_string()),
+            )
+            .await;
+
+        assert!(matches!(
+            result,
+            Err(ShortUrlGenerationError::UserLimitExceeded)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_user_daily_quota_stricter_than_config_is_enforced() {
+        let db = get_in_memory_db().await;
+
+        let user_id = 1;
+        // Admin restricted the user to a single URL per day
+        create_test_user_with_quotas(&db, user_id, Some(100), Some(1)).await;
+
+        let service = UrlServiceImpl::new(get_rate_limit_config(100, 50), db);
+
+        let result = service
+            .register_url(
+                "https://example1.com",
+                Some(user_id),
+                Some("strict1".to_string()),
+            )
+            .await;
+        assert!(result.is_ok());
+
+        let result = service
+            .register_url(
+                "https://example2.com",
+                Some(user_id),
+                Some("strict2".to_string()),
+            )
+            .await;
+
+        assert!(matches!(
+            result,
+            Err(ShortUrlGenerationError::RateLimitExceeded)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_user_total_quota_stricter_than_config_is_enforced() {
+        let db = get_in_memory_db().await;
+
+        let user_id = 1;
+        // Admin restricted the user to a single URL in total
+        create_test_user_with_quotas(&db, user_id, Some(1), Some(100)).await;
+
+        let service = UrlServiceImpl::new(get_rate_limit_config(50, 100), db);
+
+        let result = service
+            .register_url(
+                "https://example1.com",
+                Some(user_id),
+                Some("onlyone".to_string()),
+            )
+            .await;
+        assert!(result.is_ok());
+
+        let result = service
+            .register_url(
+                "https://example2.com",
+                Some(user_id),
+                Some("onlytwo".to_string()),
+            )
+            .await;
+
+        assert!(matches!(
+            result,
+            Err(ShortUrlGenerationError::UserLimitExceeded)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_zero_user_quota_blocks_url_creation() {
+        let db = get_in_memory_db().await;
+
+        let user_id = 1;
+        create_test_user_with_quotas(&db, user_id, Some(0), Some(0)).await;
+
+        let service = UrlServiceImpl::new(get_rate_limit_config(100, 100), db);
+
+        let result = service
+            .register_url(
+                "https://example.com",
+                Some(user_id),
+                Some("blocked".to_string()),
+            )
+            .await;
+
+        assert!(matches!(
+            result,
+            Err(ShortUrlGenerationError::UserLimitExceeded)
+        ));
+
+        // Regular URLs are blocked as well
+        let result = service
+            .register_url("https://example.com", Some(user_id), None)
+            .await;
+
+        assert!(matches!(
+            result,
+            Err(ShortUrlGenerationError::UserLimitExceeded)
+        ));
+    }
+
+    #[tokio::test]
+    async fn test_user_quotas_are_independent_per_user() {
+        let db = get_in_memory_db().await;
+
+        // User 1 is restricted to one URL per day, user 2 is not
+        create_test_user_with_quotas(&db, 1, Some(100), Some(1)).await;
+        create_test_user_with_quotas(&db, 2, Some(10), Some(10)).await;
+
+        let service = UrlServiceImpl::new(get_rate_limit_config(100, 100), db);
+
+        let result = service
+            .register_url("https://user1.com", Some(1), Some("u1a".to_string()))
+            .await;
+        assert!(result.is_ok());
+
+        let result = service
+            .register_url("https://user1-2.com", Some(1), Some("u1b".to_string()))
+            .await;
+        assert!(matches!(
+            result,
+            Err(ShortUrlGenerationError::RateLimitExceeded)
+        ));
+
+        for i in 1..=5 {
+            let result = service
+                .register_url(
+                    &format!("https://user2-{}.com", i),
+                    Some(2),
+                    Some(format!("u2{}", i)),
+                )
+                .await;
+            assert!(
+                result.is_ok(),
+                "User 2 should not be affected by user 1 quotas, got: {:?}",
+                result.err()
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn test_quota_check_uses_config_for_unknown_user() {
+        let db = get_in_memory_db().await;
+
+        // No user row at all: configuration is the only source of limits
+        let service = UrlServiceImpl::new(get_rate_limit_config(100, 1), db.clone());
+
+        let unknown_user_id = 42;
+        assert!(service.check_rate_limits(unknown_user_id).await.is_ok());
+
+        db.save(&crate::domain::url::model::Url {
+            id: "cfgfallback".to_string(),
+            original_url: "https://example.com".to_string(),
+            ttl: 3600,
+            created: SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap()
+                .as_secs() as i64,
+            user_id: Some(unknown_user_id),
+            custom_name: None,
+            last_accessed: None,
+        })
+        .await
+        .unwrap();
+
+        // Daily limit from the configuration (1) is now reached
+        assert!(matches!(
+            service.check_rate_limits(unknown_user_id).await,
+            Err(ShortUrlGenerationError::RateLimitExceeded)
+        ));
     }
 }

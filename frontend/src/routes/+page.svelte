@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { generateShortUrl } from '$lib/api/url';
+	import { generateShortUrl, RateLimitError } from '$lib/api/url';
 	import { fetchConfig } from '$lib/api/config';
 	import ConsumptionBadge from '$lib/components/ConsumptionBadge.svelte';
 	import CopyButton from '$lib/components/CopyButton.svelte';
@@ -216,11 +216,23 @@
 			}
 		} catch (e) {
 			console.error(e);
+
+			if (e instanceof RateLimitError) {
+				toast.error(
+					$t(
+						e.scope === 'total'
+							? 'common.consumption.reachedTotalLimit'
+							: 'common.consumption.reachedDailyLimit'
+					)
+				);
+				if ($authStore.authenticated) {
+					await fetchConfig();
+				}
+				return;
+			}
+
 			const message = e instanceof Error ? e.message : '';
 			toast.error(message || $t('homePage.errors.generateFailed'));
-			if (message === 'Rate limit exceeded' && $authStore.authenticated) {
-				await fetchConfig();
-			}
 		} finally {
 			inProgress = false;
 		}

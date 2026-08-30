@@ -16,6 +16,16 @@ pub struct Url {
     pub last_accessed: Option<i64>,
 }
 
+/// Per-user URL quotas, as configured by an administrator.
+///
+/// A `None` field means the user has no explicit quota and the service-wide
+/// configuration value applies instead.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct UserQuotas {
+    pub max_urls_per_user: Option<i64>,
+    pub max_urls_per_day: Option<i64>,
+}
+
 #[derive(Debug, Error)]
 pub enum ShortUrlGenerationError {
     #[error("Invalid original URL")]

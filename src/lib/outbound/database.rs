@@ -4,7 +4,7 @@ use sqlx::{PgPool, SqlitePool};
 use crate::domain::auth::model::{GitlabUserInfo, Session, User};
 use crate::domain::auth::ports::{SessionRepository, UserRepository};
 use crate::domain::url::audit::{AuditEventWithUser, AuditQueryParams, UrlAuditEvent};
-use crate::domain::url::model::Url;
+use crate::domain::url::model::{Url, UserQuotas};
 use crate::domain::url::ports::UrlRepository;
 use crate::outbound::postgres::init::Postgres;
 use crate::outbound::sqlite::init::Sqlite;
@@ -107,6 +107,13 @@ impl UrlRepository for Database {
         match self {
             Database::Sqlite(db) => db.count_by_user_id_since(user_id, since_timestamp).await,
             Database::Postgres(db) => db.count_by_user_id_since(user_id, since_timestamp).await,
+        }
+    }
+
+    async fn find_user_quotas(&self, user_id: i64) -> Result<Option<UserQuotas>, sqlx::Error> {
+        match self {
+            Database::Sqlite(db) => db.find_user_quotas(user_id).await,
+            Database::Postgres(db) => db.find_user_quotas(user_id).await,
         }
     }
 

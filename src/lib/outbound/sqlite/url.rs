@@ -5,7 +5,7 @@ use sqlx::sqlite::SqliteRow;
 
 use crate::domain::url::{
     audit::{AuditEventType, AuditEventWithUser, AuditQueryParams, UrlAuditEvent},
-    model::Url,
+    model::{Url, UserQuotas},
     ports::UrlRepository,
 };
 
@@ -143,6 +143,21 @@ impl UrlRepository for Sqlite {
         .await?;
 
         Ok(count)
+    }
+
+    async fn find_user_quotas(&self, user_id: i64) -> Result<Option<UserQuotas>, sqlx::Error> {
+        let quotas = sqlx::query_as::<_, (Option<i64>, Option<i64>)>(
+            "SELECT max_urls_per_user, max_urls_per_day FROM users WHERE id = $1",
+        )
+        .bind(user_id)
+        .fetch_optional(self.get_pool())
+        .await?
+        .map(|(max_urls_per_user, max_urls_per_day)| UserQuotas {
+            max_urls_per_user,
+            max_urls_per_day,
+        });
+
+        Ok(quotas)
     }
 
     async fn record_audit_event(&self, event: &UrlAuditEvent) -> Result<(), sqlx::Error> {
@@ -457,6 +472,72 @@ mod tests {
         assert_eq!(
             found_named.unwrap().custom_name,
             Some("my-link".to_string())
+        );
+    }
+
+    async fn insert_user(
+        db: &crate::outbound::sqlite::init::Sqlite,
+        user_id: i64,
+        max_urls_per_user: Option<i64>,
+        max_urls_per_day: Option<i64>,
+    ) {
+        let now = Utc::now().timestamp();
+
+        sqlx::query(
+            "INSERT INTO users (id, gitlab_id, username, created_at, updated_at,
+                                max_urls_per_user, max_urls_per_day)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)",
+        )
+        .bind(user_id)
+        .bind(user_id * 1000)
+        .bind(format!("quotauser{}", user_id))
+        .bind(now)
+        .bind(now)
+        .bind(max_urls_per_user)
+        .bind(max_urls_per_day)
+        .execute(db.get_pool())
+        .await
+        .unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_find_user_quotas_returns_assigned_values() {
+        let db = get_in_memory_db().await;
+        insert_user(&db, 1, Some(42), Some(7)).await;
+
+        let quotas = db.find_user_quotas(1).await.unwrap();
+
+        assert_eq!(
+            quotas,
+            Some(UserQuotas {
+                max_urls_per_user: Some(42),
+                max_urls_per_day: Some(7),
+            })
+        );
+    }
+
+    #[tokio::test]
+    async fn test_find_user_quotas_returns_none_for_unknown_user() {
+        let db = get_in_memory_db().await;
+
+        let quotas = db.find_user_quotas(999).await.unwrap();
+
+        assert_eq!(quotas, None);
+    }
+
+    #[tokio::test]
+    async fn test_find_user_quotas_returns_null_fields_as_none() {
+        let db = get_in_memory_db().await;
+        insert_user(&db, 2, None, None).await;
+
+        let quotas = db.find_user_quotas(2).await.unwrap();
+
+        assert_eq!(
+            quotas,
+            Some(UserQuotas {
+                max_urls_per_user: None,
+                max_urls_per_day: None,
+            })
         );
     }
 }

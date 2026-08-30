@@ -3,7 +3,9 @@ use std::future::Future;
 use crate::domain::url::model::FindUrlError;
 
 use super::audit::{AuditEventWithUser, AuditQueryParams, UrlAuditEvent};
-use super::model::{CheckCustomNameError, DeleteUrlError, ShortUrlGenerationError, Url};
+use super::model::{
+    CheckCustomNameError, DeleteUrlError, ShortUrlGenerationError, Url, UserQuotas,
+};
 
 pub trait UrlService: Clone + Send + Sync + 'static {
     fn is_url_valid(&self, url: &str) -> impl Future<Output = bool> + Send;
@@ -95,6 +97,14 @@ pub trait UrlRepository: Send + Sync + Clone + 'static {
         user_id: i64,
         since_timestamp: i64,
     ) -> impl Future<Output = Result<i64, sqlx::Error>> + Send;
+
+    /// Quotas assigned to the user by an administrator.
+    ///
+    /// Returns `None` when the user doesn't exist.
+    fn find_user_quotas(
+        &self,
+        user_id: i64,
+    ) -> impl Future<Output = Result<Option<UserQuotas>, sqlx::Error>> + Send;
 
     fn record_audit_event(
         &self,

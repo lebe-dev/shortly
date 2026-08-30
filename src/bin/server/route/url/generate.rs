@@ -11,6 +11,11 @@ use server_lib::domain::url::ports::UrlService;
 
 use crate::SharedAppState;
 
+/// Machine-readable code returned when the daily URL quota is exhausted
+pub const DAILY_LIMIT_EXCEEDED_CODE: &str = "daily_limit_exceeded";
+/// Machine-readable code returned when the total URL quota is exhausted
+pub const TOTAL_LIMIT_EXCEEDED_CODE: &str = "total_limit_exceeded";
+
 #[derive(Deserialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct RegisterUrlRequest {
@@ -79,16 +84,26 @@ pub async fn generate_short_url_route(
                 (StatusCode::CONFLICT, "Custom name is reserved").into_response()
             }
             ShortUrlGenerationError::RateLimitExceeded => {
-                error!("rate limit exceeded");
+                error!("daily URL limit exceeded");
                 (
                     StatusCode::TOO_MANY_REQUESTS,
-                    "Rate limit exceeded: too many URLs created today",
+                    Json(serde_json::json!({
+                        "code": DAILY_LIMIT_EXCEEDED_CODE,
+                        "error": "Rate limit exceeded: too many URLs created today",
+                    })),
                 )
                     .into_response()
             }
             ShortUrlGenerationError::UserLimitExceeded => {
-                error!("user URL limit exceeded");
-                (StatusCode::TOO_MANY_REQUESTS, "User URL limit exceeded").into_response()
+                error!("total URL limit exceeded");
+                (
+                    StatusCode::TOO_MANY_REQUESTS,
+                    Json(serde_json::json!({
+                        "code": TOTAL_LIMIT_EXCEEDED_CODE,
+                        "error": "User URL limit exceeded",
+                    })),
+                )
+                    .into_response()
             }
             _ => {
                 error!("{:?}", e);

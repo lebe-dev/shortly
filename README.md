@@ -15,7 +15,7 @@ docker run --name shortly -p 8080:8080 tinyops/shortly:1.5.0
 - BLAZING FAST 🌝 (Svelte+Rust)
 - **Custom named URLs** - create memorable short links like `/onboarding` (requires authentication)
 - **OAuth Authentication** - GitLab OAuth support with session management
-- **Rate limiting** - configurable per-user limits for custom URLs
+- **Rate limiting** - per-user total and daily URL limits, set by an administrator
 - Database support: SQLite, PostgreSQL
 - Locales support: en, ru, es, fr, de, jp, ge, zh, he
 - Dark theme support
