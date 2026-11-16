@@ -38,7 +38,7 @@
 <div class="language-selector relative">
 	<button
 		onclick={toggleDropdown}
-		class="dark:hover:bg-secondary/50 flex items-center gap-1.5 rounded border border-gray-600 bg-transparent px-2.5 py-1.5 text-xs font-medium text-gray-300 uppercase transition-colors hover:cursor-pointer hover:bg-blue-700"
+		class="text-muted-foreground hover:bg-accent hover:text-foreground flex h-11 items-center gap-1.5 rounded-[10px] px-3 font-mono text-xs font-medium uppercase transition-colors hover:cursor-pointer"
 		aria-label="Select language"
 		aria-expanded={isOpen}
 	>
@@ -55,17 +55,17 @@
 
 	{#if isOpen}
 		<div
-			class="absolute top-full right-0 z-50 mt-1 min-w-[60px] rounded border border-gray-600 bg-white shadow-lg dark:bg-gray-800"
+			class="border-border bg-popover absolute top-full right-0 z-50 mt-1 min-w-[72px] rounded-xl border p-1 shadow-lg"
 		>
-			<ul class="py-1">
+			<ul>
 				{#each languages as lang (lang)}
 					<li>
 						<button
 							onclick={() => changeLanguage(lang)}
-							class="flex w-full items-center justify-center px-3 py-1.5 text-xs font-medium uppercase transition-colors hover:cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 {$locale ===
+							class="hover:bg-accent flex w-full items-center justify-center rounded-lg px-3 py-1.5 font-mono text-xs font-medium uppercase transition-colors hover:cursor-pointer {$locale ===
 							lang
-								? 'bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300'
-								: 'text-gray-700 dark:text-gray-300'}"
+								? 'text-link bg-accent'
+								: 'text-foreground/80'}"
 						>
 							{lang}
 						</button>

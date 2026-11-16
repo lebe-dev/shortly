@@ -2,7 +2,7 @@
 	import { HttpError } from '$lib/api/error.js';
 	import { fetchUrlById } from '$lib/api/url';
 	import CopyButton from '$lib/components/CopyButton.svelte';
-	import ConsumptionDisplay from '$lib/components/ConsumptionDisplay.svelte';
+	import LimitsMeter from '$lib/components/LimitsMeter.svelte';
 	import { formatRemainingTime } from '$lib/date';
 	import { authStore } from '$lib/stores/auth';
 	import { configStore } from '$lib/stores/config';
@@ -44,43 +44,40 @@
 	<meta name="description" content={$t('urlPage.description')} />
 </svelte:head>
 
-<div
-	class="surface-card animate-surface-in xs:w-[100px] h-80 w-[1300px] max-w-[1300px] bg-white px-6 py-22 text-left md:px-24 dark:bg-gray-900"
->
-	{#if inProgress}
-		<div>{$t('common.loading')}</div>
-	{:else if notFound || remainingTime === 'expired'}
-		<div class="mb-4 text-2xl font-semibold tracking-tight">
-			{$t('urlPage.notFound.title')}
-		</div>
-		<ul class="ms-4 list-disc">
-			<li>{$t('urlPage.notFound.wrongUrl')}</li>
-			<li>{$t('urlPage.notFound.expired')}</li>
-		</ul>
-	{:else}
-		<div class="animate-hero-in">
-			<div class="text-muted-foreground mb-1 text-xs tracking-wide uppercase">
-				{$t('urlPage.display.fullUrlLabel')}
-			</div>
-			<div class="font-mono-tech mb-2 text-2xl wrap-break-word md:text-3xl">
-				{url}
-			</div>
-			{#if remainingTime}
-				<div class="text-muted-foreground mb-4 text-sm">
-					{$t('urlPage.display.expirationInfo', { values: { remainingTime } })}
+<div class="mx-auto w-full max-w-[808px] px-6 pt-16 pb-24 md:pt-20">
+	<div class="surface-card animate-surface-in px-6 py-10 md:px-10">
+		{#if inProgress}
+			<div>{$t('common.loading')}</div>
+		{:else if notFound || remainingTime === 'expired'}
+			<h1 class="mb-4 text-3xl font-semibold tracking-[-0.03em]">
+				{$t('urlPage.notFound.title')}
+			</h1>
+			<ul class="text-muted-foreground ms-4 list-disc space-y-1">
+				<li>{$t('urlPage.notFound.wrongUrl')}</li>
+				<li>{$t('urlPage.notFound.expired')}</li>
+			</ul>
+		{:else}
+			<div class="animate-hero-in">
+				<div class="eyebrow mb-3">
+					{$t('urlPage.display.fullUrlLabel')}
 				</div>
-			{/if}
-
-			<CopyButton data={url} label={$t('common.buttons.copy')} />
-
-			{#if $configStore && $authStore.authenticated}
 				<div
-					class="mt-6 rounded border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800"
+					class="mb-3 font-mono text-xl leading-snug tracking-[-0.02em] wrap-break-word md:text-2xl"
 				>
-					<div class="text-muted-foreground mb-2 text-xs font-medium">Your Usage</div>
-					<ConsumptionDisplay config={$configStore.features.createUrl} variant="compact" />
+					{url}
 				</div>
-			{/if}
-		</div>
-	{/if}
+				{#if remainingTime}
+					<div class="text-muted-foreground mb-4 text-sm">
+						{$t('urlPage.display.expirationInfo', { values: { remainingTime } })}
+					</div>
+				{/if}
+
+				<CopyButton data={url} label={$t('common.buttons.copy')} />
+
+				{#if $configStore && $authStore.authenticated}
+					<LimitsMeter config={$configStore.features.createUrl} class="mt-8" />
+				{/if}
+			</div>
+		{/if}
+	</div>
 </div>

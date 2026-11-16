@@ -39,7 +39,7 @@
 	</div>
 {:else}
 	<!-- User count -->
-	<div class="mb-4 ps-1 text-xs text-gray-400 dark:text-gray-500">
+	<div class="text-muted-foreground mb-4 ps-1 text-[13px]">
 		{$t('adminPage.items')}: {sortedUsers.length}
 	</div>
 

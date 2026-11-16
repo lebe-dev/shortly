@@ -16,6 +16,8 @@
 		onFocus?: () => void;
 		onBlur?: () => void;
 		inputRef?: HTMLInputElement | null;
+		inputClass?: string;
+		id?: string;
 	}
 
 	let {
@@ -29,7 +31,9 @@
 		onKeydown,
 		onFocus,
 		onBlur,
-		inputRef = $bindable(null)
+		inputRef = $bindable(null),
+		inputClass = 'max-w-xs text-base md:text-sm',
+		id
 	}: Props = $props();
 
 	let checking = $state(false);
@@ -194,14 +198,14 @@
 	});
 
 	const statusClass = $derived.by(() => {
-		if (available === true) return 'text-green-600';
-		if (available === false) return 'text-red-600';
-		if (checking) return 'text-gray-500';
-		return 'text-gray-500';
+		if (available === true) return 'text-success';
+		if (available === false) return 'text-destructive';
+		if (checking) return 'text-muted-foreground';
+		return 'text-muted-foreground';
 	});
 </script>
 
-<div class="w-full text-left">
+<div class="w-full min-w-0 text-left">
 	<Input
 		bind:ref={internalRef}
 		type="text"
@@ -213,7 +217,8 @@
 		{disabled}
 		placeholder={$t('homePage.customName.placeholder')}
 		maxlength={config.maxLength}
-		class="max-w-xs text-base md:text-sm"
+		class={inputClass}
+		{id}
 	/>
 	{#if !hideStatus}
 		{#if statusMessage}

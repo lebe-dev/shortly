@@ -3,11 +3,13 @@
 	"common": {
 		"buttons": {
 			"copy": "复制",
-			"generate": "生成"
+			"generate": "创建链接",
+			"delete": "删除"
 		},
 		"loading": "加载中...",
 		"loadingEllipsis": "...",
 		"backToHome": "返回主页",
+		"never": "永久",
 		"consumption": {
 			"title": "限制",
 			"totalLinks": "总链接数",
@@ -49,6 +51,10 @@
 	"homePage": {
 		"title": "创建短链接 :: SHRTLY",
 		"description": "将长网址转换为便捷的短链接",
+		"hero": {
+			"eyebrow": "新链接",
+			"title": "让它变短。"
+		},
 		"form": {
 			"label": "在此粘贴长网址",
 			"placeholder": "https://my.long-url.com",
@@ -84,11 +90,14 @@
 		"result": {
 			"internalAccess": "此链接仅可通过内部网络访问。",
 			"title": "您的短链接：",
+			"eyebrow": "链接已就绪",
+			"heading": "这是你的短链接。",
 			"expirationInfo": "此链接将在 {ttl} 后过期",
 			"expirationDate": "链接将保存至 {date}",
 			"namedUrlInfo": "此命名链接永不过期",
 			"clickToCopy": "点击链接复制到剪贴板",
-			"linkCopied": "链接已复制"
+			"linkCopied": "链接已复制",
+			"shortenAnother": "再缩短一个"
 		},
 		"errors": {
 			"configLoadFailed": "无法加载应用配置",
@@ -118,6 +127,7 @@
 	"loginPage": {
 		"title": "登录 :: SHRTLY",
 		"description": "登录 Shortly 服务",
+		"subtitle": "登录后可以自定义名称并管理你的链接。",
 		"buttons": {
 			"gitlab": "使用 GitLab 登录",
 			"passkey": "使用通行密钥登录",

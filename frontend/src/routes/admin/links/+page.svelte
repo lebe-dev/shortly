@@ -4,9 +4,8 @@
 	import { configStore } from '$lib/stores/config';
 	import { t } from 'svelte-intl-precompile';
 	import { toast } from 'svelte-sonner';
-	import UrlCard from '$lib/components/UrlCard.svelte';
+	import LinksTable, { type LinkRow } from '$lib/components/LinksTable.svelte';
 	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
 	import type { AdminUrlDto } from '$lib/domain/config';
 	import Search from 'lucide-svelte/icons/search';
 
@@ -81,6 +80,19 @@
 
 		return urls;
 	});
+
+	const rows: LinkRow[] = $derived(
+		filteredAndSortedUrls.map((u) => ({
+			id: u.id,
+			shortUrl: getShortUrl(u),
+			originalUrl: u.originalUrl,
+			created: u.created,
+			ttl: u.ttl,
+			lastAccessed: u.lastAccessed,
+			username: u.username,
+			userId: u.userId
+		}))
+	);
 </script>
 
 <svelte:head>
@@ -93,85 +105,70 @@
 		<p class="text-muted-foreground text-lg">{$t('adminPage.errors.notAuthorized')}</p>
 	</div>
 {:else if $configStore.admin.allUrls.length === 0}
-	<div class="py-12 text-center">
+	<div class="surface-card px-6 py-16 text-center">
 		<p class="text-muted-foreground text-lg">{$t('adminPage.empty')}</p>
 	</div>
 {:else}
-	<!-- Controls -->
-	<div class="mb-6 space-y-4">
-		<!-- Search -->
-		<div class="relative">
-			<Search class="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+	<div class="flex flex-wrap items-center gap-3">
+		<label
+			class="field border-input bg-card flex min-h-11 flex-[1_1_320px] items-center gap-2.5 rounded-xl border px-3.5"
+		>
+			<Search class="text-muted-foreground size-4 shrink-0" />
+			<span class="sr-only">{$t('adminPage.search.placeholder')}</span>
 			<Input
-				type="text"
+				type="search"
 				bind:value={searchQuery}
 				placeholder={$t('adminPage.search.placeholder')}
-				class="pl-10"
+				class="h-11 rounded-none border-0 bg-transparent px-0"
 			/>
-		</div>
+		</label>
 
-		<!-- Filters and Sort -->
-		<div class="flex flex-wrap items-center gap-4">
-			<!-- Filters -->
-			<div class="flex items-center gap-4">
-				<Label class="flex cursor-pointer items-center gap-2">
-					<input
-						type="checkbox"
-						bind:checked={onlyNamed}
-						class="h-4 w-4 cursor-pointer rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
-					/>
-					<span class="text-sm">{$t('adminPage.filters.onlyNamed')}</span>
-				</Label>
-			</div>
+		<label
+			class="border-input bg-card text-foreground/90 flex min-h-11 cursor-pointer items-center gap-2.5 rounded-xl border px-3.5 text-sm font-medium"
+		>
+			<input
+				type="checkbox"
+				bind:checked={onlyNamed}
+				class="accent-primary-strong size-4 cursor-pointer"
+			/>
+			{$t('adminPage.filters.onlyNamed')}
+		</label>
 
-			<!-- Sort -->
-			<div class="flex items-center gap-2">
-				<Label for="sort" class="text-sm">{$t('adminPage.sort.label')}:</Label>
-				<select
-					id="sort"
-					bind:value={sortBy}
-					class="border-input bg-background focus:border-primary h-10 cursor-pointer rounded-sm border-2 px-3 py-1 text-sm outline-none dark:bg-gray-800"
-				>
-					<option value="created">{$t('adminPage.sort.byCreated')}</option>
-					<option value="named">{$t('adminPage.sort.namedFirst')}</option>
-				</select>
-			</div>
-		</div>
+		<label
+			class="field border-input bg-card flex min-h-11 items-center gap-2 rounded-xl border ps-3.5 pe-2 text-sm"
+		>
+			<span class="text-muted-foreground">{$t('adminPage.sort.label')}</span>
+			<select
+				bind:value={sortBy}
+				class="text-foreground h-11 cursor-pointer bg-transparent pe-1 font-medium outline-none"
+			>
+				<option value="created">{$t('adminPage.sort.byCreated')}</option>
+				<option value="named">{$t('adminPage.sort.namedFirst')}</option>
+			</select>
+		</label>
 	</div>
 
-	<!-- Item count -->
-	<div class="mb-4 ps-1 text-xs text-gray-400 dark:text-gray-500">
+	<div class="text-muted-foreground mt-4 flex gap-5 text-[13px]">
+		<span
+			>{$t('adminPage.items')}
+			<b class="text-foreground font-mono font-semibold">{$configStore.admin.allUrls.length}</b
+			></span
+		>
 		{#if filteredAndSortedUrls.length !== $configStore.admin.allUrls.length}
-			{$t('adminPage.filtered')}: {filteredAndSortedUrls.length} / {$t('adminPage.items')}: {$configStore
-				.admin.allUrls.length}
-		{:else}
-			{$t('adminPage.items')}: {$configStore.admin.allUrls.length}
+			<span
+				>{$t('adminPage.filtered')}
+				<b class="text-foreground font-mono font-semibold">{filteredAndSortedUrls.length}</b></span
+			>
 		{/if}
 	</div>
 
-	<!-- Results -->
-	{#if filteredAndSortedUrls.length === 0}
-		<div class="py-12 text-center">
-			<p class="text-muted-foreground text-lg">{$t('adminPage.empty')}</p>
-		</div>
-	{:else}
-		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-			{#each filteredAndSortedUrls as url (url.id)}
-				<UrlCard
-					id={url.id}
-					url={getShortUrl(url)}
-					originalUrl={url.originalUrl}
-					created={url.created}
-					ttl={url.ttl}
-					customName={url.customName}
-					username={url.username}
-					userId={url.userId}
-					lastAccessed={url.lastAccessed}
-					onDelete={handleDelete}
-					onCopy={copyToClipboard}
-					showUserInfo={true}
-				/>
-			{/each}
-		</div>
-	{/if}
+	<div class="mt-3">
+		{#if rows.length === 0}
+			<div class="surface-card px-6 py-16 text-center">
+				<p class="text-muted-foreground text-lg">{$t('adminPage.empty')}</p>
+			</div>
+		{:else}
+			<LinksTable {rows} showUser onCopy={copyToClipboard} onDelete={handleDelete} />
+		{/if}
+	</div>
 {/if}

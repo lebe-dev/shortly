@@ -82,10 +82,8 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-primary={$configStore.features.createUrl.enabled}
-							class:dark:text-blue-300={$configStore.features.createUrl.enabled}
-							class:text-red-600={!$configStore.features.createUrl.enabled}
-							class:dark:text-red-400={!$configStore.features.createUrl.enabled}
+							class:text-success={$configStore.features.createUrl.enabled}
+							class:text-destructive={!$configStore.features.createUrl.enabled}
 						>
 							{$configStore.features.createUrl.enabled
 								? $t('adminPage.general.values.yes')
@@ -98,10 +96,8 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-primary={$configStore.features.createUrl.authOnly}
-							class:dark:text-blue-300={$configStore.features.createUrl.authOnly}
-							class:text-red-600={!$configStore.features.createUrl.authOnly}
-							class:dark:text-red-400={!$configStore.features.createUrl.authOnly}
+							class:text-success={$configStore.features.createUrl.authOnly}
+							class:text-destructive={!$configStore.features.createUrl.authOnly}
 						>
 							{$configStore.features.createUrl.authOnly
 								? $t('adminPage.general.values.yes')
@@ -140,10 +136,8 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-primary={$configStore.features.namedUrls.enabled}
-							class:dark:text-blue-300={$configStore.features.namedUrls.enabled}
-							class:text-red-600={!$configStore.features.namedUrls.enabled}
-							class:dark:text-red-400={!$configStore.features.namedUrls.enabled}
+							class:text-success={$configStore.features.namedUrls.enabled}
+							class:text-destructive={!$configStore.features.namedUrls.enabled}
 						>
 							{$configStore.features.namedUrls.enabled
 								? $t('adminPage.general.values.yes')
@@ -190,10 +184,8 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-primary={$configStore.auth.enabled}
-							class:dark:text-blue-300={$configStore.auth.enabled}
-							class:text-red-600={!$configStore.auth.enabled}
-							class:dark:text-red-400={!$configStore.auth.enabled}
+							class:text-success={$configStore.auth.enabled}
+							class:text-destructive={!$configStore.auth.enabled}
 						>
 							{$configStore.auth.enabled
 								? $t('adminPage.general.values.yes')
@@ -276,10 +268,8 @@
 						>
 						<span
 							class="text-sm font-medium"
-							class:text-primary={$configStore.metrics.enabled}
-							class:dark:text-blue-300={$configStore.metrics.enabled}
-							class:text-red-600={!$configStore.metrics.enabled}
-							class:dark:text-red-400={!$configStore.metrics.enabled}
+							class:text-success={$configStore.metrics.enabled}
+							class:text-destructive={!$configStore.metrics.enabled}
 						>
 							{$configStore.metrics.enabled
 								? $t('adminPage.general.values.yes')
@@ -295,7 +285,7 @@
 							<a
 								href="/api/metrics"
 								target="_blank"
-								class="text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+								class="text-link text-sm font-medium hover:underline"
 							>
 								/api/metrics
 							</a>

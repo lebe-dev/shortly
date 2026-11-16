@@ -3,11 +3,13 @@
 	"common": {
 		"buttons": {
 			"copy": "Копировать",
-			"generate": "СОЗДАТЬ"
+			"generate": "Создать ссылку",
+			"delete": "Удалить"
 		},
 		"loading": "Загрузка...",
 		"loadingEllipsis": "...",
 		"backToHome": "Вернуться на главную",
+		"never": "Бессрочно",
 		"consumption": {
 			"title": "Лимиты",
 			"totalLinks": "Всего ссылок",
@@ -49,6 +51,10 @@
 	"homePage": {
 		"title": "Создать короткую ссылку :: SHRTLY",
 		"description": "Создайте удобную короткую ссылку из длинной",
+		"hero": {
+			"eyebrow": "Новая ссылка",
+			"title": "Сделайте короче."
+		},
 		"form": {
 			"label": "Вставьте длинную ссылку сюда",
 			"placeholder": "https://my.long-url.com",
@@ -84,11 +90,14 @@
 		"result": {
 			"internalAccess": "Ссылка доступна только из внутренней сети.",
 			"title": "Ваша короткая ссылка:",
+			"eyebrow": "Ссылка готова",
+			"heading": "Ваша короткая ссылка.",
 			"expirationInfo": "Эта ссылка истечёт через {ttl}",
 			"expirationDate": "Ссылка будет храниться до {date}",
 			"namedUrlInfo": "Срок хранения: без ограничений",
 			"clickToCopy": "Кликните по ссылке, чтобы скопировать в буфер обмена",
-			"linkCopied": "Ссылка скопирована"
+			"linkCopied": "Ссылка скопирована",
+			"shortenAnother": "Сократить ещё"
 		},
 		"errors": {
 			"configLoadFailed": "Не удалось загрузить конфигурацию приложения",
@@ -118,6 +127,7 @@
 	"loginPage": {
 		"title": "Вход :: SHRTLY",
 		"description": "Войти в сервис Shortly",
+		"subtitle": "Войдите, чтобы задавать свои имена ссылок и управлять ими.",
 		"buttons": {
 			"gitlab": "Войти через GitLab",
 			"passkey": "Войти по passkey",

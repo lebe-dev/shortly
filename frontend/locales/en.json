@@ -3,11 +3,13 @@
 	"common": {
 		"buttons": {
 			"copy": "Copy",
-			"generate": "GENERATE"
+			"generate": "Create link",
+			"delete": "Delete"
 		},
 		"loading": "Loading...",
 		"loadingEllipsis": "...",
 		"backToHome": "Back to home",
+		"never": "Never",
 		"consumption": {
 			"title": "Limits",
 			"totalLinks": "Total Links",
@@ -49,6 +51,10 @@
 	"homePage": {
 		"title": "Create short url :: SHRTLY",
 		"description": "Create convenient short url from long one",
+		"hero": {
+			"eyebrow": "New link",
+			"title": "Make it short."
+		},
 		"form": {
 			"label": "Paste long URL here",
 			"placeholder": "https://my.long-url.com",
@@ -84,11 +90,14 @@
 		"result": {
 			"internalAccess": "This link is only available from an internal network.",
 			"title": "Your short url:",
+			"eyebrow": "Link ready",
+			"heading": "Here’s your short link.",
 			"expirationInfo": "This link will expire in {ttl}",
 			"expirationDate": "Link will be stored until {date}",
 			"namedUrlInfo": "This named link will never expire",
 			"clickToCopy": "Click on the link to copy to clipboard",
-			"linkCopied": "Link copied"
+			"linkCopied": "Link copied",
+			"shortenAnother": "Shorten another"
 		},
 		"errors": {
 			"configLoadFailed": "Unable to load app config",
@@ -118,6 +127,7 @@
 	"loginPage": {
 		"title": "Login :: SHRTLY",
 		"description": "Login to Shortly service",
+		"subtitle": "Signed-in users can pick custom names and manage their links.",
 		"buttons": {
 			"gitlab": "Login with GitLab",
 			"passkey": "Login with passkey",

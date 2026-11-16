@@ -3,11 +3,13 @@
 	"common": {
 		"buttons": {
 			"copy": "コピー",
-			"generate": "生成"
+			"generate": "リンクを作成",
+			"delete": "削除"
 		},
 		"loading": "読み込み中...",
 		"loadingEllipsis": "...",
 		"backToHome": "ホームに戻る",
+		"never": "無期限",
 		"consumption": {
 			"title": "制限",
 			"totalLinks": "合計リンク数",
@@ -49,6 +51,10 @@
 	"homePage": {
 		"title": "短縮URLを作成 :: SHRTLY",
 		"description": "長いURLから便利な短縮URLを作成",
+		"hero": {
+			"eyebrow": "新しいリンク",
+			"title": "短くしよう。"
+		},
 		"form": {
 			"label": "長いURLをここに貼り付け",
 			"placeholder": "https://my.long-url.com",
@@ -84,11 +90,14 @@
 		"result": {
 			"internalAccess": "このリンクは内部ネットワークからのみアクセスできます。",
 			"title": "あなたの短縮URL：",
+			"eyebrow": "リンクの準備ができました",
+			"heading": "短縮リンクはこちら。",
 			"expirationInfo": "このリンクは{ttl}後に期限切れになります",
 			"expirationDate": "リンクは{date}まで保存されます",
 			"namedUrlInfo": "この名前付きリンクは期限切れになりません",
 			"clickToCopy": "リンクをクリックしてクリップボードにコピー",
-			"linkCopied": "リンクをコピーしました"
+			"linkCopied": "リンクをコピーしました",
+			"shortenAnother": "別のリンクを短縮"
 		},
 		"errors": {
 			"configLoadFailed": "アプリ設定を読み込めませんでした",
@@ -118,6 +127,7 @@
 	"loginPage": {
 		"title": "ログイン :: SHRTLY",
 		"description": "Shortlyサービスにログイン",
+		"subtitle": "ログインすると独自の名前を付けたり、リンクを管理したりできます。",
 		"buttons": {
 			"gitlab": "GitLabでログイン",
 			"passkey": "パスキーでログイン",

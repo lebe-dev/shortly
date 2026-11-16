@@ -3,11 +3,13 @@
 	"common": {
 		"buttons": {
 			"copy": "Copiar",
-			"generate": "GENERAR"
+			"generate": "Crear enlace",
+			"delete": "Eliminar"
 		},
 		"loading": "Cargando...",
 		"loadingEllipsis": "...",
 		"backToHome": "Volver a inicio",
+		"never": "Nunca",
 		"consumption": {
 			"title": "Límites",
 			"totalLinks": "Enlaces totales",
@@ -49,6 +51,10 @@
 	"homePage": {
 		"title": "Crear URL corta :: SHRTLY",
 		"description": "Cree una URL corta conveniente desde una larga",
+		"hero": {
+			"eyebrow": "Nuevo enlace",
+			"title": "Hazlo corto."
+		},
 		"form": {
 			"label": "Pegue la URL larga aquí",
 			"placeholder": "https://mi.url-larga.com",
@@ -84,11 +90,14 @@
 		"result": {
 			"internalAccess": "Este enlace solo está disponible desde una red interna.",
 			"title": "Su URL corta:",
+			"eyebrow": "Enlace listo",
+			"heading": "Aquí está tu enlace corto.",
 			"expirationInfo": "Este enlace expirará en {ttl}",
 			"expirationDate": "El enlace se almacenará hasta {date}",
 			"namedUrlInfo": "Este enlace con nombre nunca expirará",
 			"clickToCopy": "Haga clic en el enlace para copiar al portapapeles",
-			"linkCopied": "Enlace copiado"
+			"linkCopied": "Enlace copiado",
+			"shortenAnother": "Acortar otro"
 		},
 		"errors": {
 			"configLoadFailed": "No se pudo cargar la configuración de la aplicación",
@@ -118,6 +127,7 @@
 	"loginPage": {
 		"title": "Iniciar sesión :: SHRTLY",
 		"description": "Iniciar sesión en el servicio Shortly",
+		"subtitle": "Los usuarios registrados pueden elegir nombres propios y gestionar sus enlaces.",
 		"buttons": {
 			"gitlab": "Iniciar sesión con GitLab",
 			"passkey": "Iniciar sesión con passkey",

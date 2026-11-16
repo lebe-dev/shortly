@@ -49,13 +49,8 @@
 
 <DropdownMenu>
 	<DropdownMenuTrigger>
-		<Button
-			variant="outline"
-			size="icon"
-			class="border-0 bg-transparent align-middle hover:cursor-pointer hover:bg-blue-700 dark:bg-transparent"
-			title="Menu"
-		>
-			<Menu class="h-[1.2rem] w-[1.2rem] text-gray-300" />
+		<Button variant="ghost" size="icon" class="size-11" title="Menu" aria-label="Menu">
+			<Menu class="size-5" />
 		</Button>
 	</DropdownMenuTrigger>
 	<DropdownMenuContent align="end" class="w-52">
@@ -99,7 +94,7 @@
 				{#each languages as lang (lang)}
 					<DropdownMenuItem
 						onclick={() => changeLanguage(lang)}
-						class={$locale === lang ? 'bg-blue-50 text-sm dark:bg-blue-900' : 'text-sm'}
+						class={$locale === lang ? 'bg-accent text-link text-sm' : 'text-sm'}
 					>
 						<span class="uppercase">{lang}</span>
 					</DropdownMenuItem>

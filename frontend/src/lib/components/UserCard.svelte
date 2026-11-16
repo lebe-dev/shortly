@@ -117,7 +117,9 @@
 			{#if user.avatarUrl}
 				<img src={user.avatarUrl} alt={user.username} class="h-12 w-12 rounded-full" />
 			{:else}
-				<div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-white">
+				<div
+					class="bg-secondary text-foreground flex h-12 w-12 items-center justify-center rounded-full"
+				>
 					<span class="text-sm font-semibold">{getInitials(user.username)}</span>
 				</div>
 			{/if}

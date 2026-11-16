@@ -11,7 +11,6 @@
 	import * as Pagination from '$lib/components/ui/pagination';
 	import { RangeCalendar } from '$lib/components/ui/range-calendar';
 	import * as Popover from '$lib/components/ui/popover';
-	import { Card, CardContent } from '$lib/components/ui/card';
 	import { createSvelteTable, FlexRender } from '$lib/components/ui/data-table';
 	import { getCoreRowModel, type ColumnDef, type CellContext } from '@tanstack/table-core';
 	import { type DateValue } from '@internationalized/date';
@@ -168,7 +167,7 @@
 
 <div class="space-y-6">
 	<!-- Filters Section -->
-	<div class="border-muted rounded-lg border p-4">
+	<div class="surface-card p-5">
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
 			<!-- Event Type Filter -->
 			<div>
@@ -301,39 +300,37 @@
 			</p>
 		</div>
 	{:else}
-		<Card>
-			<CardContent>
-				<Table.Root>
-					<Table.Header>
-						{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
-							<Table.Row>
-								{#each headerGroup.headers as header (header.id)}
-									<Table.Head>
-										{#if !header.isPlaceholder}
-											<FlexRender
-												content={header.column.columnDef.header}
-												context={header.getContext()}
-											/>
-										{/if}
-									</Table.Head>
-								{/each}
-							</Table.Row>
-						{/each}
-					</Table.Header>
-					<Table.Body>
-						{#each table.getRowModel().rows as row (row.id)}
-							<Table.Row>
-								{#each row.getVisibleCells() as cell (cell.id)}
-									<Table.Cell>
-										<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
-									</Table.Cell>
-								{/each}
-							</Table.Row>
-						{/each}
-					</Table.Body>
-				</Table.Root>
-			</CardContent>
-		</Card>
+		<div class="surface-card overflow-hidden">
+			<Table.Root>
+				<Table.Header>
+					{#each table.getHeaderGroups() as headerGroup (headerGroup.id)}
+						<Table.Row>
+							{#each headerGroup.headers as header (header.id)}
+								<Table.Head>
+									{#if !header.isPlaceholder}
+										<FlexRender
+											content={header.column.columnDef.header}
+											context={header.getContext()}
+										/>
+									{/if}
+								</Table.Head>
+							{/each}
+						</Table.Row>
+					{/each}
+				</Table.Header>
+				<Table.Body>
+					{#each table.getRowModel().rows as row (row.id)}
+						<Table.Row>
+							{#each row.getVisibleCells() as cell (cell.id)}
+								<Table.Cell>
+									<FlexRender content={cell.column.columnDef.cell} context={cell.getContext()} />
+								</Table.Cell>
+							{/each}
+						</Table.Row>
+					{/each}
+				</Table.Body>
+			</Table.Root>
+		</div>
 
 		<!-- Pagination -->
 		{#if totalPages > 1}

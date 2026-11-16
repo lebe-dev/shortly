@@ -3,11 +3,13 @@
 	"common": {
 		"buttons": {
 			"copy": "Kopieren",
-			"generate": "GENERIEREN"
+			"generate": "Link erstellen",
+			"delete": "Löschen"
 		},
 		"loading": "Laden...",
 		"loadingEllipsis": "...",
 		"backToHome": "Zurück zur Startseite",
+		"never": "Nie",
 		"consumption": {
 			"title": "Limits",
 			"totalLinks": "Gesamt Links",
@@ -49,6 +51,10 @@
 	"homePage": {
 		"title": "Kurzen URL erstellen :: SHRTLY",
 		"description": "Erstellen Sie eine bequeme kurze URL aus einer langen",
+		"hero": {
+			"eyebrow": "Neuer Link",
+			"title": "Mach ihn kurz."
+		},
 		"form": {
 			"label": "Lange URL hier einfügen",
 			"placeholder": "https://meine.lange-url.com",
@@ -84,11 +90,14 @@
 		"result": {
 			"internalAccess": "Dieser Link ist nur aus einem internen Netzwerk erreichbar.",
 			"title": "Ihre kurze URL:",
+			"eyebrow": "Link bereit",
+			"heading": "Hier ist dein kurzer Link.",
 			"expirationInfo": "Dieser Link läuft in {ttl} ab",
 			"expirationDate": "Link wird gespeichert bis {date}",
 			"namedUrlInfo": "Dieser benannte Link läuft nie ab",
 			"clickToCopy": "Klicken Sie auf den Link, um ihn in die Zwischenablage zu kopieren",
-			"linkCopied": "Link kopiert"
+			"linkCopied": "Link kopiert",
+			"shortenAnother": "Weiteren kürzen"
 		},
 		"errors": {
 			"configLoadFailed": "App-Konfiguration konnte nicht geladen werden",
@@ -118,6 +127,7 @@
 	"loginPage": {
 		"title": "Anmelden :: SHRTLY",
 		"description": "Beim Shortly-Dienst anmelden",
+		"subtitle": "Angemeldete Nutzer können eigene Namen wählen und ihre Links verwalten.",
 		"buttons": {
 			"gitlab": "Mit GitLab anmelden",
 			"passkey": "Mit Passkey anmelden",

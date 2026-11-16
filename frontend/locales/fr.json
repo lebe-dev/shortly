@@ -3,11 +3,13 @@
 	"common": {
 		"buttons": {
 			"copy": "Copier",
-			"generate": "GÉNÉRER"
+			"generate": "Créer le lien",
+			"delete": "Supprimer"
 		},
 		"loading": "Chargement...",
 		"loadingEllipsis": "...",
 		"backToHome": "Retour à l'accueil",
+		"never": "Jamais",
 		"consumption": {
 			"title": "Limites",
 			"totalLinks": "Liens totaux",
@@ -49,6 +51,10 @@
 	"homePage": {
 		"title": "Créer une URL courte :: SHRTLY",
 		"description": "Créez une URL courte pratique à partir d'une longue",
+		"hero": {
+			"eyebrow": "Nouveau lien",
+			"title": "Faites court."
+		},
 		"form": {
 			"label": "Collez l'URL longue ici",
 			"placeholder": "https://mon.url-longue.com",
@@ -84,11 +90,14 @@
 		"result": {
 			"internalAccess": "Ce lien est accessible uniquement depuis un réseau interne.",
 			"title": "Votre URL courte:",
+			"eyebrow": "Lien prêt",
+			"heading": "Voici votre lien court.",
 			"expirationInfo": "Ce lien expirera dans {ttl}",
 			"expirationDate": "Le lien sera stocké jusqu'au {date}",
 			"namedUrlInfo": "Ce lien nommé n'expirera jamais",
 			"clickToCopy": "Cliquez sur le lien pour copier dans le presse-papiers",
-			"linkCopied": "Lien copié"
+			"linkCopied": "Lien copié",
+			"shortenAnother": "En raccourcir un autre"
 		},
 		"errors": {
 			"configLoadFailed": "Impossible de charger la configuration de l'application",
@@ -118,6 +127,7 @@
 	"loginPage": {
 		"title": "Connexion :: SHRTLY",
 		"description": "Se connecter au service Shortly",
+		"subtitle": "Les utilisateurs connectés peuvent choisir des noms personnalisés et gérer leurs liens.",
 		"buttons": {
 			"gitlab": "Se connecter avec GitLab",
 			"passkey": "Se connecter avec une passkey",

@@ -3,11 +3,13 @@
 	"common": {
 		"buttons": {
 			"copy": "העתק",
-			"generate": "צור"
+			"generate": "צור קישור",
+			"delete": "מחק"
 		},
 		"loading": "טוען...",
 		"loadingEllipsis": "...",
 		"backToHome": "חזרה לדף הבית",
+		"never": "ללא הגבלה",
 		"consumption": {
 			"title": "מגבלות",
 			"totalLinks": "סך הכל קישורים",
@@ -49,6 +51,10 @@
 	"homePage": {
 		"title": "צור קישור קצר :: SHRTLY",
 		"description": "צור קישור קצר ונוח מקישור ארוך",
+		"hero": {
+			"eyebrow": "קישור חדש",
+			"title": "תקצרו את זה."
+		},
 		"form": {
 			"label": "הדבק כאן את הכתובת הארוכה",
 			"placeholder": "https://my.long-url.com",
@@ -84,11 +90,14 @@
 		"result": {
 			"internalAccess": "הקישור זמין רק מתוך רשת פנימית.",
 			"title": "הקישור הקצר שלך:",
+			"eyebrow": "הקישור מוכן",
+			"heading": "הנה הקישור הקצר שלך.",
 			"expirationInfo": "קישור זה יפוג בעוד {ttl}",
 			"expirationDate": "הקישור יישמר עד {date}",
 			"namedUrlInfo": "קישור זה עם שם לא יפוג לעולם",
 			"clickToCopy": "לחץ על הקישור כדי להעתיק ללוח",
-			"linkCopied": "הקישור הועתק"
+			"linkCopied": "הקישור הועתק",
+			"shortenAnother": "קצר קישור נוסף"
 		},
 		"errors": {
 			"configLoadFailed": "לא ניתן לטעון את הגדרות האפליקציה",
@@ -118,6 +127,7 @@
 	"loginPage": {
 		"title": "התחברות :: SHRTLY",
 		"description": "התחבר לשירות Shortly",
+		"subtitle": "משתמשים מחוברים יכולים לבחור שמות מותאמים ולנהל את הקישורים שלהם.",
 		"buttons": {
 			"gitlab": "התחבר עם GitLab",
 			"passkey": "התחברות עם מפתח גישה",

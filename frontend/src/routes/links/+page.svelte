@@ -6,11 +6,9 @@
 	import { t } from 'svelte-intl-precompile';
 	import { toast } from 'svelte-sonner';
 	import { Button } from '$lib/components/ui/button';
-	import ConsumptionDisplay from '$lib/components/ConsumptionDisplay.svelte';
-	import UrlCard from '$lib/components/UrlCard.svelte';
-	import Link2 from 'lucide-svelte/icons/link-2';
+	import LimitsMeter from '$lib/components/LimitsMeter.svelte';
+	import LinksTable, { type LinkRow } from '$lib/components/LinksTable.svelte';
 	import Plus from 'lucide-svelte/icons/plus';
-	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
 
 	let urls: UserUrlResponse[] = $state([]);
 	let loading = $state(true);
@@ -27,6 +25,17 @@
 			}
 		}
 	});
+
+	const rows: LinkRow[] = $derived(
+		urls.map((u) => ({
+			id: u.id,
+			shortUrl: u.url,
+			originalUrl: u.original_url,
+			created: u.created,
+			ttl: u.ttl,
+			lastAccessed: u.last_accessed
+		}))
+	);
 
 	async function loadUrls() {
 		loading = true;
@@ -72,66 +81,36 @@
 	<meta name="description" content={$t('linksPage.description')} />
 </svelte:head>
 
-<div
-	class="surface-card animate-surface-in w-full max-w-[1300px] bg-white px-3 pt-8 pb-18 md:px-14 dark:bg-gray-900"
->
-	<a
-		href={resolve('/')}
-		class="text-muted-foreground/60 hover:text-muted-foreground mb-2 inline-flex items-center gap-1 text-xs hover:underline"
-	>
-		<ArrowLeft class="h-3 w-3" />
-		{$t('common.backToHome')}
-	</a>
-	<div class="mb-6 flex items-center justify-between gap-2">
-		<div class="flex items-center gap-2">
-			<Link2 class="h-5 w-5" />
-			<h1 class="text-xl font-bold">{$t('linksPage.header')}</h1>
-		</div>
-		<a href={resolve('/')}>
-			<Button variant="secondary" class="hover:cursor-pointer">
-				<Plus class="h-4 w-4" />
-				{$t('linksPage.createNew')}
-			</Button>
-		</a>
+<div class="page animate-surface-in">
+	<div class="flex flex-wrap items-end justify-between gap-6">
+		<h1 class="page-title flex items-baseline gap-3.5">
+			{$t('linksPage.header')}
+			{#if !loading && urls.length > 0}
+				<span class="text-muted-foreground font-mono text-lg font-medium tracking-[-0.02em]"
+					>{urls.length}</span
+				>
+			{/if}
+		</h1>
+		<Button href={resolve('/')}>
+			<Plus />
+			{$t('linksPage.createNew')}
+		</Button>
 	</div>
 
-	{#if $configStore}
-		<div class="mb-6">
-			<ConsumptionDisplay
-				config={$configStore.features.createUrl}
-				variant="default"
-				showHint={true}
-			/>
-		</div>
+	{#if $configStore && $configStore.features.createUrl.currentUrls !== undefined}
+		<LimitsMeter config={$configStore.features.createUrl} class="mt-4" />
 	{/if}
 
-	{#if loading}
-		<div class="py-12 text-center">
-			<p class="text-muted-foreground">{$t('common.loading')}</p>
-		</div>
-	{:else if urls.length === 0}
-		<div class="py-12 text-center">
-			<p class="text-muted-foreground text-lg">{$t('linksPage.empty')}</p>
-			<a href={resolve('/')} class="mt-4 inline-block">
-				<Button>{$t('linksPage.createFirst')}</Button>
-			</a>
-		</div>
-	{:else}
-		<div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-			{#each urls as url (url.id)}
-				<UrlCard
-					id={url.id}
-					url={url.url}
-					originalUrl={url.original_url}
-					created={url.created}
-					ttl={url.ttl}
-					customName={url.custom_name}
-					lastAccessed={url.last_accessed}
-					onDelete={handleDelete}
-					onCopy={copyToClipboard}
-					showUserInfo={false}
-				/>
-			{/each}
-		</div>
-	{/if}
+	<div class="mt-7">
+		{#if loading}
+			<div class="text-muted-foreground py-12 text-center">{$t('common.loading')}</div>
+		{:else if urls.length === 0}
+			<div class="surface-card flex flex-col items-center gap-5 px-6 py-16 text-center">
+				<p class="text-muted-foreground text-lg">{$t('linksPage.empty')}</p>
+				<Button href={resolve('/')}>{$t('linksPage.createFirst')}</Button>
+			</div>
+		{:else}
+			<LinksTable {rows} onCopy={copyToClipboard} onDelete={handleDelete} />
+		{/if}
+	</div>
 </div>

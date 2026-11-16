@@ -9,16 +9,14 @@
 
 <Button
 	onclick={() => toggleMode()}
-	variant="outline"
+	variant="ghost"
 	size="icon"
-	class="border-0 bg-transparent align-middle hover:cursor-pointer hover:bg-blue-700 dark:bg-transparent"
+	class="relative size-11"
 	title={$t('layout.toggleTheme')}
 >
-	<Sun
-		class="text-secondary-foreground hover:text-primary-foreground h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0  dark:hover:text-amber-400"
-	/>
+	<Sun class="size-[18px] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
 	<Moon
-		class="text-secondary absolute h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all hover:cursor-pointer hover:text-gray-950 dark:scale-0 dark:-rotate-90 dark:hover:bg-green-500"
+		class="absolute size-[18px] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90"
 	/>
 
 	<span class="sr-only">{$t('layout.toggleTheme')}</span>

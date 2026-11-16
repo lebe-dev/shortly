@@ -5,6 +5,10 @@
 	import { t } from 'svelte-intl-precompile';
 	import { toast } from 'svelte-sonner';
 	import KeyRound from 'lucide-svelte/icons/key-round';
+	import Info from 'lucide-svelte/icons/info';
+	import CircleAlert from 'lucide-svelte/icons/circle-alert';
+	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
+	import Logo from '$lib/components/Logo.svelte';
 	import {
 		isPasskeySupported,
 		loginWithPasskey,
@@ -48,105 +52,84 @@
 	<meta name="description" content={$t('loginPage.description')} />
 </svelte:head>
 
-<div
-	class="surface-card animate-surface-in h-80 w-full bg-white px-8 py-22 text-center md:px-24 dark:bg-gray-900"
->
-	{#if !config}
-		<div class="flex flex-col items-center justify-center gap-3">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="48"
-				height="48"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="1.5"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="text-muted-foreground lucide lucide-circle-alert"
-			>
-				<circle cx="12" cy="12" r="10" />
-				<line x1="12" x2="12" y1="8" y2="12" />
-				<line x1="12" x2="12.01" y1="16" y2="16" />
-			</svg>
-			<div class="text-muted-foreground text-lg">
-				{$t('loginPage.errors.configLoadFailed')}
+<div class="flex flex-1 flex-col items-center px-6 pt-16 pb-16 md:pt-28">
+	<section class="surface-card animate-surface-in w-full max-w-[420px] overflow-hidden">
+		{#if !config}
+			<div class="flex flex-col items-center gap-3 px-8 py-14 text-center">
+				<CircleAlert class="text-muted-foreground size-10" strokeWidth={1.5} />
+				<div class="text-muted-foreground text-lg">{$t('loginPage.errors.configLoadFailed')}</div>
 			</div>
-		</div>
-	{:else if config.auth.enabled && config.auth.authType === 'gitlab'}
-		<div class="flex flex-col items-center justify-center gap-6">
-			<div class="text-2xl font-semibold tracking-tight">
-				{$t('loginPage.title').replace(' :: SHRTLY', '')}
-			</div>
-			<div class="flex flex-col items-center gap-3">
-				<Button
-					size="lg"
-					onclick={() => {
-						window.location.href = '/api/auth/login';
-					}}
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						width="20"
-						height="20"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						class="lucide lucide-log-in me-2"
-					>
-						<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-						<polyline points="10 17 15 12 10 7" />
-						<line x1="15" x2="3" y1="12" y2="12" />
-					</svg>
-					{$t('loginPage.buttons.gitlab')}
-				</Button>
-				{#if config.auth.passkey?.enabled && passkeySupported}
+		{:else if config.auth.enabled && config.auth.authType === 'gitlab'}
+			<div class="px-8 pt-9 pb-7">
+				<Logo size={56} />
+				<h1 class="mt-6 text-[30px] leading-[1.1] font-semibold tracking-[-0.035em]">
+					{$t('loginPage.title').replace(' :: SHRTLY', '')}
+				</h1>
+				<p class="text-muted-foreground mt-2.5 text-[15px] leading-normal">
+					{$t('loginPage.subtitle')}
+				</p>
+
+				<div class="mt-7 flex flex-col gap-2.5">
 					<Button
+						variant="ink"
 						size="lg"
-						variant="outline"
-						disabled={passkeyLoginInProgress}
-						onclick={handlePasskeyLogin}
+						onclick={() => {
+							window.location.href = '/api/auth/login';
+						}}
 					>
-						<KeyRound class="me-2 h-5 w-5" />
-						{passkeyLoginInProgress
-							? $t('loginPage.buttons.passkeyInProgress')
-							: $t('loginPage.buttons.passkey')}
+						<svg
+							aria-hidden="true"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.75"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							class="size-[18px]"
+						>
+							<path
+								d="m22 13.29-3.33-10a.42.42 0 0 0-.14-.18.38.38 0 0 0-.22-.11.39.39 0 0 0-.23.07.42.42 0 0 0-.14.18l-2.26 6.67H8.32L6.1 3.26a.42.42 0 0 0-.1-.18.38.38 0 0 0-.26-.08.39.39 0 0 0-.23.07.42.42 0 0 0-.14.18L2 13.29a.74.74 0 0 0 .27.83L12 21l9.69-6.88a.71.71 0 0 0 .31-.83Z"
+							/>
+						</svg>
+						{$t('loginPage.buttons.gitlab')}
 					</Button>
-				{/if}
-				{#if config.auth.note}
-					<div class="text-primary mt-2 mb-4 text-xs">
-						{config.auth.note}
-					</div>
-				{/if}
-				<a href={resolve('/')} class="text-muted-foreground text-sm hover:underline">
-					{$t('common.backToHome')}
-				</a>
+					{#if config.auth.passkey?.enabled && passkeySupported}
+						<Button
+							size="lg"
+							variant="outline"
+							class="font-medium"
+							disabled={passkeyLoginInProgress}
+							onclick={handlePasskeyLogin}
+						>
+							<KeyRound class="size-[18px]" />
+							{passkeyLoginInProgress
+								? $t('loginPage.buttons.passkeyInProgress')
+								: $t('loginPage.buttons.passkey')}
+						</Button>
+					{/if}
+				</div>
 			</div>
-		</div>
-	{:else}
-		<div class="flex flex-col items-center justify-center gap-3">
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="48"
-				height="48"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="1.5"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-				class="text-muted-foreground lucide lucide-info"
-			>
-				<circle cx="12" cy="12" r="10" />
-				<path d="M12 16v-4" />
-				<path d="M12 8h.01" />
-			</svg>
-			<div class="text-muted-foreground text-lg">
-				{$t('loginPage.errors.authDisabled')}
+			{#if config.auth.note}
+				<div
+					class="border-hairline bg-muted text-foreground/80 flex items-start gap-2.5 border-t px-8 py-4 text-[13px] leading-normal"
+				>
+					<Info class="text-link mt-0.5 size-4 shrink-0" />
+					<span>{config.auth.note}</span>
+				</div>
+			{/if}
+		{:else}
+			<div class="flex flex-col items-center gap-3 px-8 py-14 text-center">
+				<Info class="text-muted-foreground size-10" strokeWidth={1.5} />
+				<div class="text-muted-foreground text-lg">{$t('loginPage.errors.authDisabled')}</div>
 			</div>
-		</div>
-	{/if}
+		{/if}
+	</section>
+
+	<a
+		href={resolve('/')}
+		class="text-muted-foreground hover:text-foreground mt-6 inline-flex min-h-11 items-center gap-1.5 text-sm transition-colors"
+	>
+		<ArrowLeft class="size-3.5" />
+		{$t('common.backToHome')}
+	</a>
 </div>

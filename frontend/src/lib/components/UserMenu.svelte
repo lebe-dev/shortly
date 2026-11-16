@@ -53,17 +53,23 @@
 	<DropdownMenu>
 		<DropdownMenuTrigger>
 			<Button
-				variant="outline"
-				class="dark:hover:bg-secondary/50 flex items-center gap-2 rounded border-0 bg-transparent px-2.5 py-1.5 text-xs font-medium text-gray-300 hover:cursor-pointer hover:bg-blue-700 hover:text-gray-300"
+				variant="ghost"
+				class="h-11 gap-2 px-1.5"
+				aria-label={$authStore.user.username}
+				title={$authStore.user.username}
 			>
 				{#if $authStore.user.avatarUrl}
-					<img src={$authStore.user.avatarUrl} alt="Avatar" class="h-6 w-6 rounded-full" />
+					<img src={$authStore.user.avatarUrl} alt="" class="size-8 rounded-full" />
+				{:else}
+					<span
+						class="bg-foreground text-background flex size-8 items-center justify-center rounded-full text-xs font-semibold uppercase"
+						>{$authStore.user.username.slice(0, 2)}</span
+					>
 				{/if}
-				<span class="text-xs">{$authStore.user.username}</span>
-				<ChevronDown class="h-3 w-3" />
+				<ChevronDown class="size-3.5" />
 			</Button>
 		</DropdownMenuTrigger>
-		<DropdownMenuContent align="end" class="border-secondary w-52 rounded-xs border">
+		<DropdownMenuContent align="end" class="w-56">
 			<!-- User info header -->
 			<DropdownMenuLabel class="flex items-center gap-2 py-2 ">
 				{#if $authStore.user.avatarUrl}
@@ -108,12 +114,12 @@
 						>{$t('layout.language')} ({$locale.toUpperCase()})</span
 					>
 				</DropdownMenuSubTrigger>
-				<DropdownMenuSubContent class="border-secondary border">
+				<DropdownMenuSubContent>
 					{#each languages as lang (lang)}
 						<DropdownMenuItem
 							onclick={() => changeLanguage(lang)}
 							class={$locale === lang
-								? 'bg-primary dark:text-primary-foreground text-sm  text-gray-100 hover:cursor-pointer dark:bg-blue-300'
+								? 'bg-accent text-link text-sm hover:cursor-pointer'
 								: 'text-sm hover:cursor-pointer'}
 						>
 							<span class="uppercase">{lang}</span>
@@ -132,12 +138,9 @@
 	</DropdownMenu>
 {:else}
 	<a href={resolve('/login')} title={$t('layout.login')}>
-		<Button
-			variant="outline"
-			size="icon"
-			class="dark:hover:bg-secondary/50 flex items-center gap-1.5 rounded border border-transparent bg-transparent px-2.5 py-1.5 text-xs font-medium text-gray-300 uppercase transition-colors hover:cursor-pointer hover:bg-blue-700 hover:text-gray-300"
-		>
-			<LogIn class="h-4 w-4" />
+		<Button variant="ghost" class="h-11 px-3">
+			<LogIn class="size-4" />
+			{$t('layout.login')}
 		</Button>
 	</a>
 {/if}

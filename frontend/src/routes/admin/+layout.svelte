@@ -7,8 +7,6 @@
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import MonitorCog from 'lucide-svelte/icons/monitor-cog';
-	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
 
 	let { children } = $props();
 
@@ -51,48 +49,48 @@
 	}
 </script>
 
-<div
-	class="w-full max-w-[1300px] rounded bg-white px-3 pt-8 pb-18 shadow md:px-14 dark:bg-gray-900"
->
-	<a
-		href={resolve('/')}
-		class="text-muted-foreground/60 hover:text-muted-foreground mb-2 inline-flex items-center gap-1 text-xs hover:underline"
-	>
-		<ArrowLeft class="h-3 w-3" />
-		{$t('common.backToHome')}
-	</a>
-	<div class="mb-6 flex items-center gap-2">
-		<MonitorCog class="h-5 w-5" />
-		<h1 class="text-xl font-bold">{$t('adminPage.header')}</h1>
+<div class="animate-surface-in flex flex-1 flex-col">
+	<div class="border-border bg-card border-b">
+		<div class="mx-auto w-full max-w-[1200px] px-6 pt-10">
+			<h1 class="page-title">{$t('adminPage.header')}</h1>
+			{#if $configStore?.admin}
+				<Tabs value={activeTab} class="mt-6 w-full">
+					<TabsList class="border-b-0">
+						<TabsTrigger value="general" onclick={() => navigateToTab('general')}>
+							{$t('adminPage.tabs.general')}
+						</TabsTrigger>
+						<TabsTrigger value="links" onclick={() => navigateToTab('links')}>
+							{$t('adminPage.tabs.links')}
+							<span
+								class="text-link rounded-[5px] bg-[color-mix(in_oklab,var(--primary)_12%,transparent)] px-1.5 py-px font-mono text-[11px] font-medium"
+								>{$configStore.admin.allUrls.length}</span
+							>
+						</TabsTrigger>
+						<TabsTrigger value="users" onclick={() => navigateToTab('users')}>
+							{$t('adminPage.tabs.users')}
+						</TabsTrigger>
+						<TabsTrigger value="audit" onclick={() => navigateToTab('audit')}>
+							{$t('adminPage.tabs.audit')}
+						</TabsTrigger>
+					</TabsList>
+				</Tabs>
+			{:else}
+				<div class="h-6"></div>
+			{/if}
+		</div>
 	</div>
 
-	{#if !$configStore}
-		<div class="py-12 text-center">
-			<p class="text-muted-foreground">{$t('common.loading')}</p>
-		</div>
-	{:else if !$configStore.admin}
-		<div class="py-12 text-center">
-			<p class="text-muted-foreground text-lg">{$t('adminPage.errors.notAuthorized')}</p>
-		</div>
-	{:else}
-		<Tabs value={activeTab} class="w-full">
-			<TabsList class="mb-6">
-				<TabsTrigger value="general" onclick={() => navigateToTab('general')}>
-					{$t('adminPage.tabs.general')}
-				</TabsTrigger>
-				<TabsTrigger value="links" onclick={() => navigateToTab('links')}>
-					{$t('adminPage.tabs.links')}
-				</TabsTrigger>
-				<TabsTrigger value="users" onclick={() => navigateToTab('users')}>
-					{$t('adminPage.tabs.users')}
-				</TabsTrigger>
-				<TabsTrigger value="audit" onclick={() => navigateToTab('audit')}>
-					{$t('adminPage.tabs.audit')}
-				</TabsTrigger>
-			</TabsList>
-
-			<!-- Child route content rendered here -->
+	<div class="mx-auto w-full max-w-[1200px] px-6 pt-7 pb-24">
+		{#if !$configStore}
+			<div class="py-12 text-center">
+				<p class="text-muted-foreground">{$t('common.loading')}</p>
+			</div>
+		{:else if !$configStore.admin}
+			<div class="py-12 text-center">
+				<p class="text-muted-foreground text-lg">{$t('adminPage.errors.notAuthorized')}</p>
+			</div>
+		{:else}
 			{@render children()}
-		</Tabs>
-	{/if}
+		{/if}
+	</div>
 </div>
