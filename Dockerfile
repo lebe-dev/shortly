@@ -12,7 +12,7 @@ RUN VERSION=$(awk -F'"' '/^version[[:space:]]*=/{print $2; exit}' /tmp/Cargo.tom
     yarn test run && \
     yarn build
 
-FROM rust:1.98.0-alpine AS app-build
+FROM rust:1.100-alpine AS app-build
 
 WORKDIR /build
 
