@@ -334,7 +334,7 @@
 			</div>
 		{/if}
 		{#if showCustomNameInput && $configStore}
-			<div class="mb-8">
+			<div class="mb-8 text-left">
 				<div
 					class="mt-3 mb-1 text-left text-xs {customName.length === 0
 						? 'text-muted-foreground'
