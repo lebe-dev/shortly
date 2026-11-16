@@ -60,7 +60,7 @@
 </script>
 
 <div class="surface-card overflow-hidden">
-	<Table class={showUser ? 'min-w-[1000px]' : 'min-w-[900px]'}>
+	<Table class={showUser ? 'min-w-[960px]' : 'min-w-[820px]'}>
 		<TableHeader>
 			<TableRow class="hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-muted">
 				<TableHead>{$t('linksPage.table.shortUrl')}</TableHead>
@@ -88,12 +88,12 @@
 							target="_blank"
 							rel="noopener noreferrer"
 							title={row.shortUrl}
-							class="text-foreground hover:text-link font-mono text-sm font-medium transition-colors"
+							class="text-foreground hover:text-link font-mono text-[13px] font-medium transition-colors"
 						>
 							<span class="text-muted-foreground">/</span>{parts.slug}
 						</a>
 					</TableCell>
-					<TableCell class="max-w-[340px]">
+					<TableCell class="w-full max-w-0">
 						<a
 							href={row.originalUrl}
 							target="_blank"
@@ -125,21 +125,21 @@
 							{/if}
 						</TableCell>
 					{/if}
-					<TableCell class="text-muted-foreground text-[13px]">{formatDate(row.created)}</TableCell>
+					<TableCell class="text-muted-foreground text-[13px] tabular-nums"
+						>{formatDate(row.created)}</TableCell
+					>
 					<TableCell>
-						<span
-							class="inline-flex items-center gap-1.5 font-mono text-[13px] {toneText[exp.tone]}"
-						>
+						<span class="flex items-center gap-2 text-[13px] tabular-nums {toneText[exp.tone]}">
 							<span class="size-1.5 rounded-full {toneDot[exp.tone]}" aria-hidden="true"></span>
 							{exp.label}
 						</span>
 					</TableCell>
 					{#if showLastAccessed}
-						<TableCell class="text-muted-foreground text-[13px]">
+						<TableCell class="text-muted-foreground text-[13px] tabular-nums">
 							{row.lastAccessed ? formatDate(row.lastAccessed) : '—'}
 						</TableCell>
 					{/if}
-					<TableCell class="text-right">
+					<TableCell class="w-px text-right">
 						<div class="inline-flex gap-0.5">
 							<Button
 								variant="ghost"

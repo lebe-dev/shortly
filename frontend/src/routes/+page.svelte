@@ -335,7 +335,7 @@
 				<p class="text-muted-foreground mt-3.5 max-w-[560px] text-[17px] leading-normal">
 					{$t('homePage.form.storageInfo', {
 						values: { ttl: ttlFormatted }
-					})}{#if showCustomNameInput}. {$t('homePage.customName.noExpiration')}{/if}
+					})}
 				</p>
 			{/if}
 
@@ -390,9 +390,7 @@
 
 				{#if showCustomNameInput && $configStore}
 					<div class="bg-hairline h-px"></div>
-					<div
-						class="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-x-6 gap-y-5 px-5 pt-5 pb-6 md:px-6"
-					>
+					<div class="grid grid-cols-1 gap-x-6 gap-y-5 px-5 pt-5 pb-6 md:grid-cols-2 md:px-6">
 						<div class="min-w-0">
 							<label for="custom-name" class="flex items-baseline gap-2.5 text-[13px] font-medium">
 								<span class="text-muted-foreground font-mono text-[11px]">02</span>
@@ -402,7 +400,7 @@
 								class="field border-input bg-card mt-2.5 flex min-h-12 items-center overflow-hidden rounded-xl border"
 							>
 								<span
-									class="text-muted-foreground max-w-[55%] truncate ps-3.5 pe-0.5 font-mono text-sm whitespace-nowrap"
+									class="text-muted-foreground max-w-[60%] shrink-0 truncate ps-3.5 pe-0.5 font-mono text-sm whitespace-nowrap"
 									>{namePrefix}</span
 								>
 								<CustomNameInput
@@ -412,7 +410,7 @@
 									config={$configStore.features.namedUrls}
 									disabled={inProgress}
 									hideStatus={true}
-									inputClass="h-12 rounded-none border-0 bg-transparent px-0 font-mono text-sm font-medium md:text-sm"
+									inputClass="placeholder:font-sans h-12 min-w-0 rounded-none border-0 bg-transparent px-0 font-mono text-sm font-medium md:text-sm"
 									onAvailabilityChange={handleAvailabilityChange}
 									onErrorChange={(error) => {
 										customNameError = error;
