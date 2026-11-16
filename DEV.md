@@ -52,3 +52,34 @@ server {
     }
 }
 ```
+
+## Lint and security checks
+
+`just lint` runs rustfmt in check mode, Clippy (warnings are errors), frontend
+Prettier/ESLint, Svelte type checking, and Helm lint. It does not run UI tests.
+Install the frontend dependencies with `cd frontend && yarn install --frozen-lockfile`
+first. Rust with rustfmt and Clippy, Yarn and Helm must be available in PATH.
+
+`just security` runs the following checks in order and stops on the first failure:
+
+- `security-osv`: OSV-Scanner v2 checks `Cargo.lock` and `frontend/yarn.lock`.
+- `security-gitleaks`: Gitleaks v8 checks all local Git history and the working
+  directory, with secrets redacted. Generated artifacts are excluded via
+  `.gitleaks.toml`; local configuration files remain covered.
+- `security-semgrep`: Semgrep CE runs the registry's `p/security-audit` rules
+  with telemetry disabled. Coverage depends on the language and available rules;
+  this is not a complete audit of Rust or Svelte code.
+- `security-trivy-config`: Trivy checks Docker, Compose, Helm and Kubernetes
+  configuration. Any reported misconfiguration fails the check.
+- `security-trivy-image`: Trivy checks the local Docker image matching the
+  version in `Cargo.toml`; HIGH and CRITICAL vulnerabilities fail the check.
+  Build it first with `docker build -t tinyops/shortly:$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml) .`.
+  `just trivy` remains an alias for this check.
+
+Install `osv-scanner` (v2), `gitleaks` (v8), `semgrep` and `trivy` in PATH before
+running security checks. On macOS: `brew install osv-scanner gitleaks semgrep trivy`.
+Scanners need network access for vulnerability databases and Semgrep rules;
+source scanning runs locally and does not require a Semgrep account.
+Each check can also be called separately with `just <recipe>`.
+Findings produce a nonzero exit code; no baseline or vulnerability suppression
+is configured. OSV and Semgrep fail on findings at every severity.

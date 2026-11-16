@@ -1,0 +1,11 @@
+[extend]
+useDefault = true
+
+# Generated artifacts and Git internals are outside the source scan.
+[allowlist]
+paths = [
+    '''(^|/)target/''',
+    '''(^|/)node_modules/''',
+    '''(^|/)frontend/(build|\.svelte-kit)/''',
+    '''(^|/)\.git/''',
+]

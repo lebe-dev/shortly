@@ -1,3 +1,5 @@
+set lazy
+
 imageName := "tinyops/shortly"
 version := `cat Cargo.toml | grep version | head -1 | cut -d " " -f 3 | tr -d "\""`
 gitShortSha := `git rev-parse --short HEAD`
@@ -8,10 +10,41 @@ chartVersion := `cat helm-chart/Chart.yaml | yq -r '.version'`
 cleanup:
     rm -f {{ chartName }}-*.tgz
 
-lint:
-    cargo fmt
-    cargo clippy
-    cd frontend && yarn eslint .
+# --- Lints ---
+lint: lint-backend lint-frontend lint-chart
+
+lint-backend:
+    cargo fmt --all -- --check
+    cargo clippy --all-targets --locked -- -D warnings
+
+lint-frontend:
+    cd frontend && yarn lint
+    cd frontend && yarn check
+
+lint-chart:
+    helm lint helm-chart/
+
+# --- Security ---
+# Требует OSV-Scanner v2, Gitleaks v8, Semgrep CE, Trivy и собранный образ.
+security: security-osv security-gitleaks security-semgrep security-trivy-config security-trivy-image
+
+security-osv:
+    osv-scanner scan source --lockfile=Cargo.lock --lockfile=frontend/yarn.lock
+
+# История всех локальных веток и текущее содержимое файлов; секреты скрыты в выводе.
+security-gitleaks:
+    gitleaks git --redact --log-opts="--all" .
+    gitleaks dir --redact .
+
+security-semgrep:
+    semgrep scan --oss-only --config p/security-audit --error --strict --metrics=off --exclude target --exclude frontend/node_modules --exclude frontend/build --exclude frontend/.svelte-kit .
+
+security-trivy-config:
+    trivy fs --scanners misconfig --exit-code 1 --skip-dirs target --skip-dirs frontend/node_modules --skip-dirs frontend/build --skip-dirs frontend/.svelte-kit .
+
+# Проверяет существующий локальный образ; не скачивает его из registry.
+security-trivy-image:
+    trivy image --image-src docker --scanners vuln --severity HIGH,CRITICAL --exit-code 1 "{{ imageName }}:{{ version }}"
 
 bump-frontend-deps:
     cd frontend && rm -rf node_modules yarn.lock && yarn install
@@ -81,8 +114,8 @@ push-image:
 push-dev-image:
     docker push {{ imageName }}:{{ devVersion }}
 
-trivy:
-    trivy image --severity HIGH,CRITICAL {{ imageName }}:{{ version }}
+# Совместимость с прежней командой проверки образа.
+trivy: security-trivy-image
 
 release-image: build-release-image
     @just push-image
