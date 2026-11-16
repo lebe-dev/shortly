@@ -7,7 +7,7 @@ URL shortener service.
 ## Quick start
 
 ```bash
-docker run --name shortly -p 8080:8080 tinyops/shortly:1.5.0 
+docker run --name shortly -p 8080:8080 tinyops/shortly:1.6.0 
 ```
 
 ## Features
