@@ -6,7 +6,10 @@ import { format } from 'date-fns';
  * @param t - Translation function from svelte-intl-precompile
  * @returns Formatted string like "7 days", "2 weeks", "1 month" in current locale
  */
-export function formatDuration(hours: number, t: (key: string, options?: { values?: Record<string, string | number | Date> }) => string): string {
+export function formatDuration(
+	hours: number,
+	t: (key: string, options?: { values?: Record<string, string | number | Date> }) => string
+): string {
 	if (hours === 0) {
 		return '';
 	}
