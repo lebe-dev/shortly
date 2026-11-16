@@ -18,6 +18,7 @@
 		inputRef?: HTMLInputElement | null;
 		inputClass?: string;
 		id?: string;
+		placeholder?: string;
 	}
 
 	let {
@@ -33,7 +34,8 @@
 		onBlur,
 		inputRef = $bindable(null),
 		inputClass = 'max-w-xs text-base md:text-sm',
-		id
+		id,
+		placeholder
 	}: Props = $props();
 
 	let checking = $state(false);
@@ -215,7 +217,7 @@
 		onfocus={handleFocus}
 		onblur={handleBlur}
 		{disabled}
-		placeholder={$t('homePage.customName.placeholder')}
+		placeholder={placeholder ?? $t('homePage.customName.placeholder')}
 		maxlength={config.maxLength}
 		class={inputClass}
 		{id}

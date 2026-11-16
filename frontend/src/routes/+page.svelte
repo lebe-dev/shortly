@@ -410,7 +410,8 @@
 									config={$configStore.features.namedUrls}
 									disabled={inProgress}
 									hideStatus={true}
-									inputClass="placeholder:font-sans h-12 min-w-0 rounded-none border-0 bg-transparent px-0 font-mono text-sm font-medium md:text-sm"
+									placeholder="onboarding"
+									inputClass="h-12 min-w-0 rounded-none border-0 bg-transparent px-0 font-mono text-sm font-medium placeholder:font-normal md:text-sm"
 									onAvailabilityChange={handleAvailabilityChange}
 									onErrorChange={(error) => {
 										customNameError = error;
