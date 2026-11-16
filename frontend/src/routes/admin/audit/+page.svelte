@@ -173,7 +173,7 @@
 			<!-- Event Type Filter -->
 			<div>
 				<Label for="eventType">{$t('adminPage.audit.filters.eventType')}</Label>
-				<Select.Root bind:value={eventTypeFilter}>
+				<Select.Root type="single" bind:value={eventTypeFilter}>
 					<Select.Trigger size="sm" class="mt-2 w-full">
 						{#if eventTypeFilter === ''}
 							{$t('adminPage.audit.filters.allEventTypes')}

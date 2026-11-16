@@ -56,8 +56,8 @@
 				variant="outline"
 				class="dark:hover:bg-secondary/50 flex items-center gap-2 rounded border-0 bg-transparent px-2.5 py-1.5 text-xs font-medium text-gray-300 hover:cursor-pointer hover:bg-blue-700 hover:text-gray-300"
 			>
-				{#if $authStore.user.avatar_url}
-					<img src={$authStore.user.avatar_url} alt="Avatar" class="h-6 w-6 rounded-full" />
+				{#if $authStore.user.avatarUrl}
+					<img src={$authStore.user.avatarUrl} alt="Avatar" class="h-6 w-6 rounded-full" />
 				{/if}
 				<span class="text-xs">{$authStore.user.username}</span>
 				<ChevronDown class="h-3 w-3" />
@@ -66,8 +66,8 @@
 		<DropdownMenuContent align="end" class="border-secondary w-52 rounded-xs border">
 			<!-- User info header -->
 			<DropdownMenuLabel class="flex items-center gap-2 py-2 ">
-				{#if $authStore.user.avatar_url}
-					<img src={$authStore.user.avatar_url} alt="Avatar" class="h-6 w-6 rounded-full" />
+				{#if $authStore.user.avatarUrl}
+					<img src={$authStore.user.avatarUrl} alt="Avatar" class="h-6 w-6 rounded-full" />
 				{/if}
 				<span class="text-sm font-medium">{$authStore.user.username}</span>
 			</DropdownMenuLabel>

@@ -62,8 +62,8 @@
 		<!-- User Profile (if authenticated) -->
 		{#if config?.auth.enabled && $authStore.authenticated && $authStore.user}
 			<DropdownMenuLabel class="flex items-center gap-2 py-2">
-				{#if $authStore.user.avatar_url}
-					<img src={$authStore.user.avatar_url} alt="Avatar" class="h-6 w-6 rounded-full" />
+				{#if $authStore.user.avatarUrl}
+					<img src={$authStore.user.avatarUrl} alt="Avatar" class="h-6 w-6 rounded-full" />
 				{/if}
 				<span class="text-sm font-medium">{$authStore.user.username}</span>
 			</DropdownMenuLabel>
