@@ -1,3 +1,4 @@
+import type { UrlAccess } from '$lib/domain/config';
 import { HttpError } from './error';
 
 /** Which of the two URL quotas has been exhausted */
@@ -11,16 +12,19 @@ export class RateLimitError extends Error {
 }
 
 export class RegisterUrlRequest {
-	constructor(url: string, name?: string) {
+	constructor(url: string, name?: string, access?: UrlAccess) {
 		this.url = url;
 		this.name = name;
+		this.access = access;
 	}
 
 	url: string;
 	name?: string;
+	access?: UrlAccess;
 }
 
 export class RegisterUrlResponse {
+	access: UrlAccess = 'public';
 	constructor(url: string) {
 		this.url = url;
 	}
@@ -60,13 +64,17 @@ export async function fetchUrlById(urlId: string): Promise<UrlDetailsResponse> {
 	}
 }
 
-export async function generateShortUrl(url: string, name?: string): Promise<RegisterUrlResponse> {
+export async function generateShortUrl(
+	url: string,
+	name?: string,
+	access?: UrlAccess
+): Promise<RegisterUrlResponse> {
 	const response = await fetch('/api/url', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json'
 		},
-		body: JSON.stringify(new RegisterUrlRequest(url, name)),
+		body: JSON.stringify(new RegisterUrlRequest(url, name, access)),
 		credentials: 'include'
 	});
 
@@ -79,11 +87,19 @@ export async function generateShortUrl(url: string, name?: string): Promise<Regi
 		throw new Error('Custom name already exists or is reserved');
 	} else if (response.status === 429) {
 		const data = await response.json().catch(() => ({}));
+		if (data.code === 'name_check_rate_limited') throw new NameCheckRateLimitError();
 		throw new RateLimitError(data.code === 'total_limit_exceeded' ? 'total' : 'daily');
 	} else if (response.status === 401) {
 		throw new Error('Authentication required for named URLs');
 	} else {
 		throw new Error('Unable to generate short url');
+	}
+}
+
+export class NameCheckRateLimitError extends Error {
+	constructor() {
+		super('Too many name checks; try again later');
+		this.name = 'NameCheckRateLimitError';
 	}
 }
 
@@ -102,6 +118,7 @@ export async function checkCustomName(name: string): Promise<boolean> {
 	} else if (response.status === 409) {
 		return false;
 	} else {
+		if (response.status === 429) throw new NameCheckRateLimitError();
 		throw new Error('Failed to check name availability');
 	}
 }

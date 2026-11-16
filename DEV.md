@@ -53,6 +53,68 @@ server {
 }
 ```
 
+## Backend tests
+
+Run the backend unit tests without Docker:
+
+```bash
+cargo test --locked --lib --bin server
+```
+
+PostgreSQL integration tests require a running Docker daemon accessible to
+Testcontainers. On the first run Docker downloads `postgres:17.6-alpine`.
+
+```bash
+cargo test --locked --features postgres-integration --test postgres -- --test-threads=4
+```
+
+Each test starts its own disposable PostgreSQL container on a dynamically assigned
+port, applies the SQL files from `migrations/postgres`, and removes the container
+afterwards. No external database or application configuration is needed. The suite
+covers migration replay and rollback, URL storage and cleanup, quotas, audit
+filtering and pagination, users, sessions, and passkey persistence, including
+concurrent challenge consumption. Passkey tests exercise database storage, not a
+WebAuthn browser ceremony. Docker failures fail the tests rather than skipping them.
+
+The `postgres-integration` feature enables the integration test target; it is
+excluded from ordinary `cargo test` runs. To run all backend tests including
+PostgreSQL, use `cargo test --locked --features postgres-integration`.
+
+## Corporate link integration tests (Playwright)
+
+```bash
+cd frontend && yarn install --frozen-lockfile
+cd .. && just test-integration
+```
+
+Alternatively, run `yarn test:integration` from `frontend`. Requires Node.js 22+
+and the Rust toolchain. Browser installation, Docker, a frontend build, a running
+application and a real GitLab account are not required. These are HTTP/API tests;
+browser UI testing remains separate. The suite uses Playwright's
+[APIRequestContext](https://playwright.dev/docs/api-testing).
+
+The global setup builds the current backend with `cargo build --locked`. Each test
+starts its own server, temporary SQLite database with real migrations, and local
+GitLab OAuth stub; login creates real application sessions. Configuration and
+process environment are isolated from the developer's `.env` and `config.yml`.
+Temporary processes and databases are removed after each test, including failures.
+Playwright artifacts and server logs on failures go to `target/playwright/results`.
+
+Two local HTTP proxies represent corporate and external clients. They append
+fixed documentation-only addresses to `X-Forwarded-For`; these addresses are never
+bound to a network interface or contacted. All TCP connections use `127.0.0.1`
+and OS-assigned ports, so tests do not depend on Wi-Fi, VPN, LAN subnets, DNS,
+`/etc/hosts` or fixed available ports. Separate scenarios disable proxy trust and
+verify the actual loopback TCP peer. Forwarding-chain cases also cover IPv6,
+mapped addresses, spoofing, malformed headers and multiple trusted hops.
+
+The suite checks creation defaults and overrides, access by name/case/ID,
+GET/HEAD and redirects, absence of destination leaks, cache prevention,
+owner/admin restrictions, denied-visit tracking, public generated links,
+persistence across restart and CIDR revocation. SQLite exercises the complete
+HTTP stack; PostgreSQL storage is covered by the separate Testcontainers suite
+above. Run a subset with `yarn test:integration --grep 'forwarding'`.
+
 ## Lint and security checks
 
 `just lint` runs rustfmt in check mode, Clippy (warnings are errors), frontend

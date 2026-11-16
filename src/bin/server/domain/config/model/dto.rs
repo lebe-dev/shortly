@@ -58,6 +58,8 @@ pub struct FeaturesConfigDto {
 #[derive(PartialEq, Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct NamedUrlsConfigDto {
+    pub default_access: server_lib::domain::url::model::UrlAccess,
+    pub allow_access_override: bool,
     pub enabled: bool,
     pub min_length: usize,
     pub max_length: usize,
@@ -136,6 +138,7 @@ pub struct AdminDataDto {
 #[derive(PartialEq, Serialize, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct AdminUrlDto {
+    pub access: server_lib::domain::url::model::UrlAccess,
     /// Short URL ID
     pub id: String,
     /// Original long URL
@@ -222,6 +225,8 @@ impl From<AppConfig> for AppConfigDto {
                     current_urls_today: None,
                 },
                 named_urls: NamedUrlsConfigDto {
+                    default_access: Default::default(),
+                    allow_access_override: false,
                     enabled: config.features.named_urls.enabled,
                     min_length: config.features.named_urls.min_length,
                     max_length: config.features.named_urls.max_length,

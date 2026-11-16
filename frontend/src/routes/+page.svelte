@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { generateShortUrl, RateLimitError } from '$lib/api/url';
+	import type { UrlAccess } from '$lib/domain/config';
+	import { generateShortUrl, NameCheckRateLimitError, RateLimitError } from '$lib/api/url';
 	import { fetchConfig } from '$lib/api/config';
 	import ConsumptionBadge from '$lib/components/ConsumptionBadge.svelte';
 	import CopyButton from '$lib/components/CopyButton.svelte';
@@ -29,6 +30,11 @@
 	let shortUrlExpiryDate: string = $state('');
 
 	let customName: string = $state('');
+	let selectedAccess = $state<UrlAccess | null>(null);
+	let createdAccess = $state<UrlAccess>('public');
+	const effectiveAccess = $derived(
+		selectedAccess ?? $configStore?.features.namedUrls.defaultAccess ?? 'public'
+	);
 	let customNameAvailable = $state<boolean | null>(null);
 	let customNameError = $state<string | null>(null);
 	let showAvailableMessage = $state(false);
@@ -202,7 +208,12 @@
 		inProgress = true;
 		try {
 			const nameToUse = customName.length > 0 ? customName : undefined;
-			const data = await generateShortUrl(trimmedUrl, nameToUse);
+			const access =
+				nameToUse && $configStore?.features.namedUrls.allowAccessOverride
+					? effectiveAccess
+					: undefined;
+			const data = await generateShortUrl(trimmedUrl, nameToUse, access);
+			createdAccess = data.access;
 			shortUrl = data.url;
 
 			if (!nameToUse && shortUrlTtl > 0) {
@@ -216,6 +227,11 @@
 			}
 		} catch (e) {
 			console.error(e);
+
+			if (e instanceof NameCheckRateLimitError) {
+				toast.error($t('homePage.customName.rateLimited'));
+				return;
+			}
 
 			if (e instanceof RateLimitError) {
 				toast.error(
@@ -340,6 +356,21 @@
 					onFocus={() => (customNameInputFocused = true)}
 					onBlur={() => (customNameInputFocused = false)}
 				/>
+				{#if customName.length > 0 && $configStore.features.namedUrls.allowAccessOverride}
+					<label for="link-access" class="text-muted-foreground mt-3 block text-xs">
+						{$t('homePage.customName.accessLabel')}
+					</label>
+					<select
+						id="link-access"
+						value={effectiveAccess}
+						onchange={(event) => (selectedAccess = event.currentTarget.value as UrlAccess)}
+						disabled={inProgress}
+						class="mt-1 rounded-md border bg-transparent px-3 py-2 text-sm"
+					>
+						<option value="public">{$t('homePage.customName.accessPublic')}</option>
+						<option value="internal">{$t('homePage.customName.accessInternal')}</option>
+					</select>
+				{/if}
 				{#if showCustomNameHint}
 					<div
 						transition:slide={{ duration: 200 }}
@@ -414,6 +445,11 @@
 			<div class="text-muted-foreground mb-4 text-xs">
 				{$t('homePage.result.clickToCopy')}
 			</div>
+			{#if createdAccess === 'internal'}
+				<p class="mb-4 text-sm text-amber-700 dark:text-amber-400" role="status">
+					{$t('homePage.result.internalAccess')}
+				</p>
+			{/if}
 			{#if customName.length > 0}
 				<div class="text-muted-foreground mb-4 text-sm">
 					{$t('homePage.result.namedUrlInfo')}
@@ -430,6 +466,7 @@
 						url = '';
 						shortUrl = '';
 						customName = '';
+						selectedAccess = null;
 						shortUrlExpiryDate = '';
 					}}
 					class="text-muted-foreground text-sm hover:cursor-pointer hover:underline"

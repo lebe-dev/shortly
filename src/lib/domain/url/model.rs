@@ -4,6 +4,7 @@ use thiserror::Error;
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Eq, Hash)]
 #[serde(rename_all = "camelCase")]
 pub struct Url {
+    pub access: UrlAccess,
     pub id: String,
     pub original_url: String,
     /// TTL in seconds (0 = no expiration for named URLs)
@@ -76,4 +77,27 @@ pub enum DeleteUrlError {
     DatabaseError(#[from] sqlx::Error),
     #[error(transparent)]
     Unknown(#[from] anyhow::Error),
+}
+
+/// Availability of a short link, independent of the visitor's account.
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, Default, PartialEq, Eq, Hash, sqlx::Type)]
+#[serde(rename_all = "lowercase")]
+#[sqlx(type_name = "text", rename_all = "lowercase")]
+pub enum UrlAccess {
+    #[default]
+    Public,
+    Internal,
+}
+
+impl UrlAccess {
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Public => "public",
+            Self::Internal => "internal",
+        }
+    }
+
+    pub fn allows(self, is_internal: bool) -> bool {
+        self == Self::Public || is_internal
+    }
 }

@@ -23,8 +23,13 @@ pub struct UrlDetailsResponse {
 pub async fn get_short_url_by_id_route(
     State(state): State<Arc<SharedAppState>>,
     Path(url_id): Path<String>,
+    axum::Extension(client): axum::Extension<crate::route::link_access::ClientNetwork>,
 ) -> impl IntoResponse {
-    match state.url_service.find_by_id(&url_id).await {
+    match state
+        .url_service
+        .find_accessible_by_id(&url_id, client.internal)
+        .await
+    {
         Ok(url) => {
             if let Some(url) = url {
                 (

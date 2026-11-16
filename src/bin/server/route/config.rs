@@ -23,6 +23,9 @@ pub async fn get_app_config_route(
 ) -> impl IntoResponse {
     let mut dto: AppConfigDto = state.config.clone().into();
 
+    dto.features.named_urls.default_access = state.link_access.default_access;
+    dto.features.named_urls.allow_access_override = state.link_access.allow_override;
+
     dto.auth.passkey.enabled = state.passkey_service.is_some();
 
     if state.config.auth.enabled
@@ -131,6 +134,7 @@ pub async fn get_app_config_route(
                         };
 
                         admin_urls.push(AdminUrlDto {
+                            access: url.access,
                             id: url.id,
                             original_url: url.original_url,
                             created: url.created,

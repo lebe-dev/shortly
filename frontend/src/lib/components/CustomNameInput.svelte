@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Input } from '$lib/components/ui/input';
-	import { checkCustomName } from '$lib/api/url';
+	import { checkCustomName, NameCheckRateLimitError } from '$lib/api/url';
 	import { t } from 'svelte-intl-precompile';
 	import type { NamedUrlsConfig } from '$lib/domain/config';
 
@@ -144,7 +144,9 @@
 					onAvailabilityChange(null);
 				}
 				if (onErrorChange) {
-					onErrorChange(null);
+					onErrorChange(
+						e instanceof NameCheckRateLimitError ? $t('homePage.customName.rateLimited') : null
+					);
 				}
 			} finally {
 				checking = false;

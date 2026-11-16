@@ -7,3 +7,5 @@ pub mod middleware;
 pub mod url;
 pub mod user;
 pub mod version;
+
+pub mod link_access;

@@ -4,7 +4,7 @@ use crate::domain::url::model::FindUrlError;
 
 use super::audit::{AuditEventWithUser, AuditQueryParams, UrlAuditEvent};
 use super::model::{
-    CheckCustomNameError, DeleteUrlError, ShortUrlGenerationError, Url, UserQuotas,
+    CheckCustomNameError, DeleteUrlError, ShortUrlGenerationError, Url, UrlAccess, UserQuotas,
 };
 
 pub trait UrlService: Clone + Send + Sync + 'static {
@@ -16,6 +16,20 @@ pub trait UrlService: Clone + Send + Sync + 'static {
         user_id: Option<i64>,
         custom_name: Option<String>,
     ) -> impl Future<Output = Result<Url, ShortUrlGenerationError>> + Send;
+
+    fn register_url_with_access(
+        &self,
+        url: &str,
+        user_id: Option<i64>,
+        custom_name: Option<String>,
+        access: UrlAccess,
+    ) -> impl Future<Output = Result<Url, ShortUrlGenerationError>> + Send;
+
+    fn find_accessible_by_id(
+        &self,
+        id: &str,
+        is_internal: bool,
+    ) -> impl Future<Output = Result<Option<Url>, FindUrlError>> + Send;
 
     fn generate_short_url(&self, url: &Url) -> impl Future<Output = String> + Send;
 

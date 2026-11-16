@@ -66,6 +66,10 @@
 			}
 		},
 		"customName": {
+			"accessLabel": "访问范围",
+			"accessPublic": "所有人",
+			"accessInternal": "仅限内部网络",
+			"rateLimited": "名称检查次数过多，请一分钟后重试。",
 			"label": "自定义短名称（可选）",
 			"placeholder": "例如：onboarding",
 			"hint": "链接的短名称。例如：'onboarding'",
@@ -78,6 +82,7 @@
 			"noExpiration": "命名链接永不过期"
 		},
 		"result": {
+			"internalAccess": "此链接仅可通过内部网络访问。",
 			"title": "您的短链接：",
 			"expirationInfo": "此链接将在 {ttl} 后过期",
 			"expirationDate": "链接将保存至 {date}",

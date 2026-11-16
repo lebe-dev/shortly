@@ -66,6 +66,10 @@
 			}
 		},
 		"customName": {
+			"accessLabel": "წვდომა",
+			"accessPublic": "ყველასთვის",
+			"accessInternal": "მხოლოდ შიდა ქსელებისთვის",
+			"rateLimited": "სახელის შემოწმების ლიმიტი ამოიწურა. სცადეთ ერთ წუთში.",
 			"label": "მოკლე სახელი (არასავალდებულო)",
 			"placeholder": "მაგ. onboarding",
 			"hint": "თქვენი ბმულის მოკლე სახელი. მაგალითად, 'onboarding'",
@@ -78,6 +82,7 @@
 			"noExpiration": "სახელიანი ბმულები არასოდეს ამოიწურება"
 		},
 		"result": {
+			"internalAccess": "ბმული ხელმისაწვდომია მხოლოდ შიდა ქსელიდან.",
 			"title": "თქვენი მოკლე URL:",
 			"expirationInfo": "ეს ბმული ამოიწურება {ttl}-ში",
 			"expirationDate": "ბმული შენახული იქნება {date}-მდე",

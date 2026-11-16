@@ -18,10 +18,9 @@ use crate::AppState;
 ///    - `/api/auth/*` (authentication endpoints)
 ///    - Non-API paths (static assets, frontend routes)
 ///
-/// 2. **Feature-based access control**: When `auth-only` is disabled for URL creation,
-///    allows unauthenticated access to:
-///    - `POST /api/url` (create short URLs)
-///    - `GET /api/url/{url_id}` (retrieve URLs by ID)
+/// 2. **URL access**: URL lookup is public and checks the link's network policy.
+///    When creation `auth-only` is disabled, URL creation and name availability
+///    also allow unauthenticated requests.
 ///
 /// 3. **Authentication bypass**: If authentication is globally disabled in config,
 ///    allows all requests to pass through.
@@ -44,6 +43,7 @@ pub async fn auth_middleware(
 ) -> Response {
     let path = request.uri().path();
     let method = request.method();
+    let is_read = method == "GET" || method == "HEAD";
 
     if path == "/api/version"
         || path == "/api/health"
@@ -55,7 +55,7 @@ pub async fn auth_middleware(
         return next.run(request).await;
     }
 
-    if path == "/api/config" && method == "GET" {
+    if path == "/api/config" && is_read {
         debug!("Config request: attempting optional auth");
 
         if let Some(token) = extract_session_token(request.headers())
@@ -73,6 +73,11 @@ pub async fn auth_middleware(
             }
         }
 
+        return next.run(request).await;
+    }
+
+    // Resolving a short link is public; access restrictions are enforced by the URL lookup.
+    if is_read && path.starts_with("/api/url/") && path != "/api/url/check" {
         return next.run(request).await;
     }
 
@@ -98,8 +103,8 @@ pub async fn auth_middleware(
 
             return next.run(request).await;
         }
-        if path.starts_with("/api/url/") && method == "GET" {
-            debug!("URL retrieval allowed without auth (auth-only=false)");
+        if path == "/api/url/check" && is_read {
+            debug!("Name availability allowed without auth (auth-only=false)");
             return next.run(request).await;
         }
     }

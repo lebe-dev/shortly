@@ -22,8 +22,9 @@ impl UrlRepository for Sqlite {
                 created,
                 user_id,
                 custom_name,
-                last_accessed
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7);
+                last_accessed,
+                access
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
             "#,
         )
         .bind(&url.id)
@@ -33,6 +34,7 @@ impl UrlRepository for Sqlite {
         .bind(url.user_id)
         .bind(&url.custom_name)
         .bind(url.last_accessed)
+        .bind(url.access.as_str())
         .execute(self.get_pool())
         .await?;
 
@@ -46,6 +48,7 @@ impl UrlRepository for Sqlite {
 
         let url = select_query
             .map(|row: SqliteRow| Url {
+                access: row.get("access"),
                 id: row.get("id"),
                 original_url: row.get("original_url"),
                 ttl: row.get("ttl"),
@@ -66,6 +69,7 @@ impl UrlRepository for Sqlite {
 
         let url = select_query
             .map(|row: SqliteRow| Url {
+                access: row.get("access"),
                 id: row.get("id"),
                 original_url: row.get("original_url"),
                 ttl: row.get("ttl"),
@@ -95,6 +99,7 @@ impl UrlRepository for Sqlite {
 
         let urls = query
             .map(|row: SqliteRow| Url {
+                access: row.get("access"),
                 id: row.get("id"),
                 original_url: row.get("original_url"),
                 ttl: row.get("ttl"),
@@ -188,6 +193,7 @@ impl UrlRepository for Sqlite {
 
         let urls = query
             .map(|row: SqliteRow| Url {
+                access: row.get("access"),
                 id: row.get("id"),
                 original_url: row.get("original_url"),
                 ttl: row.get("ttl"),
@@ -366,6 +372,7 @@ mod tests {
 
         // Create an expired URL (created 2 hours ago with 1 hour TTL)
         let expired_url = Url {
+            access: Default::default(),
             id: "exp123".to_string(),
             original_url: "https://example.com/expired".to_string(),
             ttl: 3600,                              // 1 hour in seconds
@@ -396,6 +403,7 @@ mod tests {
 
         // Create an expired URL (created 2 hours ago with 1 hour TTL)
         let expired_url = Url {
+            access: Default::default(),
             id: "exp456".to_string(),
             original_url: "https://example.com/expired".to_string(),
             ttl: 3600,                              // 1 hour
@@ -407,6 +415,7 @@ mod tests {
 
         // Create a valid URL (created now with 1 week TTL)
         let valid_url = Url {
+            access: Default::default(),
             id: "val789".to_string(),
             original_url: "https://example.com/valid".to_string(),
             ttl: 604800, // 1 week in seconds
@@ -439,6 +448,7 @@ mod tests {
 
         // Create an expired regular URL
         let expired_url = Url {
+            access: Default::default(),
             id: "exp123".to_string(),
             original_url: "https://example.com/expired".to_string(),
             ttl: 3600,                              // 1 hour
@@ -450,6 +460,7 @@ mod tests {
 
         // Create a named URL with ttl=0 (should never expire)
         let named_url = Url {
+            access: Default::default(),
             id: "hash456".to_string(),
             original_url: "https://example.com/named".to_string(),
             ttl: 0,                                        // Named URLs have no expiration

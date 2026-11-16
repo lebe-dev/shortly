@@ -138,9 +138,9 @@ mod tests {
         assert_eq!(config.short_url.ttl, 168);
         assert_eq!(config.short_url.max_length, 2048);
         assert_eq!(config.scheduler.cleanup_expired_urls, "0 0 * * *");
-        assert_eq!(config.features.create_url.enabled, true);
-        assert_eq!(config.features.create_url.auth_only, true);
-        assert_eq!(config.auth.enabled, true);
+        assert!(config.features.create_url.enabled);
+        assert!(config.features.create_url.auth_only);
+        assert!(config.auth.enabled);
         assert_eq!(config.auth.auth_type, AuthType::Gitlab);
         assert_eq!(config.auth.providers.gitlab.base_url, "https://gitlab.com");
         assert_eq!(config.auth.providers.gitlab.application_id, "test-app-id");
@@ -230,9 +230,9 @@ mod tests {
 
         let config = result.unwrap();
 
-        assert_eq!(config.features.create_url.enabled, false);
-        assert_eq!(config.features.create_url.auth_only, false);
-        assert_eq!(config.auth.enabled, false);
+        assert!(!config.features.create_url.enabled);
+        assert!(!config.features.create_url.auth_only);
+        assert!(!config.auth.enabled);
         assert_eq!(config.auth.auth_type, AuthType::Gitlab);
         assert_eq!(
             config.auth.providers.gitlab.base_url,

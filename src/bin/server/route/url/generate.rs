@@ -22,22 +22,44 @@ pub struct RegisterUrlRequest {
     url: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     name: Option<String>,
+    access: Option<server_lib::domain::url::model::UrlAccess>,
 }
 
 #[derive(Serialize, Clone, Debug)]
 pub struct RegisterUrlResponse {
     pub url: String,
+    pub access: server_lib::domain::url::model::UrlAccess,
 }
 
 pub async fn generate_short_url_route(
     State(state): State<Arc<SharedAppState>>,
     user: Option<Extension<User>>,
+    axum::Extension(client): axum::Extension<crate::route::link_access::ClientNetwork>,
     Json(request): Json<RegisterUrlRequest>,
 ) -> impl IntoResponse {
     info!("generate short url request..");
     let user_id = user.as_ref().map(|u| u.id);
+    let access = match state
+        .link_access
+        .creation_access(request.name.is_some(), request.access)
+    {
+        Ok(access) => access,
+        Err(message) => {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(serde_json::json!({"error": message})),
+            )
+                .into_response();
+        }
+    };
 
     if request.name.is_some() {
+        if let Err(retry) = state
+            .name_check_limiter
+            .check(client.ip, state.link_access.checks_per_minute)
+        {
+            return crate::route::link_access::too_many_checks(retry);
+        }
         if !state.config.features.named_urls.enabled {
             error!("named URLs feature is disabled");
             return (StatusCode::BAD_REQUEST, "Named URLs feature is disabled").into_response();
@@ -55,12 +77,19 @@ pub async fn generate_short_url_route(
 
     match state
         .url_service
-        .register_url(&request.url, user_id, request.name)
+        .register_url_with_access(&request.url, user_id, request.name, access)
         .await
     {
         Ok(url) => {
             let short_url = state.url_service.generate_short_url(&url).await;
-            (StatusCode::OK, Json(RegisterUrlResponse { url: short_url })).into_response()
+            (
+                StatusCode::OK,
+                Json(RegisterUrlResponse {
+                    url: short_url,
+                    access: url.access,
+                }),
+            )
+                .into_response()
         }
         Err(e) => match e {
             ShortUrlGenerationError::InvalidOriginalUrl => {

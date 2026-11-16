@@ -66,6 +66,10 @@
 			}
 		},
 		"customName": {
+			"accessLabel": "Acceso",
+			"accessPublic": "Todos",
+			"accessInternal": "Solo redes internas",
+			"rateLimited": "Demasiadas comprobaciones de nombre. Inténtalo en un minuto.",
 			"label": "Nombre corto personalizado (opcional)",
 			"placeholder": "ej. onboarding",
 			"hint": "Nombre corto para su enlace. Por ejemplo, 'onboarding'",
@@ -78,6 +82,7 @@
 			"noExpiration": "Los enlaces con nombre nunca expiran"
 		},
 		"result": {
+			"internalAccess": "Este enlace solo está disponible desde una red interna.",
 			"title": "Su URL corta:",
 			"expirationInfo": "Este enlace expirará en {ttl}",
 			"expirationDate": "El enlace se almacenará hasta {date}",

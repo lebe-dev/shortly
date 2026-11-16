@@ -66,6 +66,10 @@
 			}
 		},
 		"customName": {
+			"accessLabel": "公開範囲",
+			"accessPublic": "全員",
+			"accessInternal": "内部ネットワークのみ",
+			"rateLimited": "名前の確認回数が多すぎます。1分後に再試行してください。",
 			"label": "カスタム短縮名（オプション）",
 			"placeholder": "例：onboarding",
 			"hint": "リンクの短縮名。例：'onboarding'",
@@ -78,6 +82,7 @@
 			"noExpiration": "名前付きリンクは期限切れになりません"
 		},
 		"result": {
+			"internalAccess": "このリンクは内部ネットワークからのみアクセスできます。",
 			"title": "あなたの短縮URL：",
 			"expirationInfo": "このリンクは{ttl}後に期限切れになります",
 			"expirationDate": "リンクは{date}まで保存されます",

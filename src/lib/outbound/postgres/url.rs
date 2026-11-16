@@ -22,8 +22,9 @@ impl UrlRepository for Postgres {
                 created,
                 user_id,
                 custom_name,
-                last_accessed
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7);
+                last_accessed,
+                access
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8);
             "#,
         )
         .bind(&url.id)
@@ -33,6 +34,7 @@ impl UrlRepository for Postgres {
         .bind(url.user_id)
         .bind(&url.custom_name)
         .bind(url.last_accessed)
+        .bind(url.access.as_str())
         .execute(self.get_pool())
         .await?;
 
@@ -46,6 +48,7 @@ impl UrlRepository for Postgres {
 
         let url = select_query
             .map(|row: PgRow| Url {
+                access: row.get("access"),
                 id: row.get("id"),
                 original_url: row.get("original_url"),
                 ttl: row.get::<i32, _>("ttl") as u32,
@@ -67,6 +70,7 @@ impl UrlRepository for Postgres {
 
         let url = select_query
             .map(|row: PgRow| Url {
+                access: row.get("access"),
                 id: row.get("id"),
                 original_url: row.get("original_url"),
                 ttl: row.get::<i32, _>("ttl") as u32,
@@ -99,6 +103,7 @@ impl UrlRepository for Postgres {
 
         let urls = query
             .map(|row: PgRow| Url {
+                access: row.get("access"),
                 id: row.get("id"),
                 original_url: row.get("original_url"),
                 ttl: row.get::<i32, _>("ttl") as u32,
@@ -192,6 +197,7 @@ impl UrlRepository for Postgres {
 
         let urls = query
             .map(|row: PgRow| Url {
+                access: row.get("access"),
                 id: row.get("id"),
                 original_url: row.get("original_url"),
                 ttl: row.get::<i32, _>("ttl") as u32,

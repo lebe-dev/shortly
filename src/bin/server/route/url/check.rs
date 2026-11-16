@@ -24,7 +24,14 @@ pub struct CheckNameResponse {
 pub async fn check_custom_name_route(
     State(state): State<Arc<SharedAppState>>,
     Query(query): Query<CheckNameQuery>,
+    axum::Extension(client): axum::Extension<crate::route::link_access::ClientNetwork>,
 ) -> impl IntoResponse {
+    if let Err(retry) = state
+        .name_check_limiter
+        .check(client.ip, state.link_access.checks_per_minute)
+    {
+        return crate::route::link_access::too_many_checks(retry);
+    }
     match state
         .url_service
         .check_custom_name_available(&query.name)

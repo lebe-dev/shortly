@@ -78,6 +78,8 @@ type ServerPasskeyService = PasskeyServiceImpl<Database, Database, Database, Ser
 #[derive(Clone)]
 pub struct AppState {
     config: AppConfig,
+    link_access: domain::config::model::link_access::LinkAccessConfig,
+    name_check_limiter: Arc<route::link_access::NameCheckLimiter>,
     url_service: UrlServiceImplType<Database>,
     auth_service: Option<ServerAuthService>,
     passkey_service: Option<ServerPasskeyService>,
@@ -96,6 +98,7 @@ async fn main() -> anyhow::Result<()> {
         std::process::exit(1);
     }
 
+    let link_access = domain::config::model::link_access::LinkAccessConfig::from_env()?;
     let config_service = AppConfigServiceImpl;
 
     let config_file = Path::new("config.yml");
@@ -194,6 +197,8 @@ async fn main() -> anyhow::Result<()> {
 
             let app_state = AppState {
                 config: app_config.clone(),
+                link_access,
+                name_check_limiter: Arc::new(Default::default()),
                 url_service: url_service.clone(),
                 auth_service: auth_service.clone(),
                 passkey_service: passkey_service.clone(),
@@ -310,6 +315,10 @@ async fn main() -> anyhow::Result<()> {
                 .route("/api/admin/audit", get(list_audit_events_route))
                 .fallback(static_handler)
                 .layer(from_fn_with_state(app_state_arc.clone(), auth_middleware))
+                .layer(from_fn_with_state(
+                    app_state_arc.clone(),
+                    route::link_access::network_middleware,
+                ))
                 .with_state(app_state_arc);
 
             let bind = app_config.bind.to_string();
@@ -333,9 +342,12 @@ async fn main() -> anyhow::Result<()> {
             println!("- Bind: http://{bind}");
             println!("- URL: {}", app_config.base_url);
 
-            axum::serve(listener, app)
-                .await
-                .expect("unable to start web server");
+            axum::serve(
+                listener,
+                app.into_make_service_with_connect_info::<std::net::SocketAddr>(),
+            )
+            .await
+            .expect("unable to start web server");
 
             Ok(())
         }
@@ -411,7 +423,11 @@ async fn index_html() -> Response {
     }
 }
 
-async fn static_handler(State(state): State<Arc<SharedAppState>>, uri: Uri) -> impl IntoResponse {
+async fn static_handler(
+    State(state): State<Arc<SharedAppState>>,
+    axum::Extension(client): axum::Extension<route::link_access::ClientNetwork>,
+    uri: Uri,
+) -> impl IntoResponse {
     let path = uri.path().trim_start_matches('/');
 
     debug!("static_handler: path = '{}'", path);
@@ -424,7 +440,11 @@ async fn static_handler(State(state): State<Arc<SharedAppState>>, uri: Uri) -> i
     {
         info!("checking database for potential short URL: '{}'", path);
 
-        match state.url_service.find_by_id(path).await {
+        match state
+            .url_service
+            .find_accessible_by_id(path, client.internal)
+            .await
+        {
             Ok(Some(url)) => {
                 info!("redirecting short URL '{}' to '{}'", path, url.original_url);
 
@@ -488,3 +508,6 @@ async fn not_found() -> Response {
 #[derive(Embed)]
 #[folder = "static/"]
 struct Assets;
+
+#[cfg(test)]
+mod link_access_tests;

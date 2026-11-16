@@ -11,6 +11,7 @@ use crate::SharedAppState;
 #[derive(Serialize)]
 pub struct UserUrlResponse {
     pub id: String,
+    pub access: server_lib::domain::url::model::UrlAccess,
     pub url: String,
     pub original_url: String,
     pub created: i64,
@@ -33,6 +34,7 @@ pub async fn list_user_urls_route(
                     let display_path = url.custom_name.as_ref().unwrap_or(&url.id);
                     UserUrlResponse {
                         id: url.id.clone(),
+                        access: url.access,
                         url: format!("{}/{}", state.config.base_url, display_path),
                         original_url: url.original_url,
                         created: url.created,

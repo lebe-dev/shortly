@@ -71,6 +71,10 @@ test:
     cargo test --lib
     cargo test --bin server
 
+# Playwright HTTP integration tests; builds the backend, no Docker or browsers required.
+test-integration:
+    cd frontend && yarn test:integration
+
 start-dev-image:
     docker compose -f docker-compose-dev.yml up -d --build --force-recreate
 

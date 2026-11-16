@@ -208,6 +208,20 @@ config:
       minLength: 3
       # Maximum length for custom URL names
       maxLength: 50
+      # NAMED_URL_DEFAULT_ACCESS: applies to new named links only, public / internal.
+      defaultAccess: "public"
+      # NAMED_URL_ALLOW_ACCESS_OVERRIDE: allow users to choose another mode in UI/API.
+      allowAccessOverride: false
+      # NAMED_URL_CHECK_RATE_LIMIT: checks and named creation attempts per source/minute/replica.
+      checkRateLimit: 30
+
+  # INTERNAL_NETWORK_CIDRS: comma-separated company/VPN client CIDRs (IPv4/IPv6).
+  # Required for internal defaults or access override; no networks allowed by default.
+  internalNetworkCidrs: ""
+  # TRUSTED_PROXY_CIDRS: comma-separated trusted proxy CIDRs, not client networks.
+  # With the nginx sidecar, include 127.0.0.1/32 and the actual ingress pod IPs/subnets.
+  # Empty means X-Forwarded-For is ignored; the TCP peer supplies the client IP.
+  trustedProxyCidrs: ""
 
   # Authentication configuration
   auth:

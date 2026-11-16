@@ -66,6 +66,10 @@
 			}
 		},
 		"customName": {
+			"accessLabel": "Zugriff",
+			"accessPublic": "Alle",
+			"accessInternal": "Nur interne Netzwerke",
+			"rateLimited": "Zu viele Namensprüfungen. Bitte in einer Minute erneut versuchen.",
 			"label": "Benutzerdefinierter Kurzname (optional)",
 			"placeholder": "z.B. onboarding",
 			"hint": "Kurzer Name für Ihren Link. Zum Beispiel 'onboarding'",
@@ -78,6 +82,7 @@
 			"noExpiration": "Benannte Links laufen nie ab"
 		},
 		"result": {
+			"internalAccess": "Dieser Link ist nur aus einem internen Netzwerk erreichbar.",
 			"title": "Ihre kurze URL:",
 			"expirationInfo": "Dieser Link läuft in {ttl} ab",
 			"expirationDate": "Link wird gespeichert bis {date}",

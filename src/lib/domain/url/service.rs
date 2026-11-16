@@ -204,15 +204,10 @@ where
 
         let base_url_without_slash = normalized_base_url.trim_end_matches('/');
 
-        if normalized_url == base_url_without_slash
+        !(normalized_url == base_url_without_slash
             || normalized_url.starts_with(&format!("{}/", base_url_without_slash))
             || normalized_url.starts_with(&format!("{}?", base_url_without_slash))
-            || normalized_url.starts_with(&format!("{}#", base_url_without_slash))
-        {
-            return false;
-        }
-
-        true
+            || normalized_url.starts_with(&format!("{}#", base_url_without_slash)))
     }
 
     async fn register_url(
@@ -221,6 +216,22 @@ where
         user_id: Option<i64>,
         custom_name: Option<String>,
     ) -> Result<super::model::Url, super::model::ShortUrlGenerationError> {
+        self.register_url_with_access(url, user_id, custom_name, Default::default())
+            .await
+    }
+
+    async fn register_url_with_access(
+        &self,
+        url: &str,
+        user_id: Option<i64>,
+        custom_name: Option<String>,
+        access: super::model::UrlAccess,
+    ) -> Result<super::model::Url, super::model::ShortUrlGenerationError> {
+        if custom_name.is_none() && access != super::model::UrlAccess::Public {
+            return Err(super::model::ShortUrlGenerationError::InvalidCustomName(
+                "Access mode is only supported for named URLs".into(),
+            ));
+        }
         let url = url.trim();
 
         info!(
@@ -266,6 +277,7 @@ where
             };
 
             let new_url = super::model::Url {
+                access,
                 id: hash_id,
                 original_url: url.to_string(),
                 ttl: 0, // No TTL for named URLs
@@ -313,6 +325,7 @@ where
                 }
                 Ok(None) => {
                     let new_url = super::model::Url {
+                        access: Default::default(),
                         id: short_id.clone(),
                         original_url: url.to_string(),
                         ttl: self.ttl,
@@ -370,6 +383,17 @@ where
 
         info!("url wasn't found by id or name '{}'", id);
         Ok(None)
+    }
+
+    async fn find_accessible_by_id(
+        &self,
+        id: &str,
+        is_internal: bool,
+    ) -> Result<Option<super::model::Url>, FindUrlError> {
+        Ok(self
+            .find_by_id(id)
+            .await?
+            .filter(|url| url.access.allows(is_internal)))
     }
 
     async fn check_custom_name_available(
@@ -1762,6 +1786,7 @@ mod tests {
         assert!(service.check_rate_limits(unknown_user_id).await.is_ok());
 
         db.save(&crate::domain::url::model::Url {
+            access: Default::default(),
             id: "cfgfallback".to_string(),
             original_url: "https://example.com".to_string(),
             ttl: 3600,

@@ -66,6 +66,10 @@
 			}
 		},
 		"customName": {
+			"accessLabel": "זמינות",
+			"accessPublic": "כולם",
+			"accessInternal": "רשתות פנימיות בלבד",
+			"rateLimited": "יותר מדי בדיקות שם. נסו שוב בעוד דקה.",
 			"label": "שם קצר מותאם אישית (אופציונלי)",
 			"placeholder": "לדוגמה, onboarding",
 			"hint": "שם קצר לקישור שלך. לדוגמה, 'onboarding'",
@@ -78,6 +82,7 @@
 			"noExpiration": "קישורים עם שם לא פגים לעולם"
 		},
 		"result": {
+			"internalAccess": "הקישור זמין רק מתוך רשת פנימית.",
 			"title": "הקישור הקצר שלך:",
 			"expirationInfo": "קישור זה יפוג בעוד {ttl}",
 			"expirationDate": "הקישור יישמר עד {date}",

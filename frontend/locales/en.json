@@ -66,6 +66,10 @@
 			}
 		},
 		"customName": {
+			"accessLabel": "Availability",
+			"accessPublic": "Everyone",
+			"accessInternal": "Internal networks only",
+			"rateLimited": "Too many name checks. Please try again in a minute.",
 			"label": "Custom short name (optional)",
 			"placeholder": "e.g., onboarding",
 			"hint": "Short name for your link. For example, 'onboarding'",
@@ -78,6 +82,7 @@
 			"noExpiration": "Named links never expire"
 		},
 		"result": {
+			"internalAccess": "This link is only available from an internal network.",
 			"title": "Your short url:",
 			"expirationInfo": "This link will expire in {ttl}",
 			"expirationDate": "Link will be stored until {date}",

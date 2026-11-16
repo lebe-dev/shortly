@@ -1,3 +1,5 @@
+export type UrlAccess = 'public' | 'internal';
+
 export interface SessionDto {
 	authenticated: boolean;
 	user?: UserInfoDto;
@@ -44,6 +46,8 @@ export class AppConfig {
 }
 
 export class NamedUrlsConfig {
+	defaultAccess: UrlAccess = 'public';
+	allowAccessOverride: boolean = false;
 	constructor(enabled: boolean, minLength: number, maxLength: number, reservedNames: string[]) {
 		this.enabled = enabled;
 		this.minLength = minLength;

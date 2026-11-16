@@ -23,6 +23,11 @@ data:
   FEATURES_NAMED_URLS_ENABLED: {{ .Values.config.features.namedUrls.enabled | quote }}
   FEATURES_NAMED_URLS_MIN_LENGTH: {{ .Values.config.features.namedUrls.minLength | quote }}
   FEATURES_NAMED_URLS_MAX_LENGTH: {{ .Values.config.features.namedUrls.maxLength | quote }}
+  NAMED_URL_DEFAULT_ACCESS: {{ .Values.config.features.namedUrls.defaultAccess | quote }}
+  NAMED_URL_ALLOW_ACCESS_OVERRIDE: {{ .Values.config.features.namedUrls.allowAccessOverride | quote }}
+  NAMED_URL_CHECK_RATE_LIMIT: {{ .Values.config.features.namedUrls.checkRateLimit | quote }}
+  INTERNAL_NETWORK_CIDRS: {{ .Values.config.internalNetworkCidrs | quote }}
+  TRUSTED_PROXY_CIDRS: {{ .Values.config.trustedProxyCidrs | quote }}
   AUTH_ENABLED: {{ .Values.config.auth.enabled | quote }}
   AUTH_TYPE: {{ .Values.config.auth.type | quote }}
   {{- if .Values.config.auth.note }}

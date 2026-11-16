@@ -17,6 +17,14 @@ path = "src/bin/server/main.rs"
 name = "server_lib"
 path = "src/lib/lib.rs"
 
+[features]
+postgres-integration = []
+
+[[test]]
+name = "postgres"
+path = "tests/postgres.rs"
+required-features = ["postgres-integration"]
+
 [dependencies]
 anyhow = "1.0.100"
 thiserror = { version = "2.0.17" }
@@ -26,6 +34,7 @@ config = { version = "0.15.19", features = ["yaml"] }
 chrono = "0.4.42"
 rand = "0.8.5"
 base62 = "2.2.3"
+ipnet = "2"
 url = "2.5.7"
 
 axum = { version = "0.8.7", features = ["json", "http1", "tokio"] }
@@ -55,6 +64,8 @@ uuid = { version = "1", features = ["v4", "serde"] }
 base64 = "0.22"
 
 [dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
 env_logger = "0.11.8"
 tempfile = "3.23.0"
 serial_test = "3.2.0"
+testcontainers = "0.28.0"
