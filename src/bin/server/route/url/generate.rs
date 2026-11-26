@@ -93,7 +93,7 @@ pub async fn generate_short_url_route(
         }
         Err(e) => match e {
             ShortUrlGenerationError::InvalidOriginalUrl => {
-                error!("invalid original url '{}'", request.url);
+                error!("invalid original URL");
                 (StatusCode::BAD_REQUEST, "Invalid URL").into_response()
             }
             ShortUrlGenerationError::InvalidCustomName(msg) => {
@@ -135,7 +135,7 @@ pub async fn generate_short_url_route(
                     .into_response()
             }
             _ => {
-                error!("{:?}", e);
+                error!("failed to register URL");
                 (StatusCode::INTERNAL_SERVER_ERROR).into_response()
             }
         },

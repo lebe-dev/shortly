@@ -278,15 +278,22 @@ fn error_response(error: PasskeyError) -> Response {
         PasskeyError::CredentialAlreadyRegistered => {
             (StatusCode::CONFLICT, "passkey_already_registered")
         }
-        PasskeyError::Webauthn(_) => (StatusCode::BAD_REQUEST, "webauthn_failed"),
+        PasskeyError::Webauthn(_) => {
+            return json_error(
+                StatusCode::BAD_REQUEST,
+                "webauthn_failed",
+                "WebAuthn ceremony failed",
+            );
+        }
         PasskeyError::DatabaseError(_) | PasskeyError::Unknown(_) => {
-            (StatusCode::INTERNAL_SERVER_ERROR, "internal_error")
+            error!("passkey request failed with an internal error");
+            return json_error(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "internal_error",
+                "Passkey request failed",
+            );
         }
     };
-
-    if status == StatusCode::INTERNAL_SERVER_ERROR {
-        error!("passkey request failed: {}", error);
-    }
 
     json_error(status, code, &error.to_string())
 }
@@ -300,4 +307,36 @@ fn json_error(status: StatusCode, code: &str, message: &str) -> Response {
         })),
     )
         .into_response()
+}
+
+#[cfg(test)]
+mod tests {
+    use axum::body::to_bytes;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn error_responses_omit_internal_details() {
+        let cases = [
+            (
+                PasskeyError::Unknown(anyhow::anyhow!("private database detail")),
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "internal_error",
+            ),
+            (
+                PasskeyError::Webauthn("private challenge detail".into()),
+                StatusCode::BAD_REQUEST,
+                "webauthn_failed",
+            ),
+        ];
+
+        for (error, status, code) in cases {
+            let response = error_response(error);
+            assert_eq!(response.status(), status);
+            let body = to_bytes(response.into_body(), 1024).await.unwrap();
+            let json: serde_json::Value = serde_json::from_slice(&body).unwrap();
+            assert_eq!(json["code"], code);
+            assert!(!json["message"].as_str().unwrap().contains("private"));
+        }
+    }
 }

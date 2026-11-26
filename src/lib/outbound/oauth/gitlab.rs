@@ -36,7 +36,10 @@ impl GitlabOAuthClient {
         redirect_uri: String,
     ) -> Self {
         Self {
-            client: Client::new(),
+            client: Client::builder()
+                .redirect(reqwest::redirect::Policy::none())
+                .build()
+                .expect("failed to initialize GitLab HTTP client"),
             base_url,
             application_id,
             secret,
@@ -60,17 +63,20 @@ impl OAuthClient for GitlabOAuthClient {
                 ("redirect_uri", self.redirect_uri.as_str()),
             ])
             .send()
-            .await?;
+            .await
+            .map_err(|_| AuthError::OAuthFailed("Token request failed".into()))?;
 
         if !response.status().is_success() {
-            let error_text = response.text().await.unwrap_or_default();
             return Err(AuthError::OAuthFailed(format!(
-                "Token exchange failed: {}",
-                error_text
+                "Token request returned HTTP {}",
+                response.status().as_u16()
             )));
         }
 
-        let token_response: TokenResponse = response.json().await?;
+        let token_response: TokenResponse = response
+            .json()
+            .await
+            .map_err(|_| AuthError::OAuthFailed("Invalid token response".into()))?;
         Ok(token_response.access_token)
     }
 
@@ -80,15 +86,19 @@ impl OAuthClient for GitlabOAuthClient {
         let response = self
             .client
             .get(&user_url)
-            .header("Authorization", format!("Bearer {}", access_token))
+            .bearer_auth(access_token)
             .send()
-            .await?;
+            .await
+            .map_err(|_| AuthError::UserInfoFailed)?;
 
         if !response.status().is_success() {
             return Err(AuthError::UserInfoFailed);
         }
 
-        let gitlab_user: GitlabApiUser = response.json().await?;
+        let gitlab_user: GitlabApiUser = response
+            .json()
+            .await
+            .map_err(|_| AuthError::UserInfoFailed)?;
 
         Ok(GitlabUserInfo {
             id: gitlab_user.id,

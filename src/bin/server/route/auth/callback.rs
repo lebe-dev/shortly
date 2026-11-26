@@ -1,10 +1,11 @@
 use axum::{
     extract::{Query, State},
-    http::{StatusCode, header},
+    http::{HeaderValue, StatusCode, header},
     response::{IntoResponse, Redirect},
 };
 use axum_extra::extract::cookie::{Cookie, SameSite};
 use serde::Deserialize;
+use server_lib::domain::auth::model::AuthError;
 use server_lib::domain::auth::ports::AuthService;
 use server_lib::domain::url::audit::{AuditEventType, UrlAuditEvent};
 use server_lib::domain::url::ports::UrlService;
@@ -32,7 +33,7 @@ pub async fn callback_route(
         None => return (StatusCode::INTERNAL_SERVER_ERROR).into_response(),
     };
 
-    match auth_service.complete_oauth(&query.code, &query.state).await {
+    let mut response = match auth_service.complete_oauth(&query.code, &query.state).await {
         Ok((user, session)) => {
             let timestamp = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
@@ -57,7 +58,7 @@ pub async fn callback_route(
                 .max_age(Duration::days(30))
                 .same_site(SameSite::Lax)
                 .http_only(true)
-                .secure(false) // Set to true in production with HTTPS
+                .secure(state.config.base_url.starts_with("https://"))
                 .build();
 
             (
@@ -69,9 +70,21 @@ pub async fn callback_route(
             )
                 .into_response()
         }
-        Err(e) => {
-            log::error!("OAuth callback failed: {:?}", e);
+        Err(error) => {
+            match error {
+                AuthError::OAuthFailed(_) | AuthError::UserInfoFailed => {
+                    log::error!("OAuth callback failed: {error}");
+                }
+                _ => log::error!("OAuth callback failed"),
+            }
             Redirect::temporary("/login?error=auth_failed").into_response()
         }
-    }
+    };
+    let headers = response.headers_mut();
+    headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
+    headers.insert(
+        header::REFERRER_POLICY,
+        HeaderValue::from_static("no-referrer"),
+    );
+    response
 }

@@ -234,11 +234,6 @@ where
         }
         let url = url.trim();
 
-        info!(
-            "registering url '{}' with custom_name: {:?}",
-            url, custom_name
-        );
-
         if !self.is_url_valid(url).await {
             return Err(super::model::ShortUrlGenerationError::InvalidOriginalUrl);
         }
@@ -299,10 +294,7 @@ where
             };
             self.repo.record_audit_event(&audit_event).await?;
 
-            info!(
-                "registered named url '{}' -> '{}' with hash '{}'",
-                url, name, new_url.id
-            );
+            info!("registered named URL with id '{}'", new_url.id);
             return Ok(new_url);
         }
 
@@ -349,11 +341,10 @@ where
                         self.repo.record_audit_event(&audit_event).await?;
                     }
 
-                    info!("registered url '{}' with id '{}'", url, short_id);
+                    info!("registered URL with id '{}'", short_id);
                     return Ok(new_url);
                 }
                 Err(e) => {
-                    error!("failed to register url '{}': {}", url, e);
                     return Err(super::model::ShortUrlGenerationError::from(e));
                 }
             }

@@ -90,13 +90,13 @@ where
             urlencoding::encode(&state)
         );
 
-        info!("Generated OAuth URL with state: {}", state);
+        info!("Generated OAuth authorization URL");
 
         Ok((auth_url, state))
     }
 
     async fn complete_oauth(&self, code: &str, _state: &str) -> Result<(User, Session), AuthError> {
-        info!("Completing OAuth flow with code");
+        info!("Exchanging OAuth authorization code");
 
         let access_token = self.oauth_client.exchange_code(code).await?;
 

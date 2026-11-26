@@ -94,7 +94,12 @@ async fn main() -> anyhow::Result<()> {
     if let Err(e) = dotenvy::dotenv()
         && !e.not_found()
     {
-        eprintln!("failed to load .env file: {}", e);
+        match e {
+            dotenvy::Error::LineParse(_, column) => {
+                eprintln!("failed to parse .env file at column {column}");
+            }
+            _ => eprintln!("failed to load .env file"),
+        }
         std::process::exit(1);
     }
 
@@ -108,7 +113,7 @@ async fn main() -> anyhow::Result<()> {
             let logging_config = get_logging_config(&app_config.log_level, &app_config.log_target);
             log4rs::init_config(logging_config).expect("unable to init logging configuration");
 
-            info!("config: {}", app_config);
+            info!("configuration loaded");
 
             let db = Database::from_connection_string(&app_config.db_cnn)
                 .await
@@ -340,7 +345,6 @@ async fn main() -> anyhow::Result<()> {
             );
 
             println!("- Bind: http://{bind}");
-            println!("- URL: {}", app_config.base_url);
 
             axum::serve(
                 listener,
@@ -351,8 +355,8 @@ async fn main() -> anyhow::Result<()> {
 
             Ok(())
         }
-        Err(e) => {
-            eprintln!("failed to load configuration: {}", e);
+        Err(_) => {
+            eprintln!("failed to load config.yml; check the file and environment overrides");
             std::process::exit(1);
         }
     }
@@ -372,7 +376,7 @@ fn build_passkey_service(
         return Ok(None);
     };
 
-    info!("passkey authentication enabled: {}", passkey_config);
+    info!("passkey authentication enabled");
 
     let service = PasskeyServiceImpl::new(
         PasskeyServiceConfig {
@@ -446,7 +450,7 @@ async fn static_handler(
             .await
         {
             Ok(Some(url)) => {
-                info!("redirecting short URL '{}' to '{}'", path, url.original_url);
+                info!("redirecting short URL '{}'", path);
 
                 let url_id = url.id.clone();
                 let user_repo = state.user_repository.clone();

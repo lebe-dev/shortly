@@ -30,6 +30,9 @@ limit_req_zone $binary_remote_addr zone=create_url:10m rate=2r/s;
 # Connection limiting: max 10 concurrent connections per IP
 limit_conn_zone $binary_remote_addr zone=addr:10m;
 
+log_format shortly '$remote_addr [$time_local] "$request_method $uri $server_protocol" '
+                   '$status $body_bytes_sent';
+
 upstream shortly_backend {
     server 127.0.0.1:31100;  # Docker setup (port 31100:8080)
     # server 127.0.0.1:8080; # Direct run (uncomment if not using Docker)
@@ -41,6 +44,7 @@ upstream shortly_backend {
 server {
     listen 80;
     server_name shortly.example.com;
+    access_log /var/log/nginx/shortly_access.log shortly;
 
     # Redirect all HTTP to HTTPS
     return 301 https://$server_name$request_uri;
@@ -85,7 +89,7 @@ server {
     limit_req zone=general burst=20 nodelay;
 
     # Logging
-    access_log /var/log/nginx/shortly_access.log;
+    access_log /var/log/nginx/shortly_access.log shortly;
     error_log /var/log/nginx/shortly_error.log;
 
     # Maximum request body size

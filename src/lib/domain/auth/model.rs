@@ -15,7 +15,7 @@ pub struct User {
     pub max_urls_per_day: i32,
 }
 
-#[derive(Debug, Clone, FromRow)]
+#[derive(Clone, FromRow)]
 pub struct Session {
     pub id: i64,
     pub token: String,
@@ -23,6 +23,18 @@ pub struct Session {
     pub created_at: i64,
     pub last_used_at: i64,
     pub expires_at: Option<i64>,
+}
+
+impl std::fmt::Debug for Session {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Session")
+            .field("id", &self.id)
+            .field("user_id", &self.user_id)
+            .field("created_at", &self.created_at)
+            .field("last_used_at", &self.last_used_at)
+            .field("expires_at", &self.expires_at)
+            .finish_non_exhaustive()
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

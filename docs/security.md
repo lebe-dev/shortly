@@ -5,7 +5,9 @@
 - Enable [authentication](configuration/gitlab.md)
 - Use [nginx](configuration/nginx.md) with ip rate limiting in front of Shortly app.
 
-PostgreSQL startup errors omit the connection string to keep credentials out of application logs.
+Startup errors omit database connection strings and configuration values. OAuth errors omit provider response bodies and credentials. Application logs identify shortened links by their short IDs.
+
+The bundled nginx access log omits query strings and Referer headers. It records callback status codes and suppresses callback-specific nginx errors that may contain the full request URI. Review access and error logging in external proxies and ingress controllers before forwarding their logs to an external service.
 
 ## Image scan (CVE status)
 

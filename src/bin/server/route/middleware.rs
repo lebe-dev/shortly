@@ -67,8 +67,8 @@ pub async fn auth_middleware(
                     request.extensions_mut().insert(user);
                     return next.run(request).await;
                 }
-                Err(e) => {
-                    debug!("session validation failed: {:?}", e);
+                Err(_) => {
+                    debug!("session validation failed");
                 }
             }
         }
@@ -92,8 +92,8 @@ pub async fn auth_middleware(
                             debug!("Optional auth successful for user: {}", user.username);
                             request.extensions_mut().insert(user);
                         }
-                        Err(e) => {
-                            debug!("optional auth failed, continuing anonymously: {:?}", e);
+                        Err(_) => {
+                            debug!("optional auth failed, continuing anonymously");
                         }
                     }
                 }
@@ -139,11 +139,8 @@ pub async fn auth_middleware(
             request.extensions_mut().insert(user);
             next.run(request).await
         }
-        Err(e) => {
-            debug!(
-                "session validation failed for '{}' '{}': {:?}",
-                method, path, e
-            );
+        Err(_) => {
+            debug!("session validation failed for '{}' '{}'", method, path);
             unauthorized_response()
         }
     }

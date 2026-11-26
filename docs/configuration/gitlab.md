@@ -38,6 +38,8 @@ Shortly supports GitLab OAuth authentication, allowing users to log in using the
 
 ## Step 2: Configure Shortly
 
+Use the canonical HTTPS base URL for GitLab. Shortly uses it directly for token exchange and user lookup and treats redirects as errors.
+
 ### Configuration File Method
 
 Edit your `config.yml`:

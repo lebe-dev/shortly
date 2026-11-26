@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use anyhow::Context;
+use anyhow::anyhow;
 use sqlx::{SqlitePool, sqlite::SqliteConnectOptions};
 
 #[derive(Debug, Clone)]
@@ -16,13 +16,26 @@ impl Sqlite {
     pub async fn new(path: &str) -> Result<Sqlite, anyhow::Error> {
         let pool = SqlitePool::connect_with(
             SqliteConnectOptions::from_str(path)
-                .with_context(|| format!("invalid database path {}", path))?
+                .map_err(|_| anyhow!("Invalid SQLite connection string"))?
                 .pragma("foreign_keys", "ON")
                 .pragma("journal_mode", "WAL"),
         )
         .await
-        .with_context(|| format!("failed to open database at {}", path))?;
+        .map_err(|_| anyhow!("Failed to open SQLite database"))?;
 
         Ok(Sqlite { pool })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Sqlite;
+
+    #[tokio::test]
+    async fn invalid_connection_string_omits_secrets() {
+        let path = "sqlite://temporary.db?mode=sqlite-test-secret";
+        let error = Sqlite::new(path).await.unwrap_err();
+
+        assert_eq!(format!("{error:#}"), "Invalid SQLite connection string");
     }
 }

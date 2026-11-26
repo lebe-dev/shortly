@@ -1,4 +1,4 @@
-use anyhow::Context;
+use anyhow::anyhow;
 use sqlx::PgPool;
 
 #[derive(Debug, Clone)]
@@ -14,7 +14,7 @@ impl Postgres {
     pub async fn new(url: &str) -> Result<Postgres, anyhow::Error> {
         let pool = PgPool::connect(url)
             .await
-            .context("Failed to connect to PostgreSQL")?;
+            .map_err(|_| anyhow!("Failed to connect to PostgreSQL"))?;
 
         Ok(Postgres { pool })
     }
