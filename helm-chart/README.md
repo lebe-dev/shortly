@@ -341,7 +341,7 @@ Control Kubernetes liveness, readiness, and startup probes for both containers.
 replicaCount: 1
 
 image:
-  tag: "1.6.0"
+  tag: "1.6.1"
 
 config:
   baseUrl: "https://go.company.com"

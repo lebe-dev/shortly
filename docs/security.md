@@ -5,6 +5,8 @@
 - Enable [authentication](configuration/gitlab.md)
 - Use [nginx](configuration/nginx.md) with ip rate limiting in front of Shortly app.
 
+PostgreSQL startup errors omit the connection string to keep credentials out of application logs.
+
 ## Image scan (CVE status)
 
 ```bash
